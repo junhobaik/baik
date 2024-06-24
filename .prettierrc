@@ -3,5 +3,18 @@
   "printWidth": 120,
   "useTabs": false,
   "tabWidth": 2,
-  "semi": true
+  "semi": true,
+  "plugins": ["@trivago/prettier-plugin-sort-imports"],
+  "importOrder": [
+    "^(react/(.*)$)|^(react$)|^(react-dom/(.*)$)|^(react-dom$)",
+    "^next/(.*)$",
+    "<THIRD_PARTY_MODULES>",
+    "^@[./]",
+    "^[./]",
+    "^@/[./]",
+    "^(?!.*[.]css$)[./].*$",
+    ".css$"
+  ],
+  "importOrderSeparation": true,
+  "importOrderSortSpecifiers": true
 }
