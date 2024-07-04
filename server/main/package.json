@@ -7,7 +7,7 @@
     "api": "sam local start-api --port 4000",
     "build": "tsup",
     "watch": "tsup --watch",
-    "archive": "pnpm --filter @baik/main-server build && zip -rj \"../../zip_builds/main-server-$(date +\"%Y%m%d%H%M%S\").zip\" ./dist/*"
+    "archive": "tsup && zip -rj \"../../zip_builds/main-server-$(date +\"%Y%m%d%H%M%S\").zip\" ./dist/*"
   },
   "keywords": [],
   "author": "",
