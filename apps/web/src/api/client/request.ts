@@ -1,6 +1,6 @@
 import { getSession } from 'next-auth/react';
 
-const BASE_URL = `http://127.0.0.1:4000/local`;
+const BASE_URL = `https://bx7cbjmv1k.execute-api.ap-northeast-2.amazonaws.com/dev`;
 
 interface RequestParam {
   module: string;

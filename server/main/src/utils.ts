@@ -42,7 +42,7 @@ export const runModuleAction = async <M extends Modules, A extends ModuleActions
 
   try {
     // Authenticated
-    if (targetAction.skip_auth) {
+    if (!targetAction.skip_auth) {
       if (!sessionToken) return createErrorResponse(401, 'Unauthorized, session token is required');
 
       const authResponse = await auth.verifySession.run({ sessionToken });
@@ -53,7 +53,10 @@ export const runModuleAction = async <M extends Modules, A extends ModuleActions
     return createSuccessResponse(res);
   } catch (err) {
     console.error(`Error in runModuleAction [${body.module}>${body.action}]:`, err);
-    return createErrorResponse(500, 'Internal server error');
+    return createErrorResponse(500, 'Internal server error!' + (err as any).message, {
+      code: 'INTERNAL_SERVER_ERROR',
+      message: err as any,
+    });
   }
 };
 
@@ -70,10 +73,14 @@ const isValidEventBody = <M extends Modules, A extends ModuleActions<M>>(body: a
   );
 };
 
-const createErrorResponse = (statusCode: number, message: string): ActionResult => {
+const createErrorResponse = (
+  statusCode: number,
+  message: string,
+  error?: { code?: string; message?: string },
+): ActionResult => {
   return {
     statusCode,
-    body: JSON.stringify({ status: statusCode, message }),
+    body: JSON.stringify({ status: statusCode, message, error }),
   };
 };
 

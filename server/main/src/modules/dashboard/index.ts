@@ -47,9 +47,6 @@ const updateBookmarkGroup = async (args: { id: string } & Partial<BookmarkGroupB
   const { id, ...updateData } = args;
   const now = Date.now();
 
-  console.log('Updating bookmark group with id:', id);
-  console.log('Update data:', updateData);
-
   const queryParams = {
     tableName,
     keyConditionExpression: 'pk = :pkValue',
@@ -60,12 +57,9 @@ const updateBookmarkGroup = async (args: { id: string } & Partial<BookmarkGroupB
   };
 
   try {
-    console.log('Querying for existing bookmark group');
     const queryResult = await db.queryItems(queryParams);
-    console.log('Query result:', queryResult);
 
     if (!queryResult.items || queryResult.items.length === 0) {
-      console.log('Bookmark group not found');
       return {
         message: 'Bookmark group not found',
         error: {
@@ -90,10 +84,6 @@ const updateBookmarkGroup = async (args: { id: string } & Partial<BookmarkGroupB
       expressionAttributeNames[`#${key}`] = key;
     });
 
-    console.log('Update expression:', updateExpression);
-    console.log('Expression attribute values:', expressionAttributeValues);
-    console.log('Expression attribute names:', expressionAttributeNames);
-
     const params = {
       tableName,
       key: {
@@ -106,12 +96,9 @@ const updateBookmarkGroup = async (args: { id: string } & Partial<BookmarkGroupB
       returnValues: 'ALL_NEW',
     };
 
-    console.log('Updating item with params:', params);
     const result = await db.updateItem(params);
-    console.log('Update result:', result);
 
     if (!result) {
-      console.log('Failed to update bookmark group: No result returned');
       throw new Error('Failed to update bookmark group');
     }
 
@@ -120,7 +107,6 @@ const updateBookmarkGroup = async (args: { id: string } & Partial<BookmarkGroupB
       message: 'Bookmark group updated successfully',
     };
   } catch (error) {
-    console.error('Error updating bookmark group:', error);
     return {
       message: 'Failed to update bookmark group',
       error: {
@@ -243,7 +229,6 @@ const getAllBookmarkGroups = async (args: {
   limit?: number;
   lastEvaluatedKey?: Record<string, any>;
 }): Promise<ActionResult> => {
-  console.log('getAllBookmarkGroups args:', args);
   const { limit = 50, lastEvaluatedKey } = args;
 
   const params = {
@@ -283,22 +268,22 @@ const getAllBookmarkGroups = async (args: {
 export default {
   createBookmarkGroup: {
     run: createBookmarkGroup,
-    skipAuth: false,
+    skip_auth: false,
   },
   updateBookmarkGroup: {
     run: updateBookmarkGroup,
-    skipAuth: false,
+    skip_auth: false,
   },
   deleteBookmarkGroup: {
     run: deleteBookmarkGroup,
-    skipAuth: false,
+    skip_auth: false,
   },
   getBookmarkGroup: {
     run: getBookmarkGroup,
-    skipAuth: false,
+    skip_auth: false,
   },
   getAllBookmarkGroups: {
     run: getAllBookmarkGroups,
-    skipAuth: false,
+    skip_auth: false,
   },
 };

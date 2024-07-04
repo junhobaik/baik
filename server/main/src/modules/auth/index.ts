@@ -1,4 +1,6 @@
 // src/modules/auth/index.ts
+import type { ActionResult } from '@baik/types';
+
 import db from '../../db';
 
 const tableName = 'baik-auth';

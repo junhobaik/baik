@@ -88,7 +88,7 @@ const ApiTest = () => {
             if (!list.length) return;
 
             const res = await api.client.dashboard.updateBookmarkGroup({
-              id: list[list.length - 1].id,
+              id: list[0].id,
               title: 'Updated Title',
               items: [{ id: uuidv4(), title: 'bookmark item', url: 'https://example.com' }],
             });
