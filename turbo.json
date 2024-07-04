@@ -1,5 +1,6 @@
 {
   "$schema": "https://turbo.build/schema.json",
+  "ui": "tui",
   "tasks": {
     "dev": {
       "cache": false,
@@ -18,6 +19,15 @@
     },
     "api": {
       "persistent": true,
+      "cache": false
+    },
+
+    "archive": {
+      "dependsOn": ["^build"]
+    },
+
+    "main-server#archive": {
+      "dependsOn": ["^build"],
       "cache": false
     }
   }

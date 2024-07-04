@@ -1,6 +1,8 @@
 {
   "cSpell.words": [
     "BOOKMARKGROUP",
-    "nextui"
+    "nextui",
+    "treeshake",
+    "tsup"
   ]
 }

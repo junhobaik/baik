@@ -1,13 +1,13 @@
 {
-  "name": "main-server",
+  "name": "@baik/main-server",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
     "api": "sam local start-api --port 4000",
-    "build": "rm -rf ./dist && esbuild ./src/index.ts --bundle --minify --keep-names --platform=node --target=esnext --format=esm --out-extension:.js=.mjs --banner:js=\"import { createRequire } from 'module';const require = createRequire(import.meta.url);\" --outdir=./dist",
-    "watch": "rm -rf ./dist && esbuild --watch ./src/index.ts --bundle --minify --keep-names --platform=node --target=esnext --format=esm --out-extension:.js=.mjs --banner:js=\"import { createRequire } from 'module';const require = createRequire(import.meta.url);\" --outdir=./dist",
-    "archive": "rm -rf node_modules && npm i && rm package-lock.json && zip -rj \"../../../zip_builds/main-server-$(date +\"%Y%m%d%H%M%S\").zip\" ./dist/*"
+    "build": "tsup",
+    "watch": "tsup --watch",
+    "archive": "pnpm --filter @baik/main-server build && zip -rj \"../../zip_builds/main-server-$(date +\"%Y%m%d%H%M%S\").zip\" ./dist/*"
   },
   "keywords": [],
   "author": "",
@@ -20,13 +20,14 @@
     "@babel/core": "^7.24.7",
     "@babel/preset-env": "^7.24.7",
     "@babel/preset-typescript": "^7.24.7",
+    "@baik/types": "workspace:*",
     "@tsconfig/node20": "^20.1.4",
     "@types/aws-lambda": "^8.10.140",
     "@types/bcryptjs": "^2.4.6",
     "@types/node": "^20.14.9",
     "@types/uuid": "^10.0.0",
     "esbuild": "^0.22.0",
-    "@baik/types": "workspace:*"
+    "tsup": "^8.1.0"
   },
   "dependencies": {
     "uuid": "^10.0.0"
