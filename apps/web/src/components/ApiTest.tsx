@@ -2,7 +2,7 @@
 
 import React from 'react';
 
-import { BookmarkGroup, ClipArticleBase, PostArticleBase, ShortsArticleBase } from '@baik/types';
+import { Article, BookmarkGroup, ClipArticleBase, PostArticleBase, ShortsArticleBase } from '@baik/types';
 import { Button } from '@nextui-org/react';
 import { getSession } from 'next-auth/react';
 import { v4 as uuidv4 } from 'uuid';
@@ -237,6 +237,9 @@ const ApiTest = () => {
           onClick={async () => {
             const res1 = await api.client.archive.getAllArticlesPublic();
             console.log('default', res1);
+
+            const res2 = await api.client.archive.getAllArticlesPublic({ orderBy: 'updated_date' });
+            console.log('orderBy: updated_date', res2);
           }}
         >
           getAllArticlesPublic
@@ -286,7 +289,7 @@ const ApiTest = () => {
             const res1 = await api.client.archive.getAllArticles();
             if (!res1.data?.items?.length) return;
 
-            const item = res1.data?.items[0];
+            const item = res1.data?.items.find((v: Article) => (v as any).pathname);
 
             const res = await api.client.archive.getArticlesByPathname({ pathname: item.pathname });
             console.log('default', res);

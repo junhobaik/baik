@@ -142,6 +142,7 @@ export const getArticlesByPathnamePublic = async (args: {
 
 export const getAllArticlesPublic = async (args?: {
   limit?: number;
+  orderBy?: 'created_at' | 'updated_date';
   lastEvaluatedKey?: Record<string, any>;
 }): Promise<ActionResult> => {
   const param = {
