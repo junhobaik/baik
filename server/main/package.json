@@ -6,7 +6,7 @@
   "scripts": {
     "api": "sam local start-api --port 4000",
     "build": "tsup",
-    "watch": "tsup --watch",
+    "watch": "tsup --config tsup.dev.config.ts --watch",
     "archive": "tsup && zip -rj \"../../zip_builds/main-server-$(date +\"%Y%m%d%H%M%S\").zip\" ./dist/*"
   },
   "keywords": [],
