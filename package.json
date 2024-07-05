@@ -4,6 +4,7 @@
   "description": "",
   "scripts": {
     "preinstall": "pnpm dlx only-allow pnpm",
+    "web": "pnpm exec turbo dev --filter=@baik/web",
     "main-server:archive": "pnpm exec turbo archive --filter=@baik/main-server"
   },
   "keywords": [],
