@@ -5,26 +5,10 @@ import React, { useMemo, useState } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 
-import { Input } from '@nextui-org/react';
-import {
-  IconAlignLeft,
-  IconBookmark,
-  IconCaretLeft,
-  IconChevronLeft,
-  IconChevronRight,
-  IconHome,
-  IconNews,
-  IconRss,
-  IconSearch,
-  IconToggleLeft,
-} from '@tabler/icons-react';
+import { IconBookmark, IconChevronLeft, IconChevronRight, IconHome, IconNews, IconRss } from '@tabler/icons-react';
 import styled from 'styled-components';
 
-interface SidebarProps {
-  className?: string;
-}
-
-const Sidebar = (props: SidebarProps) => {
+const Sidebar = () => {
   const [collapsed, setCollapsed] = useState(false);
   const searchParams = useSearchParams();
   const path = useMemo(() => searchParams.get('path'), [searchParams]);
@@ -45,10 +29,6 @@ const Sidebar = (props: SidebarProps) => {
       <div className="logo-container">
         <div className="logo-box" />
         <p className="logo-text">Baik</p>
-      </div>
-
-      <div className="search-container">
-        <Input size="sm" placeholder="Search field" startContent={<IconSearch size={20} />} />
       </div>
 
       <div className="section-container">
@@ -142,7 +122,8 @@ const SidebarStyled = styled.div`
     display: flex;
     align-items: center;
     height: 32px;
-    padding: 0 16px;
+    padding: 0 16px 0 16px;
+    margin-bottom: 16px;
     position: relative;
 
     .logo-box {
@@ -157,12 +138,6 @@ const SidebarStyled = styled.div`
       font-size: 18px;
       font-weight: bold;
     }
-  }
-
-  .search-container {
-    padding-top: 16px;
-    padding-left: 16px;
-    padding-right: 16px;
   }
 
   .section-container {
