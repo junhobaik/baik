@@ -1,4 +1,4 @@
-// src/db.ts
+// server/main/src/db.ts
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
 import {
   BatchGetCommand,

@@ -8,8 +8,12 @@ const tableName = 'baik-dashboard';
 
 const createBookmarkGroup = async (args: BookmarkGroupBase): Promise<ActionResult> => {
   const now = Date.now();
+  const id = uuidv4();
+
   const newBookmarkGroup: BookmarkGroup = {
     ...args,
+    pk: `BOOKMARKGROUP#${id}`,
+    sk: `BOOKMARKGROUP#${now}#${id}`,
     id: uuidv4(),
     data_type: 'bookmarkGroup',
     created_at: now,
@@ -18,11 +22,7 @@ const createBookmarkGroup = async (args: BookmarkGroupBase): Promise<ActionResul
 
   const params = {
     tableName,
-    item: {
-      pk: `BOOKMARKGROUP#${newBookmarkGroup.id}`,
-      sk: `BOOKMARKGROUP#${newBookmarkGroup.created_at}#${newBookmarkGroup.id}`,
-      ...newBookmarkGroup,
-    },
+    item: newBookmarkGroup,
   };
 
   try {

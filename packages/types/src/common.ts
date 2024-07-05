@@ -1,8 +1,10 @@
 // packages/types/src/common.ts
 
-export type DataTypes = 'bookmarkGroup' | 'feed' | 'session';
+export type DataTypes = 'bookmarkGroup' | 'feed' | 'article';
 
 export interface DefaultDBAttributes {
+  pk: string;
+  sk: string;
   id: string;
   data_type: DataTypes;
   created_at: number;

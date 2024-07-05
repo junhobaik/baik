@@ -1,3 +1,4 @@
+// apps/web/src/api/client/dashboard.ts
 import type { ActionResult, BookmarkGroup, DefaultDBAttributes } from '@baik/types';
 
 import { request } from './request';
