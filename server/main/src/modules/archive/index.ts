@@ -496,6 +496,52 @@ const getArticlesByPathname = async (args: {
   }
 };
 
+const getAllArticlesPublic = async (args?: {
+  orderBy?: 'created_at' | 'updated_date';
+  limit?: number;
+  lastEvaluatedKey?: Record<string, any>;
+}): Promise<ActionResult> => {
+  const { orderBy = 'created_at', limit = 50, lastEvaluatedKey } = args || {};
+
+  const sortKey = orderBy === 'created_at' ? 'GSI1SK' : 'GSI2SK';
+  const params = {
+    tableName,
+    indexName: 'AllArticlesIndex',
+    keyConditionExpression: 'GSI1PK = :gsi1pk',
+    filterExpression: '#status = :status',
+    expressionAttributeNames: {
+      '#status': 'status',
+    },
+    expressionAttributeValues: {
+      ':gsi1pk': 'ARTICLE',
+      ':status': 'published',
+    },
+    limit,
+    exclusiveStartKey: lastEvaluatedKey,
+  };
+
+  try {
+    const result = await db.queryItems(params);
+    return {
+      data: {
+        success: true,
+        items: result.items,
+        lastEvaluatedKey: result.lastEvaluatedKey,
+      },
+      message: 'Articles retrieved successfully',
+    };
+  } catch (error) {
+    console.error('Error retrieving all articles:', error);
+    return {
+      message: 'Failed to retrieve all articles',
+      error: {
+        code: 'ARCHIVE>ARTICLE>RETRIEVE_ALL_ERROR',
+        message: error instanceof Error ? error.message : String(error),
+      },
+    };
+  }
+};
+
 const getArticlesByPathnamePublic = async (args: {
   pathname: string;
   limit?: number;
@@ -507,7 +553,10 @@ const getArticlesByPathnamePublic = async (args: {
     tableName,
     indexName: 'PathnameIndex',
     keyConditionExpression: 'GSI4PK = :gsi4pk and GSI4SK = :gsi4sk',
-    filterExpression: 'status = :status',
+    filterExpression: '#status = :status',
+    expressionAttributeNames: {
+      '#status': 'status',
+    },
     expressionAttributeValues: {
       ':gsi4pk': 'ARTICLE',
       ':gsi4sk': `PATHNAME#${pathname}`,
@@ -533,47 +582,6 @@ const getArticlesByPathnamePublic = async (args: {
       message: 'Failed to retrieve articles by pathname',
       error: {
         code: 'ARCHIVE>ARTICLE>RETRIEVE_BY_PATHNAME_ERROR',
-        message: error instanceof Error ? error.message : String(error),
-      },
-    };
-  }
-};
-
-const getAllArticlesPublic = async (args?: {
-  limit?: number;
-  lastEvaluatedKey?: Record<string, any>;
-}): Promise<ActionResult> => {
-  const { limit = 50, lastEvaluatedKey } = args || {};
-
-  const params = {
-    tableName,
-    indexName: 'AllArticlesIndex',
-    keyConditionExpression: 'GSI1PK = :gsi1pk',
-    filterExpression: 'status = :status',
-    expressionAttributeValues: {
-      ':gsi1pk': 'ARTICLE',
-      ':status': 'published',
-    },
-    limit,
-    exclusiveStartKey: lastEvaluatedKey,
-  };
-
-  try {
-    const result = await db.queryItems(params);
-    return {
-      data: {
-        success: true,
-        items: result.items,
-        lastEvaluatedKey: result.lastEvaluatedKey,
-      },
-      message: 'Articles retrieved successfully',
-    };
-  } catch (error) {
-    console.error('Error retrieving all articles:', error);
-    return {
-      message: 'Failed to retrieve all articles',
-      error: {
-        code: 'ARCHIVE>ARTICLE>RETRIEVE_ALL_ERROR',
         message: error instanceof Error ? error.message : String(error),
       },
     };
