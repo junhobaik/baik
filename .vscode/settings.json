@@ -4,5 +4,6 @@
     "nextui",
     "treeshake",
     "tsup"
-  ]
+  ],
+  "typescript.tsdk": "node_modules/typescript/lib"
 }

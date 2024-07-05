@@ -26,7 +26,13 @@
       "dependsOn": ["^build"]
     },
 
-    "main-server#archive": {
+    "@baik/web#dev": {
+      "dependsOn": ["^build"],
+      "cache": false,
+      "persistent": true
+    },
+
+    "@baik/main-server#archive": {
       "dependsOn": ["^build"],
       "cache": false
     }
