@@ -455,12 +455,8 @@ const getArticlesByTypeStatus = async (args: {
   }
 };
 
-const getArticlesByPathname = async (args: {
-  pathname: string;
-  limit?: number;
-  lastEvaluatedKey?: Record<string, any>;
-}): Promise<ActionResult> => {
-  const { pathname, limit = 50, lastEvaluatedKey } = args;
+const getArticlesByPathname = async (args: { pathname: string }): Promise<ActionResult> => {
+  const { pathname } = args;
 
   const params = {
     tableName,
@@ -470,24 +466,24 @@ const getArticlesByPathname = async (args: {
       ':gsi4pk': 'ARTICLE',
       ':gsi4sk': `PATHNAME#${pathname}`,
     },
-    limit,
-    exclusiveStartKey: lastEvaluatedKey,
+    limit: 1,
   };
 
   try {
     const result = await db.queryItems(params);
+    const item = result.items ? result.items[0] : null;
+
     return {
       data: {
         success: true,
-        items: result.items,
-        lastEvaluatedKey: result.lastEvaluatedKey,
+        item: item,
       },
-      message: 'Articles retrieved successfully',
+      message: 'Article retrieved successfully',
     };
   } catch (error) {
-    console.error('Error retrieving articles by pathname:', error);
+    console.error('Error retrieving article by pathname:', error);
     return {
-      message: 'Failed to retrieve articles by pathname',
+      message: 'Failed to retrieve article by pathname',
       error: {
         code: 'ARCHIVE>ARTICLE>RETRIEVE_BY_PATHNAME_ERROR',
         message: error instanceof Error ? error.message : String(error),
@@ -542,12 +538,8 @@ const getAllArticlesPublic = async (args?: {
   }
 };
 
-const getArticlesByPathnamePublic = async (args: {
-  pathname: string;
-  limit?: number;
-  lastEvaluatedKey?: Record<string, any>;
-}): Promise<ActionResult> => {
-  const { pathname, limit = 50, lastEvaluatedKey } = args;
+const getArticlesByPathnamePublic = async (args: { pathname: string }): Promise<ActionResult> => {
+  const { pathname } = args;
 
   const params = {
     tableName,
@@ -562,24 +554,24 @@ const getArticlesByPathnamePublic = async (args: {
       ':gsi4sk': `PATHNAME#${pathname}`,
       ':status': 'published',
     },
-    limit,
-    exclusiveStartKey: lastEvaluatedKey,
+    limit: 1,
   };
 
   try {
     const result = await db.queryItems(params);
+    const item = result.items ? result.items[0] : null;
+
     return {
       data: {
         success: true,
-        items: result.items,
-        lastEvaluatedKey: result.lastEvaluatedKey,
+        item: item,
       },
-      message: 'Articles retrieved successfully',
+      message: 'Article retrieved successfully',
     };
   } catch (error) {
     console.error('Error retrieving articles by pathname:', error);
     return {
-      message: 'Failed to retrieve articles by pathname',
+      message: 'Failed to retrieve article by pathname',
       error: {
         code: 'ARCHIVE>ARTICLE>RETRIEVE_BY_PATHNAME_ERROR',
         message: error instanceof Error ? error.message : String(error),
