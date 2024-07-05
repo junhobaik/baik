@@ -1,4 +1,4 @@
-import { getSession } from 'next-auth/react';
+import { auth } from '@/auth';
 
 const BASE_URL = `http://127.0.0.1:4000/local`;
 
@@ -12,7 +12,7 @@ export const request = async (param: RequestParam) => {
   const headers = new Headers();
   headers.set('Content-Type', 'application/json');
 
-  const session = await getSession();
+  const session = await auth();
   if (session?.sessionToken) {
     headers.set('Authorization', `Bearer ${session?.sessionToken}`);
   }

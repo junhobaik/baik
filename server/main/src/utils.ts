@@ -46,7 +46,11 @@ export const runModuleAction = async <M extends Modules, A extends ModuleActions
       if (!sessionToken) return createErrorResponse(401, 'Unauthorized, session token is required');
 
       const authResponse = await auth.verifySession.run({ sessionToken });
-      if (!authResponse.data?.verified) return createErrorResponse(401, 'Unauthorized, invalid session token');
+      const isMatchUserId = authResponse.data?.item?.userId === '533ea867-72c4-42af-872d-17bf11c9c5a1';
+      const isVerified = !!authResponse.data?.verified;
+
+      if (!isMatchUserId) return createErrorResponse(401, 'Unauthorized, invalid user id');
+      if (!isVerified) return createErrorResponse(401, 'Unauthorized, invalid session token');
     }
 
     const res = await targetAction.run(body.payload);

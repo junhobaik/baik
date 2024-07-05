@@ -24,6 +24,9 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   providers: [Google],
   adapter: DynamoDBAdapter(client, { tableName: 'baik-auth' }),
   callbacks: {
+    signIn({ user }) {
+      return user.email === 'junhobaik@gmail.com';
+    },
     session({ session, user }) {
       session.user.id = user.id;
       return session;
