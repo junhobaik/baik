@@ -45,6 +45,40 @@ const ApiTest = () => {
 
         <Button
           className="m-2"
+          color="danger"
+          onClick={async () => {
+            const createBookmarkGroup = async (count: number) => {
+              console.log(`${count + 1}번째`);
+              const listRes = await api.client.dashboard.getAllBookmarkGroups();
+              const list = listRes.data?.items ?? [];
+              const list2 = list.length ? list : [{ order: 0 }];
+              const newOrder = Math.max(...list2.map((v: any) => v.order));
+
+              const res = await api.client.dashboard.createBookmarkGroup({
+                title: `Bookmark Group ${newOrder + 1}`,
+                order: newOrder + 1,
+                collapsed: false,
+                items: [],
+              });
+              console.log(res);
+            };
+
+            let count = 0;
+            const interval = setInterval(() => {
+              createBookmarkGroup(count);
+              count++;
+              if (count >= 50) {
+                clearInterval(interval);
+                console.log('Finished creating 50 bookmark groups');
+              }
+            }, 1000);
+          }}
+        >
+          createBookmarkGroup 50
+        </Button>
+
+        <Button
+          className="m-2"
           onClick={async () => {
             const listRes = await api.client.dashboard.getAllBookmarkGroups();
             const list = listRes.data?.items ?? [];
@@ -101,6 +135,42 @@ const ApiTest = () => {
 
       <div className="m-2 p-2 border">
         <p>Archive &gt; Article</p>
+
+        <Button
+          className="m-2"
+          color="danger"
+          onClick={async () => {
+            const run = async (count: number) => {
+              console.log(`${count}번째 실행`);
+              const now = +Date.now();
+              const nowStr = now.toString();
+              const post: PostArticleBase = {
+                type: 'post',
+                status: 'published',
+                pathname: nowStr,
+                content: nowStr,
+                published_date: now,
+                updated_date: now,
+                title: `Article Title ${now}`,
+              };
+
+              const res = await api.client.archive.createArticle(post);
+              console.log(res);
+            };
+
+            let count = 0;
+            const interval = setInterval(() => {
+              run(count);
+              count++;
+              if (count >= 50) {
+                clearInterval(interval);
+                console.log('Finished creating 50 articles');
+              }
+            }, 1000);
+          }}
+        >
+          createArticle 50
+        </Button>
 
         <Button
           className="m-2"
