@@ -2,7 +2,7 @@
 
 import React, { useEffect, useMemo } from 'react';
 
-import { DefaultDBAttributes } from '@baik/types';
+import type { DefaultDBAttributes } from '@baik/types';
 import { Button } from '@nextui-org/react';
 import { ColumnDef, flexRender, getCoreRowModel, useReactTable } from '@tanstack/react-table';
 import styled from 'styled-components';
@@ -45,12 +45,15 @@ const DataTable = <T extends DefaultDBAttributes>(props: DataTableProps<T>) => {
       header: header.title ?? (header.key as string),
       cell: (info) => {
         const value = info.getValue() as T[keyof T];
+
         if (header.render) {
           return header.render({ value, items });
         }
+
         if (header.valueParser) {
           return header.valueParser(value)?.toString() ?? '';
         }
+
         return value?.toString() ?? '';
       },
     }));

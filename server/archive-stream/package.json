@@ -1,13 +1,12 @@
 {
-  "name": "@baik/main-server",
+  "name": "@baik/archive-stream",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
-    "api": "sam local start-api --port 4000",
     "build": "tsup",
     "watch": "tsup --config tsup.dev.config.ts --watch",
-    "archive": "tsup && zip -rj \"../../zip_builds/main-server-$(date +\"%Y%m%d%H%M%S\").zip\" ./dist/*"
+    "archive": "tsup && zip -rj \"../../zip_builds/archive-stream-server-$(date +\"%Y%m%d%H%M%S\").zip\" ./dist/*"
   },
   "keywords": [],
   "author": "",
@@ -17,6 +16,9 @@
     "@aws-sdk/client-s3": "^3.606.0",
     "@aws-sdk/lib-dynamodb": "^3.606.0",
     "@aws-sdk/util-dynamodb": "^3.606.0",
+    "@babel/core": "^7.24.7",
+    "@babel/preset-env": "^7.24.7",
+    "@babel/preset-typescript": "^7.24.7",
     "@baik/types": "workspace:*",
     "@tsconfig/node20": "^20.1.4",
     "@types/aws-lambda": "^8.10.140",
@@ -26,6 +28,6 @@
     "tsup": "^8.1.0"
   },
   "dependencies": {
-    "uuid": "^10.0.0"
+    "algoliasearch": "^4.24.0"
   }
 }

@@ -1,0 +1,48 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: 'AWS::Serverless-2016-10-31'
+
+Globals:
+  Api:
+    Cors:
+      AllowMethods: "'POST, GET, OPTIONS'"
+      AllowHeaders: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+      AllowOrigin: "'*'"
+  Function:
+    Timeout: 30
+
+Parameters:
+  Stage:
+    Type: String
+    Default: local
+    AllowedValues:
+      - local
+
+Conditions:
+  IsProduction: !Equals [!Ref Stage, 'prod']
+
+Resources:
+  MyApi:
+    Type: 'AWS::Serverless::Api'
+    Properties:
+      StageName: !Ref Stage
+      Cors:
+        AllowMethods: "'POST, GET, OPTIONS'"
+        AllowHeaders: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+        AllowOrigin: "'*'"
+
+  MyLambdaFunction:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      Handler: dist/index.handler
+      Runtime: nodejs20.x
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            RestApiId: !Ref MyApi
+            Path: /local
+            Method: POST
+      Environment:
+        Variables:
+          STAGE: !Ref Stage
+          NODE_ENV: !Ref Stage
