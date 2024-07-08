@@ -8,7 +8,7 @@ const AdminLayout = async (props: { children: React.ReactNode; params: { account
   return (
     <main className="fixed top-0 left-0 flex flex-1 h-screen w-screen overflow-hidden">
       <Sidebar />
-      <div className="flex-1 bg-gray-50 p-4 overflow-y-auto">{children}</div>
+      <div className="flex-1 bg-gray-50 overflow-y-auto">{children}</div>
     </main>
   );
 };

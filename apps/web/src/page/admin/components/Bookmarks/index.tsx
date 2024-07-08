@@ -10,7 +10,7 @@ const AdminBookmarks = () => {
   const { data, query } = useBookmarkGroups();
 
   return (
-    <div className="h-full">
+    <div className="h-screen flex flex-col overflow-hidden p-4">
       <BookmarkDataTable
         items={data}
         hasNextItems={query.hasNextPage}
