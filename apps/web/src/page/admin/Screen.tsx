@@ -7,6 +7,7 @@ import { useSearchParams } from 'next/navigation';
 import { Session } from 'next-auth';
 
 import AdminBookmarks from './components/Bookmarks';
+import AdminArticles from './components/Articles';
 
 interface AdminScreenProps {
   session: Session | null;
@@ -22,6 +23,7 @@ const AdminScreen = (props: AdminScreenProps) => {
   }
 
   if (path === 'bookmarks') return <AdminBookmarks />;
+  if (path === 'articles') return <AdminArticles />;
 
   return <div></div>;
 };

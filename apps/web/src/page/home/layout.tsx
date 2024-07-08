@@ -1,4 +1,4 @@
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 
 import '@/styles/globals.css';
 
@@ -6,6 +6,13 @@ import { Providers } from './providers';
 import { Registries } from './registries';
 
 import '@junhobaik/ui/css';
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  userScalable: true,
+  viewportFit: 'cover',
+};
 
 export const metadata: Metadata = {
   title: 'my-archive',
@@ -27,3 +34,6 @@ export default function RootLayout({
     </html>
   );
 }
+
+RootLayout.metadata = metadata;
+RootLayout.viewport = viewport;
