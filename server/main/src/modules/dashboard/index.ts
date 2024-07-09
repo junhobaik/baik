@@ -1,5 +1,14 @@
 // server/main/src/modules/dashboard/index.ts
-import type { ActionResult, BookmarkGroup, BookmarkGroupBase, DataTypes } from '@baik/types';
+import type {
+  ActionResult,
+  BookmarkGroup,
+  BookmarkGroupBase,
+  CrawlerFeedItem,
+  DataTypes,
+  FeedItem,
+  FeedItemBase,
+  RSSFeedItem,
+} from '@baik/types';
 import { v4 as uuidv4 } from 'uuid';
 
 import db from '../../db';
@@ -265,6 +274,283 @@ const getAllBookmarkGroups = async (args: {
   }
 };
 
+const createFeedItem = async (args: FeedItemBase): Promise<ActionResult> => {
+  const now = Date.now();
+  const id = uuidv4();
+
+  const commonAttributes = {
+    pk: `FEEDITEM#${id}`,
+    sk: `FEEDITEM#${now}`,
+    id,
+    data_type: 'feed' as DataTypes,
+    created_at: now,
+    updated_at: now,
+  };
+
+  let newFeedItem: FeedItem;
+
+  if (args.type === 'crawler') {
+    newFeedItem = {
+      ...commonAttributes,
+      ...args,
+      selector: args.selector,
+    } as CrawlerFeedItem;
+  } else {
+    newFeedItem = {
+      ...commonAttributes,
+      ...args,
+    } as RSSFeedItem;
+  }
+
+  const params = {
+    tableName,
+    item: newFeedItem,
+  };
+
+  try {
+    await db.createItem(params);
+    return {
+      data: { success: true, item: newFeedItem },
+      message: 'Feed item created successfully',
+    };
+  } catch (error) {
+    console.error('Error creating feed item:', error);
+    return {
+      message: 'Failed to create feed item',
+      error: {
+        code: 'DASHBOARD>FEED_ITEM>UNKNOWN_ERROR',
+        message: error instanceof Error ? error.message : String(error),
+      },
+    };
+  }
+};
+
+const updateFeedItem = async (args: { id: string } & Partial<FeedItemBase>): Promise<ActionResult> => {
+  const { id, ...updateData } = args;
+  const now = Date.now();
+
+  const getItemParams = {
+    tableName,
+    key: { id },
+  };
+
+  try {
+    const existingItem = await db.getItem(getItemParams);
+
+    if (!existingItem) {
+      return {
+        message: 'Feed item not found',
+        error: {
+          code: 'DASHBOARD>FEED_ITEM>NOT_FOUND',
+          message: `Feed item with id ${id} not found`,
+        },
+      };
+    }
+
+    let updateExpression = 'set updated_at = :updated_at';
+    const expressionAttributeValues: Record<string, any> = {
+      ':updated_at': now,
+    };
+    const expressionAttributeNames: Record<string, string> = {};
+
+    Object.entries(updateData).forEach(([key, value]) => {
+      if (key === 'data') {
+        Object.entries(value as Record<string, any>).forEach(([dataKey, dataValue]) => {
+          updateExpression += `, #data.#${dataKey} = :${dataKey}`;
+          expressionAttributeValues[`:${dataKey}`] = dataValue;
+          expressionAttributeNames[`#${dataKey}`] = dataKey;
+        });
+        expressionAttributeNames['#data'] = 'data';
+      } else if (key === 'selector' && (existingItem.type === 'crawler' || updateData.type === 'crawler')) {
+        updateExpression += ', #selector = :selector';
+        expressionAttributeValues[':selector'] = value;
+        expressionAttributeNames['#selector'] = 'selector';
+      } else {
+        updateExpression += `, #${key} = :${key}`;
+        expressionAttributeValues[`:${key}`] = value;
+        expressionAttributeNames[`#${key}`] = key;
+      }
+    });
+
+    const updateParams = {
+      tableName,
+      key: { id },
+      updateExpression,
+      expressionAttributeValues,
+      expressionAttributeNames,
+      returnValues: 'ALL_NEW',
+    };
+
+    const result = await db.updateItem(updateParams);
+
+    if (!result) {
+      throw new Error('Failed to update feed item');
+    }
+
+    return {
+      data: { item: result },
+      message: 'Feed item updated successfully',
+    };
+  } catch (error) {
+    console.error('Error updating feed item:', error);
+    return {
+      message: 'Failed to update feed item',
+      error: {
+        code: 'DASHBOARD>FEED_ITEM>UPDATE_ERROR',
+        message: error instanceof Error ? error.message : String(error),
+      },
+    };
+  }
+};
+
+const deleteFeedItem = async (args: { id: string }): Promise<ActionResult> => {
+  const { id } = args;
+
+  const pkValue = `FEEDITEM#${id}`;
+
+  try {
+    const queryParams = {
+      tableName,
+      keyConditionExpression: 'pk = :pkValue',
+      expressionAttributeValues: {
+        ':pkValue': pkValue,
+      },
+      limit: 1,
+    };
+
+    const queryResult = await db.queryItems(queryParams);
+
+    if (!queryResult.items || queryResult.items.length === 0) {
+      return {
+        message: 'Feed item not found',
+        error: {
+          code: 'DASHBOARD>FEED_ITEM>NOT_FOUND',
+          message: `Feed item with id ${id} not found`,
+        },
+      };
+    }
+
+    const item = queryResult.items[0];
+
+    const deleteParams = {
+      tableName,
+      key: {
+        pk: pkValue,
+        sk: item.sk,
+      },
+      conditionExpression: 'attribute_exists(pk)',
+    };
+
+    await db.deleteItem(deleteParams);
+
+    return {
+      message: 'Feed item deleted successfully',
+      data: { id: id },
+    };
+  } catch (error) {
+    console.error('Error deleting feed item:', error);
+
+    if ((error as any).name === 'ConditionalCheckFailedException') {
+      return {
+        message: 'Feed item not found or already deleted',
+        error: {
+          code: 'DASHBOARD>FEED_ITEM>DELETE_FAILED',
+          message: `Feed item with id ${id} not found or already deleted`,
+        },
+      };
+    }
+
+    return {
+      message: 'Failed to delete feed item',
+      error: {
+        code: 'DASHBOARD>FEED_ITEM>DELETE_ERROR',
+        message: error instanceof Error ? error.message : String(error),
+      },
+    };
+  }
+};
+
+const getFeedItem = async (args: { id: string }): Promise<ActionResult> => {
+  const { id } = args;
+
+  const queryParams = {
+    tableName,
+    keyConditionExpression: 'pk = :pkValue',
+    expressionAttributeValues: {
+      ':pkValue': `FEEDITEM#${id}`,
+    },
+    limit: 1,
+  };
+
+  try {
+    const queryResult = await db.queryItems(queryParams);
+
+    if (!queryResult.items || queryResult.items.length === 0) {
+      return {
+        message: 'Feed item not found',
+        error: {
+          code: 'DASHBOARD>FEED_ITEM>NOT_FOUND',
+          message: `Feed item with id ${id} not found`,
+        },
+      };
+    }
+
+    return {
+      data: { item: queryResult.items[0] },
+      message: 'Feed item retrieved successfully',
+    };
+  } catch (error) {
+    console.error('Error retrieving feed item:', error);
+    return {
+      message: 'Failed to retrieve feed item',
+      error: {
+        code: 'DASHBOARD>FEED_ITEM>RETRIEVE_ERROR',
+        message: error instanceof Error ? error.message : String(error),
+      },
+    };
+  }
+};
+
+const getAllFeedItems = async (args: {
+  limit?: number;
+  lastEvaluatedKey?: Record<string, any>;
+}): Promise<ActionResult> => {
+  const { limit = 50, lastEvaluatedKey } = args;
+
+  const params = {
+    tableName,
+    indexName: 'DataTypeCreatedAtIndex',
+    keyConditionExpression: 'data_type = :dataType',
+    expressionAttributeValues: {
+      ':dataType': 'feedItem',
+    },
+    scanIndexForward: false,
+    limit,
+    exclusiveStartKey: lastEvaluatedKey,
+  };
+
+  try {
+    const result = await db.queryItems(params);
+    return {
+      data: {
+        success: true,
+        items: result.items,
+        lastEvaluatedKey: result.lastEvaluatedKey,
+      },
+      message: 'Feed items retrieved successfully',
+    };
+  } catch (error) {
+    console.error('Error retrieving feed items:', error);
+    return {
+      message: 'Failed to retrieve feed items',
+      error: {
+        code: 'DASHBOARD>FEED_ITEM>RETRIEVE_ALL_ERROR',
+        message: error instanceof Error ? error.message : String(error),
+      },
+    };
+  }
+};
+
 export default {
   createBookmarkGroup: {
     run: createBookmarkGroup,
@@ -284,6 +570,26 @@ export default {
   },
   getAllBookmarkGroups: {
     run: getAllBookmarkGroups,
+    skip_auth: false,
+  },
+  createFeedItem: {
+    run: createFeedItem,
+    skip_auth: false,
+  },
+  updateFeedItem: {
+    run: updateFeedItem,
+    skip_auth: false,
+  },
+  deleteFeedItem: {
+    run: deleteFeedItem,
+    skip_auth: false,
+  },
+  getFeedItem: {
+    run: getFeedItem,
+    skip_auth: false,
+  },
+  getAllFeedItems: {
+    run: getAllFeedItems,
     skip_auth: false,
   },
 };

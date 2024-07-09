@@ -23,9 +23,12 @@ export interface FeedArticle {
   [key: string]: any;
 }
 
+export type FeedType = 'rss' | 'crawler';
+
 export interface FeedItemBase {
   url: string;
-  type: 'rss' | 'crawler';
+  type: FeedType;
+  selector?: string;
   data: {
     title: string;
     description: string;
@@ -41,6 +44,10 @@ export interface CrawlerFeedItemBase extends FeedItemBase {
 
 export interface RssFeedItemBase extends FeedItemBase {
   type: 'rss';
+  selector?: never;
 }
 
-export type FeedItem = (RssFeedItemBase | CrawlerFeedItemBase) & DefaultDBAttributes;
+export type RSSFeedItem = RssFeedItemBase & DefaultDBAttributes;
+export type CrawlerFeedItem = CrawlerFeedItemBase & DefaultDBAttributes;
+
+export type FeedItem = RSSFeedItem | CrawlerFeedItem;
