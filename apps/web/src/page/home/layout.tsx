@@ -46,7 +46,7 @@ const RootLayout = async ({
           <Registries>
             <main className="fixed top-0 left-0 flex flex-1 h-screen w-screen overflow-hidden">
               <Sidebar />
-              <div className="flex-1 bg-gray-50 overflow-y-auto">{children}</div>
+              <div className="flex-1 bg-[#F7F9FC] overflow-y-auto">{children}</div>
             </main>
           </Registries>
         </Providers>
