@@ -4,6 +4,7 @@
 import React from 'react';
 
 import type { Article, BookmarkItem } from '@baik/types';
+import { Button } from '@nextui-org/react';
 import { IconCopy } from '@tabler/icons-react';
 import dayjs from 'dayjs';
 
@@ -50,6 +51,21 @@ const tableOptions: DataTableOptions<Article> = {
       key: 'updated_at',
       title: 'Updated At',
       valueParser: (value) => dayjs(value as number).format('YYYY-MM-DD HH:mm:ss'),
+    },
+    {
+      key: '',
+      title: '',
+      render: ({ item }) => {
+        return (
+          <div>
+            {(item.pathname || item.url) && (
+              <Button size="sm" href={`/archive/${item.pathname ?? item.url}`} target="_blank" as="a">
+                Open
+              </Button>
+            )}
+          </div>
+        );
+      },
     },
   ],
   index: true,

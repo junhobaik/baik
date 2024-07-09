@@ -9,11 +9,11 @@ import { ColumnDef, flexRender, getCoreRowModel, useReactTable } from '@tanstack
 import styled from 'styled-components';
 
 type HeaderOption<T extends DefaultDBAttributes> = {
-  key: keyof T;
+  key: keyof T | '' | '_';
   title?: string;
 } & (
   | { render?: never; valueParser?: never }
-  | { render: (args: { value: T[keyof T]; items: T[] }) => React.ReactNode; valueParser?: never }
+  | { render: (args: { value: T[keyof T]; items: T[]; item: T }) => React.ReactNode; valueParser?: never }
   | { valueParser: (value: T[keyof T]) => T[keyof T]; render?: never }
 );
 
@@ -40,15 +40,23 @@ const DataTable = <T extends DefaultDBAttributes>(props: DataTableProps<T>) => {
     console.log('rowSelection', rowSelection);
   }, [rowSelection]);
 
+  const headers = useMemo(() => {
+    return options.headers.map((header) => {
+      if (!header.key) header.key = '_';
+      return { ...header };
+    });
+  }, [options.headers]);
+
   const columns = useMemo<ColumnDef<T>[]>(() => {
-    const baseColumns: ColumnDef<T>[] = options.headers.map((header) => ({
+    const baseColumns: ColumnDef<T>[] = headers.map((header) => ({
       accessorKey: header.key as string,
       header: header.title ?? (header.key as string),
       cell: (info) => {
         const value = info.getValue() as T[keyof T];
 
         if (header.render) {
-          return header.render({ value, items });
+          const item = info.row.original;
+          return header.render({ value, items, item });
         }
 
         if (header.valueParser) {

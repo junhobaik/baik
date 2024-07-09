@@ -1,5 +1,6 @@
+import * as archive from './archive';
 import * as dashboard from './dashboard';
 
-const client = { dashboard };
+const server = { dashboard, archive };
 
-export default client;
+export default server;
