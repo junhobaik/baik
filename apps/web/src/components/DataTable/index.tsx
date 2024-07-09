@@ -4,7 +4,7 @@
 import React, { useEffect, useMemo } from 'react';
 
 import type { DefaultDBAttributes } from '@baik/types';
-import { Button } from '@nextui-org/react';
+import { Button, ButtonProps } from '@nextui-org/react';
 import { ColumnDef, flexRender, getCoreRowModel, useReactTable } from '@tanstack/react-table';
 import styled from 'styled-components';
 
@@ -105,6 +105,30 @@ const DataTable = <T extends DefaultDBAttributes>(props: DataTableProps<T>) => {
     onRowSelectionChange: setRowSelection,
   });
 
+  const paginationButtonProps = useMemo(() => {
+    let variant = 'flat';
+    let color = 'default';
+
+    if (hasNextItems) {
+      variant = 'flat';
+      color = 'primary';
+    }
+    if (!hasNextItems) {
+      variant = 'ghost';
+    }
+    if (isLoading) {
+      variant = 'solid';
+      color = 'warning';
+    }
+    return {
+      variant: variant,
+      color: color,
+      loading: isLoading,
+      isLoading: isLoading,
+      isDisabled: !hasNextItems,
+    } as Partial<ButtonProps>;
+  }, [isLoading, hasNextItems]);
+
   return (
     <TableContainer>
       <TableWrapper>
@@ -131,14 +155,11 @@ const DataTable = <T extends DefaultDBAttributes>(props: DataTableProps<T>) => {
       </TableWrapper>
       <PaginationContainer>
         <Button
-          variant={hasNextItems ? 'flat' : 'ghost'}
-          color={hasNextItems ? 'primary' : 'default'}
           fullWidth
-          isLoading={isLoading}
-          isDisabled={!hasNextItems}
           onClick={() => {
             fetchMoreItems?.();
           }}
+          {...paginationButtonProps}
         >
           {isLoading && 'Loading...'}
           {!isLoading && hasNextItems && 'Load more'}
@@ -162,26 +183,34 @@ const TableWrapper = styled.div`
   overflow-x: auto;
   border-radius: 8px;
   background-color: #fff;
-  border: 1px solid #d8d8d887;
 `;
 
 const TableStyled = styled.table`
   width: 100%;
-  border-collapse: collapse;
+  border-collapse: separate;
+  border-spacing: 0;
   font-size: 14px;
 
   thead {
     position: sticky;
     top: 0;
-    background-color: #f4f4f5;
+    background-color: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
     z-index: 1;
+
+    th,
+    td {
+      padding: 16px 12px;
+      text-align: left;
+    }
   }
 
   th,
   td {
-    padding: 12px;
+    padding: 8px 12px;
     text-align: left;
-    border-bottom: 1px solid #dee2e6;
+    border-bottom: 1px solid #eeeeee;
   }
 
   th {
@@ -194,7 +223,7 @@ const TableStyled = styled.table`
   } */
 
   tbody tr:hover {
-    background-color: #e9ecef;
+    background-color: rgb(239, 246, 255);
   }
 `;
 
