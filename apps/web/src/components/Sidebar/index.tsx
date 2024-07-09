@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -16,16 +16,14 @@ import {
   IconRss,
   IconTestPipe,
 } from '@tabler/icons-react';
+import { useAtom } from 'jotai';
 import styled from 'styled-components';
+
+import { sidebarCollapsed } from '@/store';
 
 const Sidebar = () => {
   const pathname = usePathname();
-  const [collapsed, setCollapsed] = useState(!!localStorage.getItem('sidebar-collapsed'));
-
-  useEffect(() => {
-    if (collapsed) localStorage.setItem('sidebar-collapsed', 'true');
-    else localStorage.removeItem('sidebar-collapsed');
-  }, [collapsed]);
+  const [collapsed, setCollapsed] = useAtom(sidebarCollapsed);
 
   return (
     <SidebarStyled className={`${collapsed ? 'collapsed' : ''}`}>
