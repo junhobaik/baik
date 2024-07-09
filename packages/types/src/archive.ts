@@ -4,6 +4,13 @@ import type { DefaultDBAttributes } from './common';
 export type ArticleStatus = 'draft' | 'published' | 'private';
 export type ArticleType = 'post' | 'shorts' | 'clip';
 
+export interface ClipSite {
+  title: string;
+  link: string;
+  favicon_url?: string;
+  description?: string;
+}
+
 export interface ArticleBase {
   title: string;
   content: string;
@@ -11,30 +18,35 @@ export interface ArticleBase {
   type: ArticleType;
   published_date: number;
   updated_date: number;
+
+  keywords?: string[];
+  pathname?: string;
+  url?: string;
+  site?: ClipSite;
 }
 
 export interface PostArticleBase extends ArticleBase {
   type: 'post';
   pathname: string;
-  keywords?: string[];
+  url?: never;
+  site?: never;
 }
 
 export interface ShortsArticleBase extends ArticleBase {
   type: 'shorts';
   pathname: string;
-  keywords?: string[];
+  url?: never;
+  site?: never;
 }
 
 export interface ClipArticleBase extends ArticleBase {
   type: 'clip';
   url: string;
   origin_title: string;
-  site: {
-    title: string;
-    link: string;
-    favicon_url?: string;
-    description?: string;
-  };
+  site: ClipSite;
+
+  pathname?: never;
+  keywords?: never;
 }
 
 export interface ArticleGSIAttributes {

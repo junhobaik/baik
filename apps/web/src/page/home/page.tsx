@@ -47,26 +47,6 @@ const Home = () => {
 
         {signed === null ? <Button color="warning" isLoading></Button> : null}
       </div>
-
-      <Button
-        color="primary"
-        onClick={() => {
-          router.push('/admin');
-        }}
-      >
-        /admin
-      </Button>
-
-      <div className="p-1"></div>
-
-      <Button
-        color="primary"
-        onClick={() => {
-          router.push('/test');
-        }}
-      >
-        /test
-      </Button>
     </main>
   );
 };

@@ -6,9 +6,6 @@ import { useSearchParams } from 'next/navigation';
 
 import { Session } from 'next-auth';
 
-import AdminBookmarks from './components/Bookmarks';
-import AdminArticles from './components/Articles';
-
 interface AdminScreenProps {
   session: Session | null;
 }
@@ -21,9 +18,6 @@ const AdminScreen = (props: AdminScreenProps) => {
   if (!session) {
     return <div>로그인이 필요합니다.</div>;
   }
-
-  if (path === 'bookmarks') return <AdminBookmarks />;
-  if (path === 'articles') return <AdminArticles />;
 
   return <div></div>;
 };

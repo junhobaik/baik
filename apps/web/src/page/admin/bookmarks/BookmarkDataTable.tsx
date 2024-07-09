@@ -22,12 +22,12 @@ const tableOptions: DataTableOptions<BookmarkGroup> = {
         const { value } = args;
         return (
           <div className="flex items-center">
-            <p className="mr-[2px]">{(value as string).split('-')[0]}</p>
             <IconCopy
               size={16}
               className="text-gray-500 hover:text-gray-700"
               onClick={() => copyClipboard(value as string)}
             />
+            <p className="ml-[2px]">{(value as string).slice(0, 3)}</p>
           </div>
         );
       },

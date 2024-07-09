@@ -1,0 +1,270 @@
+'use client';
+
+import React, { useEffect, useState } from 'react';
+
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+
+import {
+  IconBookmark,
+  IconBox,
+  IconChevronLeft,
+  IconChevronRight,
+  IconEdit,
+  IconHome,
+  IconNews,
+  IconRss,
+  IconTestPipe,
+} from '@tabler/icons-react';
+import styled from 'styled-components';
+
+const Sidebar = () => {
+  const pathname = usePathname();
+  const [collapsed, setCollapsed] = useState(!!localStorage.getItem('sidebar-collapsed'));
+
+  useEffect(() => {
+    if (collapsed) localStorage.setItem('sidebar-collapsed', 'true');
+    else localStorage.removeItem('sidebar-collapsed');
+  }, [collapsed]);
+
+  return (
+    <SidebarStyled className={`${collapsed ? 'collapsed' : ''}`}>
+      <div className="toggle-container">
+        <div
+          className="toggle"
+          onClick={() => {
+            setCollapsed((prev) => !prev);
+          }}
+        >
+          {!collapsed ? <IconChevronLeft /> : <IconChevronRight />}
+        </div>
+      </div>
+
+      <div className="logo-container">
+        <div className="logo-box" />
+        <p className="logo-text">Baik</p>
+      </div>
+
+      <div className="section-divider">
+        <p className="section-divider--text">Main</p>
+        <div className="section-divider--line"></div>
+      </div>
+
+      <div className="section-container">
+        <p className="section-title">Dashboard</p>
+        <div>
+          <Link className={`styled-link ${pathname === '/' ? 'active' : ''}`} href={'/'}>
+            <span className="icon-wrapper">
+              <IconHome size={20} />
+            </span>
+            <p className="link-text">Dashboard</p>
+          </Link>
+        </div>
+      </div>
+
+      <div className="section-container">
+        <p className="section-title">Archive</p>
+        <div>
+          <Link className={`styled-link ${pathname === '/archive' ? 'active' : ''}`} href={'/archive'}>
+            <span className="icon-wrapper">
+              <IconBox size={20} />
+            </span>
+            <p className="link-text">Archive</p>
+          </Link>
+        </div>
+        <div>
+          <Link className={`styled-link ${pathname === '/archive/write' ? 'active' : ''}`} href={'/archive/write'}>
+            <span className="icon-wrapper">
+              <IconEdit size={20} />
+            </span>
+            <p className="link-text">Write</p>
+          </Link>
+        </div>
+      </div>
+
+      <div className="section-divider">
+        <p className="section-divider--text">Admin</p>
+        <div className="section-divider--line"></div>
+      </div>
+
+      <div className="section-container">
+        <p className="section-title">Dashboard</p>
+        <div>
+          <Link className={`styled-link ${pathname === '/admin/bookmarks' ? 'active' : ''}`} href={'/admin/bookmarks'}>
+            <span className="icon-wrapper">
+              <IconBookmark size={20} />
+            </span>
+            <p className="link-text">Bookmarks</p>
+          </Link>
+          <Link className={`styled-link ${pathname === '/admin/feeds' ? 'active' : ''}`} href={'/admin/feeds'}>
+            <span className="icon-wrapper">
+              <IconRss size={20} />
+            </span>
+            <p className="link-text">Feeds</p>
+          </Link>
+        </div>
+      </div>
+
+      <div className="section-container">
+        <p className="section-title">Archive</p>
+        <div>
+          <Link className={`styled-link ${pathname === '/admin/articles' ? 'active' : ''}`} href={'/admin/articles'}>
+            <span className="icon-wrapper">
+              <IconNews size={20} />
+            </span>
+            <p className="link-text">Articles</p>
+          </Link>
+        </div>
+      </div>
+
+      <div className="section-divider">
+        <p className="section-divider--text">Dev</p>
+        <div className="section-divider--line"></div>
+      </div>
+
+      <div className="section-container">
+        <p className="section-title">Test</p>
+        <div>
+          <Link className={`styled-link ${pathname === '/api-test' ? 'active' : ''}`} href={'/api-test'}>
+            <span className="icon-wrapper">
+              <IconTestPipe size={20} />
+            </span>
+            <p className="link-text">API Test</p>
+          </Link>
+        </div>
+      </div>
+    </SidebarStyled>
+  );
+};
+
+const SidebarStyled = styled.div`
+  width: 240px;
+  overflow-y: auto;
+  padding-top: 24px;
+  transition: width 0.1s;
+
+  .logo-text,
+  .section-title,
+  .link-text,
+  .section-divider {
+    opacity: 1;
+    transition: opacity 0.1s;
+  }
+
+  &.collapsed {
+    width: 52px;
+    overflow: hidden;
+
+    .logo-text,
+    .section-title,
+    .link-text,
+    .section-divider {
+      opacity: 0;
+    }
+  }
+
+  .toggle-container {
+    display: flex;
+    justify-content: flex-end;
+    padding: 0 16px 16px 16px;
+
+    .toggle {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 20px;
+      height: 20px;
+      border-radius: 4px;
+      color: #595959;
+      background-color: #e0e0e0;
+      cursor: pointer;
+    }
+  }
+
+  .logo-container {
+    display: flex;
+    align-items: center;
+    height: 32px;
+    padding: 0 16px 16px;
+    margin-bottom: 48px;
+    position: relative;
+
+    .logo-box {
+      margin-right: 4px;
+      border: 1px solid;
+      min-width: 20px;
+      width: 20px;
+      height: 20px;
+    }
+
+    .logo-text {
+      font-size: 18px;
+      font-weight: bold;
+    }
+  }
+
+  .section-divider {
+    height: 32px;
+    padding: 0 8px 16px 8px;
+    position: relative;
+    display: flex;
+    align-items: center;
+    &--text {
+      position: absolute;
+      background-color: #fff;
+      z-index: 1;
+      padding: 0 4px;
+      font-size: 12px;
+      font-weight: 600;
+      color: #64748b;
+    }
+    &--line {
+      position: absolute;
+      height: 1px;
+      width: calc(100% - 16px);
+      background-color: #e0e0e0;
+    }
+  }
+
+  .section-container {
+    padding-bottom: 16px;
+    font-weight: 600;
+    color: #475569;
+    font-size: 14px;
+
+    .section-title {
+      font-size: 12px;
+      font-weight: 600;
+      color: #64748b;
+      height: 16px;
+      display: flex;
+      align-items: center;
+      padding: 0 16px;
+    }
+
+    .styled-link {
+      display: flex;
+      align-items: center;
+      padding: 4px 16px;
+      height: 40px;
+
+      &:hover {
+        background-color: #eff6ff;
+      }
+
+      &.active {
+        background-color: rgb(219, 234, 254);
+      }
+
+      .link-text {
+        font-size: 14px;
+      }
+
+      .icon-wrapper {
+        margin-right: 8px;
+      }
+    }
+  }
+`;
+
+export default Sidebar;

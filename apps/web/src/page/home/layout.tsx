@@ -1,7 +1,9 @@
 import type { Metadata, Viewport } from 'next';
 
+import { auth } from '@/auth';
 import '@/styles/globals.css';
 
+import Sidebar from '../../components/Sidebar';
 import { Providers } from './providers';
 import { Registries } from './registries';
 
@@ -19,21 +21,41 @@ export const metadata: Metadata = {
   description: 'my-archive',
 };
 
-export default function RootLayout({
+const RootLayout = async ({
   children,
 }: Readonly<{
   children: React.ReactNode;
-}>) {
+}>) => {
+  const session = await auth();
+
+  if (!session)
+    return (
+      <html lang="kr" className="light">
+        <body>
+          <Providers>
+            <Registries>{children}</Registries>
+          </Providers>
+        </body>
+      </html>
+    );
+
   return (
     <html lang="kr" className="light min-h-full h-full">
       <body className="min-h-full h-full">
         <Providers>
-          <Registries>{children}</Registries>
+          <Registries>
+            <main className="fixed top-0 left-0 flex flex-1 h-screen w-screen overflow-hidden">
+              <Sidebar />
+              <div className="flex-1 bg-gray-50 overflow-y-auto">{children}</div>
+            </main>
+          </Registries>
         </Providers>
       </body>
     </html>
   );
-}
+};
 
 RootLayout.metadata = metadata;
 RootLayout.viewport = viewport;
+
+export default RootLayout;

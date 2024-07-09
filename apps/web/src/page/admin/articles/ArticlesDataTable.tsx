@@ -1,3 +1,6 @@
+'use client';
+
+// apps/web/src/page/admin/Articles/ArticlesDataTable.tsx
 import React from 'react';
 
 import type { Article, BookmarkItem } from '@baik/types';
@@ -34,6 +37,8 @@ const tableOptions: DataTableOptions<Article> = {
     },
     { key: 'status', title: 'Status' },
     { key: 'type', title: 'Type' },
+    { key: 'pathname', title: 'Pathname' },
+    { key: 'url', title: 'URL' },
     { key: 'title', title: 'Title' },
     { key: 'content', title: 'Content' },
     {

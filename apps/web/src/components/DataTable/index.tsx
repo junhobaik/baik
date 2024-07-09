@@ -1,5 +1,6 @@
 'use client';
 
+// apps/web/src/components/DataTable/index.tsx
 import React, { useEffect, useMemo } from 'react';
 
 import type { DefaultDBAttributes } from '@baik/types';
