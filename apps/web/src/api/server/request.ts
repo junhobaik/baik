@@ -1,6 +1,5 @@
 import { auth } from '@/auth';
-
-const BASE_URL = `http://127.0.0.1:4000/local`;
+import { BASE_URL } from '@/configs/variables';
 
 interface RequestParam {
   module: string;

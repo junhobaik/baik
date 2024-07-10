@@ -1,6 +1,5 @@
+import { BASE_URL } from '@/configs/variables';
 import { getSession } from 'next-auth/react';
-
-const BASE_URL = `http://127.0.0.1:4000/local`;
 
 interface RequestParam {
   module: string;
