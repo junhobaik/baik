@@ -2,6 +2,7 @@
 
 import React from 'react';
 
+import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
@@ -17,11 +18,12 @@ import {
   IconTestPipe,
 } from '@tabler/icons-react';
 import { useAtom } from 'jotai';
+import { Session } from 'next-auth';
 import styled from 'styled-components';
 
 import { sidebarCollapsed } from '@/store';
 
-const Sidebar = () => {
+const Sidebar = ({ session }: { session: Session }) => {
   const pathname = usePathname();
   const [collapsed, setCollapsed] = useAtom(sidebarCollapsed);
 
@@ -39,7 +41,7 @@ const Sidebar = () => {
       </div>
 
       <div className="logo-container">
-        <div className="logo-box" />
+        <div className="logo-box">{!!session.user?.image && <Image src={'/icon.png'} alt="" fill />}</div>
         <p className="logo-text">Baik</p>
       </div>
 
@@ -188,8 +190,10 @@ const SidebarStyled = styled.div`
     position: relative;
 
     .logo-box {
+      position: relative;
       margin-right: 4px;
-      border: 1px solid;
+      border-radius: 4px;
+      overflow: hidden;
       min-width: 20px;
       width: 20px;
       height: 20px;

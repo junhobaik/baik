@@ -59,3 +59,8 @@ export const markdownToPlainText = (markdownText: string): string => {
 
   return convert(marked.parse(md) as string);
 };
+
+export const removeFrontmatter = (markdownText: string): string => {
+  const frontmatterRegex = /^---\s*[\r\n]+([\s\S]*?)[\r\n]+---[\r\n]*/;
+  return markdownText.replace(frontmatterRegex, '');
+};
