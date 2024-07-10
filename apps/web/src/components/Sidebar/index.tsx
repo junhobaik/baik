@@ -6,6 +6,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
+import { Button } from '@nextui-org/react';
 import {
   IconBookmark,
   IconBox,
@@ -13,12 +14,14 @@ import {
   IconChevronRight,
   IconEdit,
   IconHome,
+  IconLogout,
   IconNews,
   IconRss,
   IconTestPipe,
 } from '@tabler/icons-react';
 import { useAtom } from 'jotai';
 import { Session } from 'next-auth';
+import { signOut } from 'next-auth/react';
 import styled from 'styled-components';
 
 import { sidebarCollapsed } from '@/store';
@@ -133,6 +136,12 @@ const Sidebar = ({ session }: { session: Session }) => {
           </Link>
         </div>
       </div>
+
+      <div className="foot">
+        <Button fullWidth variant="light" startContent={<IconLogout size={18} />} onClick={() => signOut()}>
+          Sign Out
+        </Button>
+      </div>
     </SidebarStyled>
   );
 };
@@ -142,6 +151,15 @@ const SidebarStyled = styled.div`
   overflow-y: auto;
   padding-top: 24px;
   transition: width 0.1s;
+  height: 100svh;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid #e0e0e055;
+
+  .foot {
+    padding: 16px;
+    margin-top: auto;
+  }
 
   .logo-text,
   .section-title,
