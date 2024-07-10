@@ -112,28 +112,28 @@ export const getArticlesByTypeStatus = async (args: {
   return await request(param);
 };
 
-export const getArticlesByPathname = async (args: {
+export const getArticleByPathname = async (args: {
   pathname: string;
   limit?: number;
   lastEvaluatedKey?: Record<string, any>;
 }): Promise<ActionResult> => {
   const param = {
     module: 'archive',
-    action: 'getArticlesByPathname',
+    action: 'getArticleByPathname',
     payload: args,
   };
 
   return await request(param);
 };
 
-export const getArticlesByPathnamePublic = async (args: {
+export const getArticleByPathnamePublic = async (args: {
   pathname: string;
   limit?: number;
   lastEvaluatedKey?: Record<string, any>;
 }): Promise<ActionResult> => {
   const param = {
     module: 'archive',
-    action: 'getArticlesByPathnamePublic',
+    action: 'getArticleByPathnamePublic',
     payload: args,
   };
 

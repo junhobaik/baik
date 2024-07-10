@@ -125,14 +125,13 @@ const updateArticle = async (args: UpdateArticleArgs): Promise<ActionResult> => 
     });
 
     // GSI 업데이트 처리
-    if (updateData.type) {
+    if (updateData.type || updateData.status) {
+      const newType = updateData.type || item.type;
+      const newStatus = updateData.status || item.status;
       updateExpression += `, GSI3PK = :GSI3PK`;
-      expressionAttributeValues[':GSI3PK'] = `TYPE#${updateData.type}#STATUS#${updateData.status ?? item.status}`;
+      expressionAttributeValues[':GSI3PK'] = `TYPE#${newType}#STATUS#${newStatus}`;
     }
-    if (updateData.status) {
-      updateExpression += `, GSI3PK = :GSI3PK`;
-      expressionAttributeValues[':GSI3PK'] = `TYPE#${updateData.type ?? item.type}#STATUS#${updateData.status}`;
-    }
+
     updateExpression += `, GSI3SK = :GSI3SK, GSI2SK = :GSI2SK`;
     expressionAttributeValues[':GSI3SK'] = `UPDATED#${now}#${id}`;
     expressionAttributeValues[':GSI2SK'] = `UPDATED#${now}#${id}`;
@@ -164,7 +163,7 @@ const updateArticle = async (args: UpdateArticleArgs): Promise<ActionResult> => 
     }
 
     return {
-      data: { item: result },
+      data: { item: result, success: true },
       message: 'Article updated successfully',
     };
   } catch (error) {
@@ -455,7 +454,7 @@ const getArticlesByTypeStatus = async (args: {
   }
 };
 
-const getArticlesByPathname = async (args: { pathname: string }): Promise<ActionResult> => {
+const getArticleByPathname = async (args: { pathname: string }): Promise<ActionResult> => {
   const { pathname } = args;
 
   const params = {
@@ -538,7 +537,7 @@ const getAllArticlesPublic = async (args?: {
   }
 };
 
-const getArticlesByPathnamePublic = async (args: { pathname: string }): Promise<ActionResult> => {
+const getArticleByPathnamePublic = async (args: { pathname: string }): Promise<ActionResult> => {
   const { pathname } = args;
 
   const params = {
@@ -613,13 +612,13 @@ export default {
     run: getArticlesByTypeStatus,
     skip_auth: false,
   },
-  getArticlesByPathname: {
-    run: getArticlesByPathname,
+  getArticleByPathname: {
+    run: getArticleByPathname,
     skip_auth: false,
   },
   // public
-  getArticlesByPathnamePublic: {
-    run: getArticlesByPathnamePublic,
+  getArticleByPathnamePublic: {
+    run: getArticleByPathnamePublic,
     skip_auth: true,
   },
   getAllArticlesPublic: {

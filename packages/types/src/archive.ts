@@ -23,6 +23,7 @@ export interface ArticleBase {
   pathname?: string;
   url?: string;
   site?: ClipSite;
+  thumbnail_img_url?: string;
 }
 
 export interface PostArticleBase extends ArticleBase {
@@ -44,7 +45,6 @@ export interface ClipArticleBase extends ArticleBase {
   url: string;
   origin_title: string;
   site: ClipSite;
-
   pathname?: never;
   keywords?: never;
 }

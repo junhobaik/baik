@@ -1,14 +1,16 @@
 'use client';
 
 // apps/web/src/components/DataTable/index.tsx
-import React, { useEffect, useMemo } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 
-import type { DefaultDBAttributes } from '@baik/types';
-import { Button, ButtonProps } from '@nextui-org/react';
+import { Button, ButtonProps, Checkbox } from '@nextui-org/react';
+import { IconEdit, IconFileCode2 } from '@tabler/icons-react';
 import { ColumnDef, flexRender, getCoreRowModel, useReactTable } from '@tanstack/react-table';
 import styled from 'styled-components';
 
-type HeaderOption<T extends DefaultDBAttributes> = {
+import DetailModal from './DetailModal';
+
+type HeaderOption<T> = {
   key: keyof T | '' | '_';
   title?: string;
 } & (
@@ -17,13 +19,16 @@ type HeaderOption<T extends DefaultDBAttributes> = {
   | { valueParser: (value: T[keyof T]) => T[keyof T]; render?: never }
 );
 
-export interface DataTableOptions<T extends DefaultDBAttributes> {
+export interface DataTableOptions<T> {
   headers: HeaderOption<T>[];
   index?: boolean;
   checkbox?: boolean;
+  detail?: boolean;
+  updateItem?: (updatedItem: T) => Promise<void>;
+  keysToDisabled?: string[];
 }
 
-type DataTableProps<T extends DefaultDBAttributes> = {
+type DataTableProps<T> = {
   items: T[];
   options: DataTableOptions<T>;
 } & (
@@ -31,10 +36,11 @@ type DataTableProps<T extends DefaultDBAttributes> = {
   | { hasNextItems: boolean; fetchMoreItems: () => Promise<unknown>; isLoading: boolean }
 );
 
-const DataTable = <T extends DefaultDBAttributes>(props: DataTableProps<T>) => {
+const DataTable = <T,>(props: DataTableProps<T>) => {
   const { items, options, hasNextItems = false, fetchMoreItems, isLoading = false } = props;
 
-  const [rowSelection, setRowSelection] = React.useState({});
+  const [rowSelection, setRowSelection] = useState<Record<number, boolean>>({});
+  const [detailModalItem, setDetailModalItem] = useState<T | null>();
 
   useEffect(() => {
     console.log('rowSelection', rowSelection);
@@ -67,7 +73,7 @@ const DataTable = <T extends DefaultDBAttributes>(props: DataTableProps<T>) => {
       },
     }));
 
-    if (options.index) {
+    if (options.index && !options.checkbox) {
       baseColumns.unshift({
         accessorKey: '__index',
         header: '',
@@ -77,17 +83,48 @@ const DataTable = <T extends DefaultDBAttributes>(props: DataTableProps<T>) => {
 
     if (options.checkbox) {
       baseColumns.unshift({
-        id: 'select',
+        id: '__select',
         header: ({ table }) => (
           <input
+            className="h-5 w-5"
             type="checkbox"
             checked={table.getIsAllRowsSelected()}
             onChange={table.getToggleAllRowsSelectedHandler()}
           />
         ),
+
         cell: ({ row }) => (
-          <input type="checkbox" checked={row.getIsSelected()} onChange={row.getToggleSelectedHandler()} />
+          <label className="flex items-center">
+            <input
+              className="h-5 w-5"
+              type="checkbox"
+              checked={row.getIsSelected()}
+              onChange={row.getToggleSelectedHandler()}
+            />
+            {!!options.index && <span className="ml-2 text-gray-700">{row.index + 1}</span>}
+          </label>
         ),
+      });
+    }
+
+    if (options.detail) {
+      baseColumns.push({
+        id: '__detail',
+        header: () => null,
+        cell: ({ row }) => {
+          return (
+            <Button
+              size="sm"
+              className="min-w-0"
+              variant="light"
+              onClick={() => {
+                setDetailModalItem(row.original);
+              }}
+            >
+              {options.updateItem ? <IconEdit size={18} /> : <IconFileCode2 size={18} />}
+            </Button>
+          );
+        },
       });
     }
 
@@ -130,43 +167,52 @@ const DataTable = <T extends DefaultDBAttributes>(props: DataTableProps<T>) => {
   }, [isLoading, hasNextItems]);
 
   return (
-    <TableContainer>
-      <TableWrapper>
-        <TableStyled>
-          <thead>
-            {table.getHeaderGroups().map((headerGroup) => (
-              <tr key={headerGroup.id}>
-                {headerGroup.headers.map((header) => (
-                  <th key={header.id}>{flexRender(header.column.columnDef.header, header.getContext())}</th>
-                ))}
-              </tr>
-            ))}
-          </thead>
-          <tbody>
-            {table.getRowModel().rows.map((row) => (
-              <tr key={row.id}>
-                {row.getVisibleCells().map((cell) => (
-                  <td key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</td>
-                ))}
-              </tr>
-            ))}
-          </tbody>
-        </TableStyled>
-      </TableWrapper>
-      <PaginationContainer>
-        <Button
-          fullWidth
-          onClick={() => {
-            fetchMoreItems?.();
-          }}
-          {...paginationButtonProps}
-        >
-          {isLoading && 'Loading...'}
-          {!isLoading && hasNextItems && 'Load more'}
-          {!isLoading && !hasNextItems && 'No more items'}
-        </Button>
-      </PaginationContainer>
-    </TableContainer>
+    <>
+      <TableContainer>
+        <TableWrapper>
+          <TableStyled>
+            <thead>
+              {table.getHeaderGroups().map((headerGroup) => (
+                <tr key={headerGroup.id}>
+                  {headerGroup.headers.map((header) => (
+                    <th key={header.id}>{flexRender(header.column.columnDef.header, header.getContext())}</th>
+                  ))}
+                </tr>
+              ))}
+            </thead>
+            <tbody>
+              {table.getRowModel().rows.map((row) => (
+                <tr key={row.id}>
+                  {row.getVisibleCells().map((cell) => (
+                    <td key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </TableStyled>
+        </TableWrapper>
+        <PaginationContainer>
+          <Button
+            fullWidth
+            onClick={() => {
+              fetchMoreItems?.();
+            }}
+            {...paginationButtonProps}
+          >
+            {isLoading && 'Loading...'}
+            {!isLoading && hasNextItems && 'Load more'}
+            {!isLoading && !hasNextItems && 'No more items'}
+          </Button>
+        </PaginationContainer>
+      </TableContainer>
+
+      <DetailModal
+        item={detailModalItem}
+        onClose={() => setDetailModalItem(null)}
+        updateItem={options.updateItem}
+        keysToDisabled={options.keysToDisabled}
+      />
+    </>
   );
 };
 

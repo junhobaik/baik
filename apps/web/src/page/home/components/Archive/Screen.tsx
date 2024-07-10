@@ -1,15 +1,47 @@
-import React from 'react';
+'use client';
 
-import { BookmarkGroup } from '@baik/types';
+import React, { useEffect } from 'react';
+
+import Link from 'next/link';
+
+import { Article } from '@baik/types';
+import { Button } from '@nextui-org/react';
 import { Session } from 'next-auth';
+import { signIn, signOut } from 'next-auth/react';
 
-interface DashboardScreenProps {
-  session: Session;
-  bookmarkGroupList: BookmarkGroup[];
+interface ArchiveScreenProps {
+  session: Session | null;
+  articles: Article[];
 }
 
-const DashboardScreen = (props: DashboardScreenProps) => {
-  return <div>DashboardScreen</div>;
+const ArchiveScreen = (props: ArchiveScreenProps) => {
+  const { session, articles } = props;
+
+  useEffect(() => {
+    console.log(props);
+  }, [props]);
+
+  return (
+    <div>
+      {!session ? (
+        <Button className="mr-1" onClick={() => signIn()}>
+          Sign In
+        </Button>
+      ) : (
+        <Button className="mr-1" onClick={() => signOut()}>
+          Sign Out
+        </Button>
+      )}
+
+      <ul>
+        {articles.map((article) => (
+          <Link href={`/${article.pathname}`} key={article.id}>
+            <li key={article.id}>{article.title}</li>
+          </Link>
+        ))}
+      </ul>
+    </div>
+  );
 };
 
-export default DashboardScreen;
+export default ArchiveScreen;

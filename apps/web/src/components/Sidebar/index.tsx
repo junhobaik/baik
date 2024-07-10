@@ -51,7 +51,7 @@ const Sidebar = () => {
       <div className="section-container">
         <p className="section-title">Dashboard</p>
         <div>
-          <Link className={`styled-link ${pathname === '/' ? 'active' : ''}`} href={'/'}>
+          <Link className={`styled-link ${pathname === '/dashboard' ? 'active' : ''}`} href={'/dashboard'}>
             <span className="icon-wrapper">
               <IconHome size={20} />
             </span>
@@ -63,7 +63,7 @@ const Sidebar = () => {
       <div className="section-container">
         <p className="section-title">Archive</p>
         <div>
-          <Link className={`styled-link ${pathname === '/archive' ? 'active' : ''}`} href={'/archive'}>
+          <Link className={`styled-link ${pathname === '/' ? 'active' : ''}`} href={'/'}>
             <span className="icon-wrapper">
               <IconBox size={20} />
             </span>
@@ -71,7 +71,7 @@ const Sidebar = () => {
           </Link>
         </div>
         <div>
-          <Link className={`styled-link ${pathname === '/archive/write' ? 'active' : ''}`} href={'/archive/write'}>
+          <Link className={`styled-link ${pathname === '/write' ? 'active' : ''}`} href={'/write'}>
             <span className="icon-wrapper">
               <IconEdit size={20} />
             </span>

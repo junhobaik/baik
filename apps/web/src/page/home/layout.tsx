@@ -4,8 +4,8 @@ import { auth } from '@/auth';
 import '@/styles/globals.css';
 
 import Sidebar from '../../components/Sidebar';
-import { Providers } from './providers';
-import { Registries } from './registries';
+import { Providers } from './components/providers';
+import { Registries } from './components/registries';
 
 import '@junhobaik/ui/css';
 

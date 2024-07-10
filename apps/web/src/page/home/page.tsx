@@ -1,54 +1,19 @@
-'use client';
+'use server';
 
-import { useEffect, useState } from 'react';
+import React from 'react';
 
-import { useRouter } from 'next/navigation';
+import { Article } from '@baik/types';
+import { Session } from 'next-auth';
 
-import { Button } from '@nextui-org/react';
-import { getSession, signIn, signOut } from 'next-auth/react';
+import api from '@/api';
+import { auth } from '@/auth';
 
-const Home = () => {
-  const router = useRouter();
-  const [signed, setSigned] = useState<null | boolean>(null);
+import Archive from './components/Archive';
 
-  const fetchSigned = async () => {
-    const session = await getSession();
-    setSigned(!!session);
-  };
+const Home = async () => {
+  const session = await auth();
 
-  useEffect(() => {
-    fetchSigned();
-  }, []);
-
-  return (
-    <main className="w-full h-screen flex flex-col justify-center items-center">
-      <div className="p-4">
-        {signed === false ? (
-          <Button
-            color="secondary"
-            onClick={() => {
-              signIn();
-            }}
-          >
-            Sign In
-          </Button>
-        ) : null}
-
-        {signed === true ? (
-          <Button
-            color="danger"
-            onClick={() => {
-              signOut();
-            }}
-          >
-            Sign Out
-          </Button>
-        ) : null}
-
-        {signed === null ? <Button color="warning" isLoading></Button> : null}
-      </div>
-    </main>
-  );
+  return <Archive session={session} />;
 };
 
 export default Home;

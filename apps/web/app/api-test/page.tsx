@@ -4,7 +4,7 @@ import React from 'react';
 
 import { Article, BookmarkGroup, ClipArticleBase, PostArticleBase, ShortsArticleBase } from '@baik/types';
 import { Button } from '@nextui-org/react';
-import { getSession } from 'next-auth/react';
+import { getSession, signIn, signOut } from 'next-auth/react';
 import { v4 as uuidv4 } from 'uuid';
 
 import api from '@/api';
@@ -29,6 +29,10 @@ const ApiTest = () => {
         >
           verifyCurrentSession
         </Button>
+        <Button className="mr-1" onClick={() => signIn()}>
+          Sign In
+        </Button>
+        <Button onClick={() => signOut()}>Sign Out</Button>
       </div>
 
       <div className="m-2 p-2 border">
@@ -361,14 +365,14 @@ const ApiTest = () => {
 
             const item = res1.data?.items.find((v: Article) => (v as any).pathname);
 
-            const res = await api.client.archive.getArticlesByPathname({ pathname: item.pathname });
+            const res = await api.client.archive.getArticleByPathname({ pathname: item.pathname });
             console.log('default', res);
 
-            const res2 = await api.client.archive.getArticlesByPathnamePublic({ pathname: item.pathname });
+            const res2 = await api.client.archive.getArticleByPathnamePublic({ pathname: item.pathname });
             console.log('public', res2);
           }}
         >
-          getArticlesByPathname
+          getArticleByPathname
         </Button>
       </div>
     </div>

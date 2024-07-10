@@ -7,7 +7,13 @@ import { Session } from 'next-auth';
 
 import api from '@/api';
 
-const fetchArticles = async (session: Session) => {
+import ArchiveScreen from './Screen';
+
+interface ArchiveProps {
+  session: Session | null;
+}
+
+const fetchArticles = async (session: Session | null) => {
   let articles: Article[];
 
   if (session) {
@@ -21,14 +27,13 @@ const fetchArticles = async (session: Session) => {
   return articles;
 };
 
-const ArchivePage = async (props: { session: Session }) => {
+const Archive = async (props: ArchiveProps) => {
   const { session } = props;
-
   const articles = await fetchArticles(session);
 
   console.log('articles', articles);
 
-  return <div></div>;
+  return <ArchiveScreen session={session} articles={articles} />;
 };
 
-export default ArchivePage;
+export default Archive;
