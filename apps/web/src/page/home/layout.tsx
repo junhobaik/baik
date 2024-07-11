@@ -4,6 +4,7 @@ import { auth } from '@/auth';
 import '@/styles/globals.css';
 
 import Sidebar from '../../components/Sidebar';
+import ArchiveFooter from './components/ArchiveFooter';
 import ArchiveHeader from './components/ArchiveHeader';
 import { Providers } from './components/providers';
 import { Registries } from './components/registries';
@@ -31,12 +32,13 @@ const RootLayout = async ({
 
   if (!session)
     return (
-      <html lang="kr" className="light">
-        <body>
+      <html lang="kr" className="light min-h-full h-full">
+        <body className="min-h-full h-full">
           <Providers>
             <Registries>
               <ArchiveHeader />
-              <main>{children}</main>
+              <main className="w-[1200px] mx-auto">{children}</main>
+              <ArchiveFooter />
             </Registries>
           </Providers>
         </body>
