@@ -69,6 +69,18 @@ const BookmarkDataTable = (props: BookmarkDataTableProps) => {
 
       // TODO: Feeds
     },
+    deleteItem: async (id: string) => {
+      const res = await api.client.dashboard.deleteBookmarkGroup({ id });
+      if (res.data?.success) {
+        await query.refetch();
+      }
+    },
+    deleteItems: async (selections: { pk: string; sk: string }[]) => {
+      const res = await api.client.dashboard.deleteBookmarkGroups(selections);
+      if (res.data?.success) {
+        await query.refetch();
+      }
+    },
   };
 
   return (

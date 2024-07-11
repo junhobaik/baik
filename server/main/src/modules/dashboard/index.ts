@@ -112,7 +112,7 @@ const updateBookmarkGroup = async (args: { id: string } & Partial<BookmarkGroupB
     }
 
     return {
-      data: { item: result },
+      data: { item: result, success: true },
       message: 'Bookmark group updated successfully',
     };
   } catch (error) {
@@ -168,7 +168,7 @@ const deleteBookmarkGroup = async (args: { id: string }): Promise<ActionResult> 
 
     return {
       message: 'Bookmark group deleted successfully',
-      data: { id: id },
+      data: { id: id, success: true },
     };
   } catch (error) {
     console.error('Error deleting bookmark group:', error);
@@ -187,6 +187,50 @@ const deleteBookmarkGroup = async (args: { id: string }): Promise<ActionResult> 
       message: 'Failed to delete bookmark group',
       error: {
         code: 'DASHBOARD>BOOKMARK_GROUP>DELETE_ERROR',
+        message: error instanceof Error ? error.message : String(error),
+      },
+    };
+  }
+};
+
+const deleteBookmarkGroups = async ({ list }: { list: { pk: string; sk: string }[] }): Promise<ActionResult> => {
+  if (list.length === 0) {
+    return {
+      message: 'No bookmark groups to delete',
+      data: { success: true, deletedCount: 0 },
+    };
+  }
+
+  try {
+    const chunkSize = 25;
+    const chunks = [];
+    for (let i = 0; i < list.length; i += chunkSize) {
+      chunks.push(list.slice(i, i + chunkSize));
+    }
+
+    let deletedCount = 0;
+    for (const chunk of chunks) {
+      const deleteParams = {
+        tableName,
+        keys: chunk.map((item) => ({ pk: item.pk, sk: item.sk })),
+      };
+
+      const result = await db.batchDeleteItems(deleteParams);
+
+      const unprocessedItems = result.UnprocessedItems?.[tableName]?.length || 0;
+      deletedCount += chunk.length - unprocessedItems;
+    }
+
+    return {
+      message: 'Bookmark groups deleted successfully',
+      data: { success: true, deletedCount },
+    };
+  } catch (error) {
+    console.error('Error deleting bookmark groups:', error);
+    return {
+      message: 'Failed to delete bookmark groups',
+      error: {
+        code: 'DASHBOARD>BOOKMARK_GROUP>BATCH_DELETE_ERROR',
         message: error instanceof Error ? error.message : String(error),
       },
     };
@@ -388,7 +432,7 @@ const updateFeedItem = async (args: { id: string } & Partial<FeedItemBase>): Pro
     }
 
     return {
-      data: { item: result },
+      data: { item: result, success: true },
       message: 'Feed item updated successfully',
     };
   } catch (error) {
@@ -445,7 +489,7 @@ const deleteFeedItem = async (args: { id: string }): Promise<ActionResult> => {
 
     return {
       message: 'Feed item deleted successfully',
-      data: { id: id },
+      data: { id: id, success: true },
     };
   } catch (error) {
     console.error('Error deleting feed item:', error);
@@ -496,7 +540,7 @@ const getFeedItem = async (args: { id: string }): Promise<ActionResult> => {
     }
 
     return {
-      data: { item: queryResult.items[0] },
+      data: { item: queryResult.items[0], success: true },
       message: 'Feed item retrieved successfully',
     };
   } catch (error) {
@@ -562,6 +606,10 @@ export default {
   },
   deleteBookmarkGroup: {
     run: deleteBookmarkGroup,
+    skip_auth: false,
+  },
+  deleteBookmarkGroups: {
+    run: deleteBookmarkGroups,
     skip_auth: false,
   },
   getBookmarkGroup: {

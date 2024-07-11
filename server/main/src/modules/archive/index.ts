@@ -219,7 +219,7 @@ const deleteArticle = async (args: { id: string }): Promise<ActionResult> => {
 
     return {
       message: 'Article deleted successfully',
-      data: { id: id },
+      data: { id: id, success: true },
     };
   } catch (error) {
     console.error('Error deleting article:', error);
@@ -270,7 +270,7 @@ const getArticle = async (args: { id: string }): Promise<ActionResult> => {
     }
 
     return {
-      data: { item: queryResult.items[0] },
+      data: { item: queryResult.items[0], success: true },
       message: 'Article retrieved successfully',
     };
   } catch (error) {
@@ -579,6 +579,63 @@ const getArticleByPathnamePublic = async (args: { pathname: string }): Promise<A
   }
 };
 
+const deleteArticles = async ({ list }: { list: { pk: string; sk: string }[] }): Promise<ActionResult> => {
+  if (list.length === 0) {
+    return {
+      message: 'No articles to delete',
+      data: { success: true, deletedCount: 0 },
+    };
+  }
+
+  try {
+    const chunkSize = 25;
+    const chunks = [];
+    for (let i = 0; i < list.length; i += chunkSize) {
+      chunks.push(list.slice(i, i + chunkSize));
+    }
+
+    let deletedCount = 0;
+    let unprocessedItems: { pk: string; sk: string }[] = [];
+
+    for (const chunk of chunks) {
+      const deleteParams = {
+        tableName,
+        keys: chunk.map((item) => ({ pk: item.pk, sk: item.sk })),
+      };
+
+      const result = await db.batchDeleteItems(deleteParams);
+
+      const currentUnprocessedItems = result.UnprocessedItems?.[tableName] || [];
+      deletedCount += chunk.length - currentUnprocessedItems.length;
+
+      unprocessedItems = unprocessedItems.concat(
+        currentUnprocessedItems.map((item: any) => ({
+          pk: item.DeleteRequest.Key.pk,
+          sk: item.DeleteRequest.Key.sk,
+        })),
+      );
+    }
+
+    return {
+      message: 'Articles deleted successfully',
+      data: {
+        success: true,
+        deletedCount,
+        unprocessedItems: unprocessedItems.length > 0 ? unprocessedItems : undefined,
+      },
+    };
+  } catch (error) {
+    console.error('Error deleting articles:', error);
+    return {
+      message: 'Failed to delete articles',
+      error: {
+        code: 'ARCHIVE>ARTICLE>BATCH_DELETE_ERROR',
+        message: error instanceof Error ? error.message : String(error),
+      },
+    };
+  }
+};
+
 export default {
   createArticle: {
     run: createArticle,
@@ -614,6 +671,10 @@ export default {
   },
   getArticleByPathname: {
     run: getArticleByPathname,
+    skip_auth: false,
+  },
+  deleteArticles: {
+    run: deleteArticles,
     skip_auth: false,
   },
   // public

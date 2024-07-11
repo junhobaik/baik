@@ -2,6 +2,7 @@
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
 import {
   BatchGetCommand,
+  BatchWriteCommand,
   DeleteCommand,
   DynamoDBDocumentClient,
   GetCommand,
@@ -185,9 +186,34 @@ export const batchGetItems = async (args: BatchGetItemsArgs) => {
 
   try {
     const response = await docClient.send(command);
-    return response.Responses?.[args.tableName];
+    return response.Responses?.[args.tableName] || [];
   } catch (error) {
     console.error('Error batch getting items:', error);
+    throw error;
+  }
+};
+
+interface BatchDeleteItemsArgs {
+  tableName: string;
+  keys: Record<string, any>[];
+}
+
+export const batchDeleteItems = async (args: BatchDeleteItemsArgs) => {
+  const deleteRequests = args.keys.map((key) => ({
+    DeleteRequest: { Key: key },
+  }));
+
+  const command = new BatchWriteCommand({
+    RequestItems: {
+      [args.tableName]: deleteRequests,
+    },
+  });
+
+  try {
+    const response = await docClient.send(command);
+    return response;
+  } catch (error) {
+    console.error('Error batch deleting items:', error);
     throw error;
   }
 };
@@ -200,4 +226,5 @@ export default {
   queryItems,
   scanItems,
   batchGetItems,
+  batchDeleteItems,
 };

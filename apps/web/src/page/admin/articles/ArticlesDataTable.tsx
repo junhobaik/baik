@@ -104,6 +104,12 @@ const ArticlesDataTable = (props: ArticlesDataTableProps) => {
         await query.refetch();
       }
     },
+    deleteItem: async (id: string) => {
+      const res = await api.client.archive.deleteArticle({ id });
+      if (res.data?.success) {
+        await query.refetch();
+      }
+    },
   };
 
   return (

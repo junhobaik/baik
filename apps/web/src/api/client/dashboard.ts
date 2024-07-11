@@ -39,6 +39,16 @@ export const deleteBookmarkGroup = async ({ id }: { id: string }): Promise<Actio
   return await request(param);
 };
 
+export const deleteBookmarkGroups = async (list: { pk: string; sk: string }[]): Promise<ActionResult> => {
+  const param = {
+    module: 'dashboard',
+    action: 'deleteBookmarkGroups',
+    payload: { list },
+  };
+
+  return await request(param);
+};
+
 export const getBookmarkGroup = async ({ id }: { id: string }): Promise<ActionResult> => {
   const param = {
     module: 'dashboard',

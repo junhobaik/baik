@@ -153,3 +153,13 @@ export const getAllArticlesPublic = async (args?: {
 
   return await request(param);
 };
+
+export const deleteArticles = async (list: { pk: string; sk: string }[]): Promise<ActionResult> => {
+  const param = {
+    module: 'archive',
+    action: 'deleteArticles',
+    payload: { list },
+  };
+
+  return await request(param);
+};

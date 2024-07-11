@@ -1,10 +1,11 @@
 'use client';
 
 // apps/web/src/components/DataTable/index.tsx
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 
-import { Button, ButtonProps, Checkbox } from '@nextui-org/react';
-import { IconEdit, IconFileCode2 } from '@tabler/icons-react';
+import { DefaultDBAttributes } from '@baik/types';
+import { Button, ButtonProps } from '@nextui-org/react';
+import { IconEdit, IconFileCode2, IconTrash } from '@tabler/icons-react';
 import { ColumnDef, flexRender, getCoreRowModel, useReactTable } from '@tanstack/react-table';
 import styled from 'styled-components';
 
@@ -24,8 +25,10 @@ export interface DataTableOptions<T> {
   index?: boolean;
   checkbox?: boolean;
   detail?: boolean;
-  updateItem?: (updatedItem: T) => Promise<void>;
   keysToDisabled?: string[];
+  updateItem?: (updatedItem: T) => Promise<void>;
+  deleteItem?: (id: string) => Promise<void>;
+  deleteItems?: (list: { pk: string; sk: string }[]) => Promise<void>;
 }
 
 type DataTableProps<T> = {
@@ -36,15 +39,37 @@ type DataTableProps<T> = {
   | { hasNextItems: boolean; fetchMoreItems: () => Promise<unknown>; isLoading: boolean }
 );
 
-const DataTable = <T,>(props: DataTableProps<T>) => {
+const DataTable = <T extends DefaultDBAttributes>(props: DataTableProps<T>) => {
   const { items, options, hasNextItems = false, fetchMoreItems, isLoading = false } = props;
 
   const [rowSelection, setRowSelection] = useState<Record<number, boolean>>({});
   const [detailModalItem, setDetailModalItem] = useState<T | null>();
+  const [deleteLoading, setDeleteLoading] = useState(false);
 
-  useEffect(() => {
-    console.log('rowSelection', rowSelection);
+  const selections = useMemo(() => {
+    const selectedIndexList = Object.keys(rowSelection);
+    return selectedIndexList.map((index) => ({
+      pk: items[Number(index)].pk,
+      sk: items[Number(index)].sk,
+    }));
   }, [rowSelection]);
+
+  const toolsEnabled = useMemo(() => {
+    return !!options.deleteItems;
+  }, [options.deleteItems]);
+
+  const handleDeleteItem = async (id: string) => {
+    setDeleteLoading(true);
+    await options.deleteItem?.(id);
+    setDeleteLoading(false);
+  };
+
+  const handleDeleteItems = async () => {
+    setDeleteLoading(true);
+    await options.deleteItems?.(selections);
+    setRowSelection({});
+    setDeleteLoading(false);
+  };
 
   const headers = useMemo(() => {
     return options.headers.map((header) => {
@@ -107,22 +132,39 @@ const DataTable = <T,>(props: DataTableProps<T>) => {
       });
     }
 
-    if (options.detail) {
+    if (options.detail || options.deleteItem) {
       baseColumns.push({
         id: '__detail',
         header: () => null,
         cell: ({ row }) => {
           return (
-            <Button
-              size="sm"
-              className="min-w-0"
-              variant="light"
-              onClick={() => {
-                setDetailModalItem(row.original);
-              }}
-            >
-              {options.updateItem ? <IconEdit size={18} /> : <IconFileCode2 size={18} />}
-            </Button>
+            <div className="flex">
+              {!!options.detail && (
+                <Button
+                  size="sm"
+                  className="min-w-0"
+                  variant="light"
+                  color="primary"
+                  onClick={() => {
+                    setDetailModalItem(row.original);
+                  }}
+                >
+                  {options.updateItem ? <IconEdit size={18} /> : <IconFileCode2 size={18} />}
+                </Button>
+              )}
+              {!!options.deleteItem && (
+                <Button
+                  size="sm"
+                  className="min-w-0"
+                  variant="light"
+                  color="danger"
+                  isLoading={deleteLoading}
+                  onClick={() => handleDeleteItem(row.original.id)}
+                >
+                  <IconTrash size={18} />
+                </Button>
+              )}
+            </div>
           );
         },
       });
@@ -169,6 +211,22 @@ const DataTable = <T,>(props: DataTableProps<T>) => {
   return (
     <>
       <TableContainer>
+        {toolsEnabled && (
+          <TableToolsContainer>
+            {!!options.deleteItems && (
+              <Button
+                color="danger"
+                size="sm"
+                startContent={<IconTrash size={16} />}
+                onClick={handleDeleteItems}
+                isLoading={deleteLoading}
+              >
+                Selected Delete
+              </Button>
+            )}
+          </TableToolsContainer>
+        )}
+
         <TableWrapper>
           <TableStyled>
             <thead>
@@ -215,6 +273,13 @@ const DataTable = <T,>(props: DataTableProps<T>) => {
     </>
   );
 };
+
+const TableToolsContainer = styled.div`
+  border-radius: 8px;
+  background-color: #fff;
+  padding: 16px;
+  margin-bottom: 8px;
+`;
 
 const TableContainer = styled.div`
   display: flex;
