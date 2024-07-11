@@ -1,7 +1,7 @@
 'use client';
 
 // apps/web/src/components/DataTable/index.tsx
-import React, { useMemo, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 
 import { DefaultDBAttributes } from '@baik/types';
 import { Button, ButtonProps } from '@nextui-org/react';
@@ -52,24 +52,28 @@ const DataTable = <T extends DefaultDBAttributes>(props: DataTableProps<T>) => {
       pk: items[Number(index)].pk,
       sk: items[Number(index)].sk,
     }));
-  }, [rowSelection]);
+  }, [rowSelection, items]);
 
   const toolsEnabled = useMemo(() => {
     return !!options.deleteItems;
   }, [options.deleteItems]);
 
-  const handleDeleteItem = async (id: string) => {
-    setDeleteLoading(true);
-    await options.deleteItem?.(id);
-    setDeleteLoading(false);
-  };
+  const handleDeleteItem = useCallback(
+    async (id: string) => {
+      setDeleteLoading(true);
+      await options.deleteItem?.(id);
+      setRowSelection({});
+      setDeleteLoading(false);
+    },
+    [options.deleteItem],
+  );
 
-  const handleDeleteItems = async () => {
+  const handleDeleteItems = useCallback(async () => {
     setDeleteLoading(true);
     await options.deleteItems?.(selections);
     setRowSelection({});
     setDeleteLoading(false);
-  };
+  }, [options.deleteItems, selections]);
 
   const headers = useMemo(() => {
     return options.headers.map((header) => {
@@ -117,7 +121,6 @@ const DataTable = <T extends DefaultDBAttributes>(props: DataTableProps<T>) => {
             onChange={table.getToggleAllRowsSelectedHandler()}
           />
         ),
-
         cell: ({ row }) => (
           <label className="flex items-center">
             <input
@@ -145,9 +148,7 @@ const DataTable = <T extends DefaultDBAttributes>(props: DataTableProps<T>) => {
                   className="min-w-0"
                   variant="light"
                   color="primary"
-                  onClick={() => {
-                    setDetailModalItem(row.original);
-                  }}
+                  onClick={() => setDetailModalItem(row.original)}
                 >
                   {options.updateItem ? <IconEdit size={18} /> : <IconFileCode2 size={18} />}
                 </Button>
@@ -171,7 +172,7 @@ const DataTable = <T extends DefaultDBAttributes>(props: DataTableProps<T>) => {
     }
 
     return baseColumns;
-  }, [options.headers, options.index, options.checkbox, items]);
+  }, [options, items, handleDeleteItem, deleteLoading]);
 
   const table = useReactTable({
     data: items,
@@ -184,9 +185,9 @@ const DataTable = <T extends DefaultDBAttributes>(props: DataTableProps<T>) => {
     onRowSelectionChange: setRowSelection,
   });
 
-  const paginationButtonProps = useMemo(() => {
-    let variant = 'flat';
-    let color = 'default';
+  const paginationButtonProps = useMemo<Partial<ButtonProps>>(() => {
+    let variant: ButtonProps['variant'] = 'flat';
+    let color: ButtonProps['color'] = 'default';
 
     if (hasNextItems) {
       variant = 'flat';
@@ -200,13 +201,17 @@ const DataTable = <T extends DefaultDBAttributes>(props: DataTableProps<T>) => {
       color = 'warning';
     }
     return {
-      variant: variant,
-      color: color,
+      variant,
+      color,
       loading: isLoading,
-      isLoading: isLoading,
+      isLoading,
       isDisabled: !hasNextItems,
-    } as Partial<ButtonProps>;
+    };
   }, [isLoading, hasNextItems]);
+
+  const handleLoadMore = useCallback(() => {
+    fetchMoreItems?.();
+  }, [fetchMoreItems]);
 
   return (
     <>
@@ -250,13 +255,7 @@ const DataTable = <T extends DefaultDBAttributes>(props: DataTableProps<T>) => {
           </TableStyled>
         </TableWrapper>
         <PaginationContainer>
-          <Button
-            fullWidth
-            onClick={() => {
-              fetchMoreItems?.();
-            }}
-            {...paginationButtonProps}
-          >
+          <Button fullWidth onClick={handleLoadMore} {...paginationButtonProps}>
             {isLoading && 'Loading...'}
             {!isLoading && hasNextItems && 'Load more'}
             {!isLoading && !hasNextItems && 'No more items'}
