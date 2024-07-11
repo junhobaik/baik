@@ -23,7 +23,7 @@ const createBookmarkGroup = async (args: BookmarkGroupBase): Promise<ActionResul
     ...args,
     pk: `BOOKMARKGROUP#${id}`,
     sk: `BOOKMARKGROUP#${now}#${id}`,
-    id: uuidv4(),
+    id: id,
     data_type: 'bookmarkGroup',
     created_at: now,
     updated_at: now,
