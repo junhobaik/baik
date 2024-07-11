@@ -31,8 +31,6 @@ const Archive = async (props: ArchiveProps) => {
   const { session } = props;
   const articles = await fetchArticles(session);
 
-  console.log('articles', articles);
-
   return <ArchiveScreen session={session} articles={articles} />;
 };
 

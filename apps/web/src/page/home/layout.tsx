@@ -4,6 +4,7 @@ import { auth } from '@/auth';
 import '@/styles/globals.css';
 
 import Sidebar from '../../components/Sidebar';
+import ArchiveHeader from './components/ArchiveHeader';
 import { Providers } from './components/providers';
 import { Registries } from './components/registries';
 
@@ -33,7 +34,10 @@ const RootLayout = async ({
       <html lang="kr" className="light">
         <body>
           <Providers>
-            <Registries>{children}</Registries>
+            <Registries>
+              <ArchiveHeader />
+              <main>{children}</main>
+            </Registries>
           </Providers>
         </body>
       </html>

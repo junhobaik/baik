@@ -137,7 +137,7 @@ const Sidebar = ({ session }: { session: Session }) => {
         </div>
       </div>
 
-      <div className="foot">
+      <div className="foot-container">
         <Button fullWidth variant="light" startContent={<IconLogout size={18} />} onClick={() => signOut()}>
           Sign Out
         </Button>
@@ -156,7 +156,7 @@ const SidebarStyled = styled.div`
   flex-direction: column;
   border: 1px solid #e0e0e055;
 
-  .foot {
+  .foot-container {
     padding: 16px;
     margin-top: auto;
   }
@@ -164,7 +164,8 @@ const SidebarStyled = styled.div`
   .logo-text,
   .section-title,
   .link-text,
-  .section-divider {
+  .section-divider,
+  .foot-container {
     opacity: 1;
     transition: opacity 0.1s;
   }
@@ -176,8 +177,10 @@ const SidebarStyled = styled.div`
     .logo-text,
     .section-title,
     .link-text,
-    .section-divider {
+    .section-divider,
+    .foot-container {
       opacity: 0;
+      pointer-events: none;
     }
   }
 
