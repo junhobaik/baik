@@ -9,6 +9,8 @@ import { IconEdit, IconFileCode2, IconTrash } from '@tabler/icons-react';
 import { ColumnDef, flexRender, getCoreRowModel, useReactTable } from '@tanstack/react-table';
 import styled from 'styled-components';
 
+import useRenderTracker from '@/hooks/useRenderTracker';
+
 import DetailModal from './DetailModal';
 
 type HeaderOption<T> = {
@@ -42,6 +44,8 @@ type DataTableProps<T> = {
 );
 
 const DataTable = <T extends DefaultDBAttributes>(props: DataTableProps<T>) => {
+  useRenderTracker({ name: 'DataTable' });
+
   const { items, options, hasNextItems = false, fetchMoreItems, isLoading = false } = props;
 
   const [rowSelection, setRowSelection] = useState<Record<number, boolean>>({});
