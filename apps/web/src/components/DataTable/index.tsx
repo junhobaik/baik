@@ -14,6 +14,8 @@ import DetailModal from './DetailModal';
 type HeaderOption<T> = {
   key: keyof T | '' | '_';
   title?: string;
+  headerStyle?: string;
+  cellStyle?: string;
 } & (
   | { render?: never; valueParser?: never }
   | { render: (args: { value: T[keyof T]; items: T[]; item: T }) => React.ReactNode; valueParser?: never }
@@ -70,8 +72,10 @@ const DataTable = <T extends DefaultDBAttributes>(props: DataTableProps<T>) => {
 
   const handleDeleteItems = useCallback(async () => {
     setDeleteLoading(true);
-    await options.deleteItems?.(selections);
-    setRowSelection({});
+    if (selections.length) {
+      await options.deleteItems?.(selections);
+      setRowSelection({});
+    }
     setDeleteLoading(false);
   }, [options.deleteItems, selections]);
 
@@ -85,20 +89,22 @@ const DataTable = <T extends DefaultDBAttributes>(props: DataTableProps<T>) => {
   const columns = useMemo<ColumnDef<T>[]>(() => {
     const baseColumns: ColumnDef<T>[] = headers.map((header) => ({
       accessorKey: header.key as string,
-      header: header.title ?? (header.key as string),
+      header: () => {
+        return <p className={header.headerStyle ?? ''}>{header.title ?? (header.key as string)}</p>;
+      },
       cell: (info) => {
         const value = info.getValue() as T[keyof T];
 
         if (header.render) {
           const item = info.row.original;
-          return header.render({ value, items, item });
+          return <div className={header.cellStyle ?? ''}>{header.render({ value, items, item })}</div>;
         }
 
         if (header.valueParser) {
-          return header.valueParser(value)?.toString() ?? '';
+          return <div className={header.cellStyle ?? ''}>{header.valueParser(value)?.toString() ?? ''}</div>;
         }
 
-        return value?.toString() ?? '';
+        return <div className={header.cellStyle ?? ''}>{value?.toString() ?? ''}</div>;
       },
     }));
 
@@ -144,6 +150,7 @@ const DataTable = <T extends DefaultDBAttributes>(props: DataTableProps<T>) => {
             <div className="flex">
               {!!options.detail && (
                 <Button
+                  isIconOnly
                   size="sm"
                   className="min-w-0"
                   variant="light"
@@ -155,6 +162,7 @@ const DataTable = <T extends DefaultDBAttributes>(props: DataTableProps<T>) => {
               )}
               {!!options.deleteItem && (
                 <Button
+                  isIconOnly
                   size="sm"
                   className="min-w-0"
                   variant="light"
@@ -222,7 +230,7 @@ const DataTable = <T extends DefaultDBAttributes>(props: DataTableProps<T>) => {
               <Button
                 color="danger"
                 size="sm"
-                startContent={<IconTrash size={16} />}
+                startContent={deleteLoading ? null : <IconTrash size={20} />}
                 onClick={handleDeleteItems}
                 isLoading={deleteLoading}
               >
@@ -300,6 +308,7 @@ const TableStyled = styled.table`
   border-collapse: separate;
   border-spacing: 0;
   font-size: 14px;
+  white-space: pre-line;
 
   thead {
     position: sticky;
