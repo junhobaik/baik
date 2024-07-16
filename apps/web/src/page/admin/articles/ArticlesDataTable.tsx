@@ -3,9 +3,11 @@
 // apps/web/src/page/admin/Articles/ArticlesDataTable.tsx
 import React from 'react';
 
+import { useRouter } from 'next/navigation';
+
 import type { Article } from '@baik/types';
-import { Select, SelectItem } from '@nextui-org/react';
-import { IconCopy } from '@tabler/icons-react';
+import { Button, Select, SelectItem } from '@nextui-org/react';
+import { IconCopy, IconLink } from '@tabler/icons-react';
 import dayjs from 'dayjs';
 
 import api from '@/api';
@@ -22,6 +24,7 @@ interface ArticlesDataTableProps {
 
 const ArticlesDataTable = (props: ArticlesDataTableProps) => {
   const { items, hasNextItems, fetchMoreItems, isLoading } = props;
+  const router = useRouter();
 
   const { query } = useArticles();
 
@@ -59,12 +62,12 @@ const ArticlesDataTable = (props: ArticlesDataTableProps) => {
             <Select
               aria-label="Status"
               items={[
-                { label: '공개', value: 'published' },
-                { label: '비공개', value: 'private' },
-                { label: '작성중', value: 'draft' },
+                { label: '🟢 공개', value: 'published' },
+                { label: '🔴 비공개', value: 'private' },
+                { label: '🟠 작성중', value: 'draft' },
               ]}
               size="sm"
-              className="w-24"
+              className="w-28"
               defaultSelectedKeys={[value as string]}
               onChange={updateStatus}
             >
@@ -74,27 +77,62 @@ const ArticlesDataTable = (props: ArticlesDataTableProps) => {
         },
       },
       { key: 'type', title: 'Type' },
-      { key: 'pathname', title: 'Pathname' },
-      { key: 'url', title: 'URL' },
-      { key: 'title', title: 'Title' },
       {
-        key: 'content',
-        title: 'Content',
-        render: ({ value }) => <p className="line-clamp-1 max-w-40">{value as string}</p>,
+        key: 'pathname',
+        title: 'Path | URL',
+        headerStyle: 'text-center',
+        cellStyle: 'text-center',
+        render: ({ item }) => {
+          return (
+            <div>
+              {!!item.pathname && <p>{item.pathname}</p>}
+              {!!item.url && (
+                <Button
+                  variant="light"
+                  size="sm"
+                  onClick={() => {
+                    window.open(item.url, '_blank');
+                  }}
+                >
+                  <IconLink size={16} />
+                </Button>
+              )}
+            </div>
+          );
+        },
+      },
+      { key: 'title', title: 'Title', cellStyle: 'font-bold' },
+      {
+        key: 'published_date',
+        title: 'Published',
+        valueParser: (value) => dayjs(value as number).format('YYYY-MM-DD\nHH:mm:ss'),
       },
       {
-        key: 'created_at',
-        title: 'Created At',
-        valueParser: (value) => dayjs(value as number).format('YYYY-MM-DD HH:mm:ss'),
+        key: 'updated_date',
+        title: 'Updated',
+        valueParser: (value) => dayjs(value as number).format('YYYY-MM-DD\nHH:mm:ss'),
       },
       {
-        key: 'updated_at',
-        title: 'Updated At',
-        valueParser: (value) => dayjs(value as number).format('YYYY-MM-DD HH:mm:ss'),
+        key: '',
+        title: '',
+        render: ({ item }) => {
+          return (
+            <Button
+              size="sm"
+              color="primary"
+              isDisabled={!item.pathname}
+              onClick={() => {
+                router.push('/write?pathname=' + item.pathname);
+              }}
+            >
+              Edit
+            </Button>
+          );
+        },
       },
     ],
     index: true,
-    checkbox: false,
+    checkbox: true,
     detail: true,
     keysToDisabled: ['GSI1PK', 'GSI1SK', 'GSI2PK', 'GSI2SK', 'GSI3PK', 'GSI3SK', 'GSI4PK', 'GSI4SK'],
     updateItem: async (item: Article) => {
@@ -106,6 +144,12 @@ const ArticlesDataTable = (props: ArticlesDataTableProps) => {
     },
     deleteItem: async (id: string) => {
       const res = await api.client.archive.deleteArticle({ id });
+      if (res.data?.success) {
+        await query.refetch();
+      }
+    },
+    deleteItems: async (selections: { pk: string; sk: string }[]) => {
+      const res = await api.client.archive.deleteArticles(selections);
       if (res.data?.success) {
         await query.refetch();
       }
