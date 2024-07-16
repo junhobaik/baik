@@ -64,3 +64,27 @@ export const removeFrontmatter = (markdownText: string): string => {
   const frontmatterRegex = /^---\s*[\r\n]+([\s\S]*?)[\r\n]+---[\r\n]*/;
   return markdownText.replace(frontmatterRegex, '');
 };
+
+export const toKebabCase = (str: string) => {
+  return str
+    .replace(/([a-z])([A-Z])/g, '$1-$2') // camelCase 처리
+    .replace(/[\s_]+/g, '-') // 공백과 언더바 처리
+    .toLowerCase(); // 소문자로 변환
+};
+
+export const isKebabCase = (str: string) => {
+  const kebabCaseRegex = /^[a-z0-9]+(-[a-z0-9]+)*$/;
+  return kebabCaseRegex.test(str);
+};
+
+export const removeSpecialCharacters = (str: string, exceptions: string[] = []) => {
+  const regexString = `[^a-zA-Z0-9\\s${exceptions.join('')}]`;
+  const regex = new RegExp(regexString, 'g');
+  return str.replace(regex, '');
+};
+
+export const containsSpecialCharacters = (str: string, exceptions: string[] = []) => {
+  const regexString = `[^a-zA-Z0-9\\s${exceptions.join('')}]`;
+  const regex = new RegExp(regexString);
+  return regex.test(str);
+};
