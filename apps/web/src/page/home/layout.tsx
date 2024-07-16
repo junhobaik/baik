@@ -1,7 +1,7 @@
+// sort-imports-ignore
 import type { Metadata, Viewport } from 'next';
 
 import { auth } from '@/auth';
-import '@/styles/globals.css';
 
 import Sidebar from '../../components/Sidebar';
 import ArchiveFooter from './components/ArchiveFooter';
@@ -10,6 +10,7 @@ import { Providers } from './components/providers';
 import { Registries } from './components/registries';
 
 import '@junhobaik/ui/css';
+import '@/styles/globals.css';
 
 export const viewport: Viewport = {
   width: 'device-width',
