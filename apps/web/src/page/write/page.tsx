@@ -1,9 +1,16 @@
+'use server';
+
 import React from 'react';
 
-interface WritePageProps {}
+import WriteScreen from './Screen';
 
-const WritePage = (props: WritePageProps) => {
-  return <div>WritePage</div>;
+interface WritePageProps {
+  params: {};
+  searchParams: { pathname?: string };
+}
+
+const WritePage = async (props: WritePageProps) => {
+  return <WriteScreen />;
 };
 
 export default WritePage;
