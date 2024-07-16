@@ -89,7 +89,6 @@ const MDEditor = forwardRef<MDXEditorMethods | null, MDEditorProps>((props, ref)
     <MDXEditorStyled className={props.className ?? ''} $contentMaxWidth={contentMaxWidth}>
       <MDXEditor
         className="mdxeditor prose"
-        onChange={(e) => console.log(e)}
         ref={ref}
         markdown={markdown}
         contentEditableClassName="content-editor prose"
