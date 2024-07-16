@@ -6,6 +6,7 @@
     "Frontmatter",
     "jsonld",
     "katex",
+    "mdxeditor",
     "nextui",
     "sandpack",
     "treeshake",
