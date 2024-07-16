@@ -19,7 +19,7 @@ export interface ArticleBase {
   published_date: number;
   updated_date: number;
 
-  keywords?: string[];
+  keywords?: string;
   pathname?: string;
   url?: string;
   site?: ClipSite;
