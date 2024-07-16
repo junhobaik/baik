@@ -13,7 +13,9 @@
     "^[./]",
     "^@/[./]",
     "^(?!.*[.]css$)[./].*$",
-    ".css$"
+
+    ".css$",
+    "^@/styles/(.*)$"
   ],
   "importOrderSeparation": true,
   "importOrderSortSpecifiers": true
