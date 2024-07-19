@@ -11,6 +11,7 @@ import { DateValue } from '@nextui-org/react';
 import dayjs from 'dayjs';
 
 import api from '@/api';
+import useArticles from '@/hooks/useArticles';
 import { containsSpecialCharacters, isKebabCase } from '@/utils';
 
 interface UseArticleWriteProps {
@@ -34,6 +35,7 @@ const ERROR_MESSAGES = {
 };
 
 const useArticleWrite = (props?: UseArticleWriteProps) => {
+  const { query } = useArticles({ enabled: false });
   const { article: articleProp = null } = props ?? {};
 
   const router = useRouter();
@@ -161,6 +163,7 @@ const useArticleWrite = (props?: UseArticleWriteProps) => {
     const res = await api.client.archive.createArticle(newData as PostArticle | ShortsArticle);
     if (res.data?.success) {
       router.replace(`/write?pathname=${res.data.item.pathname}`);
+      query.refetch();
     }
 
     setSubmitLoading(false);
@@ -183,6 +186,7 @@ const useArticleWrite = (props?: UseArticleWriteProps) => {
 
     if (res.data?.success) {
       setArticle(res.data.item);
+      query.refetch();
     }
 
     setSubmitLoading(false);
@@ -194,6 +198,7 @@ const useArticleWrite = (props?: UseArticleWriteProps) => {
     if (article) {
       setTitle(article.title);
       setType(article.type);
+      setStatus(article.status);
       setPathname(article.pathname);
       setPublishedDate(parseDateTime(dayjs(article.published_date).format('YYYY-MM-DDTHH:mm:ss')));
       setUpdatedDate(parseDateTime(dayjs(article.updated_date).format('YYYY-MM-DDTHH:mm:ss')));
