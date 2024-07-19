@@ -46,3 +46,4 @@ Resources:
         Variables:
           STAGE: !Ref Stage
           NODE_ENV: !Ref Stage
+          OPENAI_API_KEY: ''
