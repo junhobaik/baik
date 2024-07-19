@@ -4,13 +4,14 @@
 import React, { useCallback, useMemo, useState } from 'react';
 
 import { DefaultDBAttributes } from '@baik/types';
-import { Button, ButtonProps } from '@nextui-org/react';
-import { IconEdit, IconFileCode2, IconTrash } from '@tabler/icons-react';
+import { Button, ButtonProps, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger, Spinner } from '@nextui-org/react';
+import { IconCaretDownFilled, IconEdit, IconFileCode2, IconTrash } from '@tabler/icons-react';
 import { ColumnDef, flexRender, getCoreRowModel, useReactTable } from '@tanstack/react-table';
 import styled from 'styled-components';
 
 import useRenderTracker from '@/hooks/useRenderTracker';
 
+import Checkbox from '../Checkbox';
 import DetailModal from './DetailModal';
 
 type HeaderOption<T> = {
@@ -59,10 +60,6 @@ const DataTable = <T extends DefaultDBAttributes>(props: DataTableProps<T>) => {
       sk: items[Number(index)].sk,
     }));
   }, [rowSelection, items]);
-
-  const toolsEnabled = useMemo(() => {
-    return !!options.deleteItems;
-  }, [options.deleteItems]);
 
   const handleDeleteItem = useCallback(
     async (id: string) => {
@@ -124,23 +121,47 @@ const DataTable = <T extends DefaultDBAttributes>(props: DataTableProps<T>) => {
       baseColumns.unshift({
         id: '__select',
         header: ({ table }) => (
-          <input
-            className="h-5 w-5"
-            type="checkbox"
-            checked={table.getIsAllRowsSelected()}
-            onChange={table.getToggleAllRowsSelectedHandler()}
-          />
+          <div className="flex items-center">
+            <Checkbox
+              size={24}
+              checked={table.getIsAllRowsSelected()}
+              onChange={table.getToggleAllRowsSelectedHandler()}
+            />
+            <Dropdown>
+              <DropdownTrigger>
+                <div className="inline-flex h-6 w-6 items-center justify-center ml-[1px] hover:bg-gray-300 rounded-md">
+                  <IconCaretDownFilled size={18} />
+                </div>
+              </DropdownTrigger>
+              <DropdownMenu
+                variant="flat"
+                aria-label="Dropdown checkbox"
+                onAction={(key) => {
+                  if (key === 'deleteItems') {
+                    handleDeleteItems();
+                  }
+                }}
+              >
+                <DropdownItem
+                  className="text-red-600"
+                  color="danger"
+                  key="deleteItems"
+                  startContent={<IconTrash size={18} />}
+                >
+                  Selected Delete
+                </DropdownItem>
+              </DropdownMenu>
+            </Dropdown>
+          </div>
         ),
         cell: ({ row }) => (
-          <label className="flex items-center">
-            <input
-              className="h-5 w-5"
-              type="checkbox"
-              checked={row.getIsSelected()}
-              onChange={row.getToggleSelectedHandler()}
-            />
-            {!!options.index && <span className="ml-2 text-gray-700">{row.index + 1}</span>}
-          </label>
+          <Checkbox
+            size={24}
+            checked={row.getIsSelected()}
+            onChange={row.getToggleSelectedHandler()}
+            label={options.index ? `${row.index + 1}` : ''}
+            labelFontSize={16}
+          />
         ),
       });
     }
@@ -184,7 +205,7 @@ const DataTable = <T extends DefaultDBAttributes>(props: DataTableProps<T>) => {
     }
 
     return baseColumns;
-  }, [options, items, handleDeleteItem, deleteLoading]);
+  }, [options, items, handleDeleteItem, handleDeleteItems, deleteLoading]);
 
   const table = useReactTable({
     data: items,
@@ -228,22 +249,6 @@ const DataTable = <T extends DefaultDBAttributes>(props: DataTableProps<T>) => {
   return (
     <>
       <TableContainer>
-        {toolsEnabled && (
-          <TableToolsContainer>
-            {!!options.deleteItems && (
-              <Button
-                color="danger"
-                size="sm"
-                startContent={deleteLoading ? null : <IconTrash size={20} />}
-                onClick={handleDeleteItems}
-                isLoading={deleteLoading}
-              >
-                Selected Delete
-              </Button>
-            )}
-          </TableToolsContainer>
-        )}
-
         <TableWrapper>
           <TableStyled>
             <thead>
