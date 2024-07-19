@@ -13,6 +13,7 @@ type AlgoliaHit = {
 interface UseSearchArticlesProps {
   searchValue?: string;
   hitsPerPage?: number;
+  publishedOnly?: boolean;
 }
 
 interface UseSearchArticlesResult {
@@ -33,13 +34,16 @@ const parseHits = (hits: AlgoliaHit[]): Article[] => {
 };
 
 const useSearchArticles = (props: UseSearchArticlesProps): UseSearchArticlesResult => {
-  const { searchValue = '', hitsPerPage = 5 } = props;
+  const { searchValue = '', hitsPerPage = 5, publishedOnly = false } = props;
   const [hits, setHits] = useState<Article[]>([]);
 
   useEffect(() => {
     if (searchValue.trim()) {
       index
-        .search<Article>(searchValue, { hitsPerPage: hitsPerPage })
+        .search<Article>(searchValue, {
+          hitsPerPage: hitsPerPage,
+          ...(publishedOnly && { filters: 'published:true' }),
+        })
         .then(({ hits }) => {
           const items = parseHits(hits);
           setHits(items);
@@ -50,7 +54,7 @@ const useSearchArticles = (props: UseSearchArticlesProps): UseSearchArticlesResu
     } else {
       setHits([]);
     }
-  }, [searchValue, hitsPerPage]);
+  }, [searchValue, hitsPerPage, publishedOnly]);
 
   return {
     items: hits,
