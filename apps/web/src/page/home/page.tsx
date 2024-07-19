@@ -2,18 +2,14 @@
 
 import React from 'react';
 
-import { Article } from '@baik/types';
-import { Session } from 'next-auth';
-
-import api from '@/api';
 import { auth } from '@/auth';
 
-import Archive from './components/Archive';
+import ArchivePage from './components/ArchivePage';
 
 const Home = async () => {
   const session = await auth();
 
-  return <Archive session={session} />;
+  return <ArchivePage session={session} />;
 };
 
 export default Home;

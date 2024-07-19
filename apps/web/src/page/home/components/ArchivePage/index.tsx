@@ -27,11 +27,11 @@ const fetchArticles = async (session: Session | null) => {
   return articles;
 };
 
-const Archive = async (props: ArchiveProps) => {
+const ArchivePage = async (props: ArchiveProps) => {
   const { session } = props;
   const articles = await fetchArticles(session);
 
   return <ArchiveScreen session={session} articles={articles} />;
 };
 
-export default Archive;
+export default ArchivePage;
