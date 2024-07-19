@@ -26,10 +26,10 @@ const WriteScreen = () => {
           isRequired
           className="mb-4"
           placeholder="Title"
-          variant="bordered"
+          variant="underlined"
           size="lg"
           radius="sm"
-          color="default"
+          color="primary"
           value={title}
           onValueChange={setTitle}
           isInvalid={!!errors.title}
