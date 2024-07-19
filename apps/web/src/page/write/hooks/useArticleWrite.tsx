@@ -57,6 +57,17 @@ const useArticleWrite = (props?: UseArticleWriteProps) => {
   const [fetchLoading, setFetchLoading] = useState(false);
   const [submitLoading, setSubmitLoading] = useState(false);
 
+  const translate = useCallback(async () => {
+    const content = editorRef.current?.getMarkdown();
+    if (content) {
+      const res = await api.client.utils.translate({ text: content, language: 'en' });
+
+      if (res.data?.success) {
+        return res.data.item;
+      }
+    }
+  }, []);
+
   const removeError = useCallback((key: string) => {
     setErrors((prev) => {
       const newErrors = { ...prev };
