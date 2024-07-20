@@ -1,5 +1,6 @@
-import { BASE_URL } from '@/configs/variables';
 import { getSession } from 'next-auth/react';
+
+import { BASE_URL } from '@/configs/variables';
 
 interface RequestParam {
   module: string;
@@ -16,6 +17,12 @@ export const request = async (param: RequestParam) => {
     headers.set('Authorization', `Bearer ${session?.sessionToken}`);
   }
 
+  console.debug(`🔺 [${param.module}>${param.action}]`, {
+    method: 'POST',
+    headers: headers,
+    body: param,
+  });
+
   const response = await fetch(BASE_URL, {
     method: 'POST',
     headers: headers,
@@ -23,6 +30,11 @@ export const request = async (param: RequestParam) => {
   });
 
   const responseData = await response.json();
+
+  console.debug(`🔹 [${param.module}>${param.action}]`, {
+    payload: param.payload,
+    response: responseData,
+  });
 
   return responseData;
 };

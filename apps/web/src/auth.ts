@@ -1,7 +1,7 @@
 import { DynamoDBAdapter } from '@auth/dynamodb-adapter';
 import { DynamoDB, DynamoDBClientConfig } from '@aws-sdk/client-dynamodb';
 import { DynamoDBDocument } from '@aws-sdk/lib-dynamodb';
-import NextAuth from 'next-auth';
+import NextAuth, { NextAuthConfig } from 'next-auth';
 import Google from 'next-auth/providers/google';
 
 const config: DynamoDBClientConfig = {
@@ -20,7 +20,7 @@ const client = DynamoDBDocument.from(new DynamoDB(config), {
   },
 });
 
-export const { handlers, signIn, signOut, auth } = NextAuth({
+export const authConfig: NextAuthConfig = {
   providers: [Google],
   adapter: DynamoDBAdapter(client, { tableName: 'baik-auth' }),
   callbacks: {
@@ -32,4 +32,6 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       return session;
     },
   },
-});
+};
+
+export const { handlers, signIn, signOut, auth } = NextAuth(authConfig);

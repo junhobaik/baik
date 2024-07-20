@@ -58,15 +58,21 @@ const useArticleWrite = (props?: UseArticleWriteProps) => {
   const [submitLoading, setSubmitLoading] = useState(false);
 
   const translate = useCallback(async () => {
+    const titleTranslateRes = await api.client.utils.translate({ text: title, language: 'en' });
+    if (!titleTranslateRes.data?.success) return null;
+
     const content = editorRef.current?.getMarkdown();
     if (content) {
-      const res = await api.client.utils.translate({ text: content, language: 'en' });
-
-      if (res.data?.success) {
-        return res.data.item;
+      const contentTranslateRes = await api.client.utils.translate({ text: content, language: 'en' });
+      if (contentTranslateRes.data?.success) {
+        return {
+          en: { title: titleTranslateRes.data.item, content: contentTranslateRes.data.item },
+        };
       }
     }
-  }, []);
+
+    return null;
+  }, [title]);
 
   const removeError = useCallback((key: string) => {
     setErrors((prev) => {
@@ -192,6 +198,9 @@ const useArticleWrite = (props?: UseArticleWriteProps) => {
     const updateContents = getCurrentContents();
 
     const updateData = { id: article.id, ...updateContents };
+
+    const translateData = await translate();
+    if (translateData) updateData.intl = translateData;
 
     const res = await api.client.archive.updateArticle(updateData);
 

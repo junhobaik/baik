@@ -11,6 +11,7 @@ import ArchiveScreen from './Screen';
 
 interface ArchiveProps {
   session: Session | null;
+  lang: 'en' | 'ko';
 }
 
 const fetchArticles = async (session: Session | null) => {
@@ -28,10 +29,10 @@ const fetchArticles = async (session: Session | null) => {
 };
 
 const ArchivePage = async (props: ArchiveProps) => {
-  const { session } = props;
+  const { session, lang } = props;
   const articles = await fetchArticles(session);
 
-  return <ArchiveScreen session={session} articles={articles} />;
+  return <ArchiveScreen session={session} articles={articles} lang={lang} />;
 };
 
 export default ArchivePage;

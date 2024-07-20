@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useMemo } from 'react';
 
 import Link from 'next/link';
 
@@ -10,12 +10,25 @@ import { Session } from 'next-auth';
 interface ArchiveScreenProps {
   session: Session | null;
   articles: Article[];
+  lang?: 'en' | 'ko';
 }
 
 const ArchiveScreen = (props: ArchiveScreenProps) => {
-  const { session, articles } = props;
+  const { session, articles, lang } = props;
 
-  const articlesList = articles.map((article) => {
+  const parsedArticles = useMemo(() => {
+    const filteredArticles = lang === 'ko' ? articles : articles.filter((article) => !!article.intl?.en);
+
+    return filteredArticles.map((article) => {
+      return {
+        ...article,
+        title: lang === 'en' ? article.intl?.en?.title : article.title,
+        content: lang === 'en' ? article.intl?.en?.content : article.content,
+      };
+    });
+  }, [articles, lang]);
+
+  const articlesList = parsedArticles.map((article) => {
     if (article.type === 'clip') {
       <Link href={`/${article.url}`} key={article.id}>
         <li key={`article-${article.id}`}>{article.title}</li>

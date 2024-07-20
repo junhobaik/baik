@@ -18,7 +18,12 @@ export interface ArticleBase {
   type: ArticleType;
   published_date: number;
   updated_date: number;
-
+  intl?: {
+    en?: {
+      title: string;
+      content: string;
+    };
+  };
   keywords?: string;
   pathname?: string;
   url?: string;

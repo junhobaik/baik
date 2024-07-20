@@ -23,7 +23,6 @@ const useArticles = (props?: UseArticlesProps): UseArticlesResult => {
   const { enabled = true, refetchOnWindowFocus = false, retry = 5, limit = 100 } = props || {};
 
   const fetchBookmarkGroups = async ({ pageParam = undefined }) => {
-    console.debug('fetch, useArticles', { pageParam });
     try {
       const res = await api.client.archive.getAllArticles({
         limit: limit,

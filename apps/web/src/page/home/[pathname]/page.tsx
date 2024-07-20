@@ -2,6 +2,7 @@
 
 import React from 'react';
 
+import { headers } from 'next/headers';
 import { notFound } from 'next/navigation';
 
 import { Article } from '@baik/types';
@@ -13,32 +14,40 @@ import { markdownToPlainText } from '@/utils';
 
 import ArticleScreen from './Screen';
 
-const fetchArticle = async (pathname: string, session: Session | null) => {
-  let item: Article | undefined;
-
-  if (session) {
-    const res = await api.server.archive.getArticleByPathname({ pathname });
-    item = res.data?.item;
-  } else {
-    const res = await api.server.archive.getArticleByPathnamePublic({ pathname });
-    item = res.data?.item;
-  }
-
-  if (!item) return notFound();
-  return item;
-};
-
 const ArchiveArticlePage = async ({ params }: { params: { pathname: string } }) => {
+  const headersList = headers();
+  const headerPathname = headersList.get('x-pathname') || '';
+  const lang = headerPathname.startsWith('/en/') ? 'en' : 'ko';
+
   const session = await auth();
 
+  const fetchArticle = async (pathname: string, session: Session | null) => {
+    let item: Article | undefined;
+
+    if (session) {
+      const res = await api.server.archive.getArticleByPathname({ pathname });
+      item = res.data?.item;
+    } else {
+      const res = await api.server.archive.getArticleByPathnamePublic({ pathname });
+      item = res.data?.item;
+    }
+
+    if (!item) return notFound();
+    if (lang === 'en' && !item.intl?.en) return notFound();
+
+    return item;
+  };
+
   const article = await fetchArticle(params.pathname, session);
-  const content = markdownToPlainText(article.content ?? '');
+  const title = (lang === 'en' ? article.intl?.en?.title : article.title) ?? '';
+  const content = (lang === 'en' ? article.intl?.en?.content : article.content) ?? '';
+  const plainContent = markdownToPlainText(content);
 
   const structuredData = {
     '@context': 'https://schema.org',
     '@type': 'Article',
-    headline: article.title,
-    articleBody: content,
+    headline: title,
+    articleBody: plainContent,
     datePublished: new Date(article.published_date).toISOString(),
     dateModified: new Date(article.updated_date).toISOString(),
     author: {
@@ -49,10 +58,16 @@ const ArchiveArticlePage = async ({ params }: { params: { pathname: string } }) 
     image: article.thumbnail_img_url || '',
   };
 
+  const parsedArticle = {
+    ...article,
+    title,
+    content,
+  };
+
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }} />
-      <ArticleScreen session={session} article={article} />
+      <ArticleScreen session={session} article={parsedArticle} />
     </>
   );
 };

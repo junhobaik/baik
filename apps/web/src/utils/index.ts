@@ -88,3 +88,31 @@ export const containsSpecialCharacters = (str: string, exceptions: string[] = []
   const regex = new RegExp(regexString);
   return regex.test(str);
 };
+
+export const calculateDynamoDBSize = (item: any): number => {
+  const getSize = (value: any): number => {
+    if (value === null || value === undefined) {
+      return 1;
+    }
+
+    switch (typeof value) {
+      case 'string':
+        return Buffer.from(value).length + 1;
+      case 'number':
+        return 8;
+      case 'boolean':
+        return 1;
+      case 'object':
+        if (Array.isArray(value)) {
+          return 3 + value.reduce((sum, item) => sum + getSize(item), 0);
+        } else {
+          return 3 + Object.entries(value).reduce((sum, [key, val]) => sum + getSize(key) + getSize(val), 0);
+        }
+      default:
+        return 0;
+    }
+  };
+
+  const bytes = getSize(item);
+  return Number((bytes / 1024).toFixed(2));
+};
