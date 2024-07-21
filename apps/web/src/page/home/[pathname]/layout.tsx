@@ -28,7 +28,7 @@ export const generateMetadata = async ({ params }: Props): Promise<Metadata> => 
   const content = markdownToPlainText(item?.content ?? '');
 
   return {
-    title: item?.title ? `${item.title} - Baik` : `Baik's archive`,
+    title: item?.title ? `${item.title}${variables.SITE_TITLE_SUFFIX}` : variables.SITE_TITLE,
     description: content.slice(0, 140) ?? '',
     alternates: {
       canonical: `${variables.SITE_URL}/${item?.pathname}`,

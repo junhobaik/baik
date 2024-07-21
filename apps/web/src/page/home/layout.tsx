@@ -11,6 +11,7 @@ import { Registries } from './components/registries';
 
 import '@junhobaik/ui/css';
 import '@/styles/globals.css';
+import { variables } from '@/configs';
 
 export const viewport: Viewport = {
   width: 'device-width',
@@ -20,8 +21,8 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  title: 'my-archive',
-  description: 'my-archive',
+  title: variables.SITE_TITLE,
+  description: variables.SITE_DESCRIPTION,
 };
 
 const RootLayout = async ({

@@ -6,6 +6,8 @@ import { Article } from '@baik/types';
 import { Session } from 'next-auth';
 
 import api from '@/api';
+import { variables } from '@/configs';
+import { markdownToPlainText } from '@/utils';
 
 import ArchiveScreen from './Screen';
 
@@ -32,7 +34,58 @@ const ArchivePage = async (props: ArchiveProps) => {
   const { session, lang } = props;
   const articles = await fetchArticles(session);
 
-  return <ArchiveScreen session={session} articles={articles} lang={lang} />;
+  const structuredData = {
+    '@context': 'https://schema.org',
+    '@type': 'Blog',
+    url: variables.SITE_URL,
+    name: variables.SITE_TITLE,
+    description: variables.SITE_DESCRIPTION,
+    author: {
+      '@type': 'Person',
+      name: variables.MY_NAME,
+    },
+    publisher: {
+      '@type': 'Person',
+      name: variables.MY_NAME,
+      // TODO: about, my-page 구현 후 수정
+      url: variables.SITE_URL,
+      // TODO: 프로필 이미지 기능 추가 후 추가
+      // image: {
+      //   '@type': 'ImageObject',
+      //   url: 'https://.../profile-image.jpg',
+      // },
+    },
+    mainEntity: {
+      '@type': 'ItemList',
+      itemListElement: articles.map((article, index) => {
+        const content = (lang === 'en' ? article.intl?.en?.content : article.content) ?? '';
+        const plainContent = markdownToPlainText(content);
+
+        return {
+          '@type': 'BlogPosting',
+          position: index + 1,
+          url: article.type === 'clip' ? article.url : `https://yourblog.com/${article.pathname}`,
+          headline: article.intl && lang === 'en' ? article.intl.en?.title : article.title,
+          datePublished: new Date(article.published_date).toISOString(),
+          dateModified: new Date(article.updated_date).toISOString(),
+          author: {
+            '@type': 'Person',
+            name: variables.MY_NAME,
+          },
+          image: article.thumbnail_img_url ?? '',
+          keywords: article.keywords,
+          articleBody: plainContent,
+        };
+      }),
+    },
+  };
+
+  return (
+    <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }} />
+      <ArchiveScreen session={session} articles={articles} lang={lang} />
+    </>
+  );
 };
 
 export default ArchivePage;
