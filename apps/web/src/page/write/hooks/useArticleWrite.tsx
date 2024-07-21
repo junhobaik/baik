@@ -54,6 +54,8 @@ const useArticleWrite = (props?: UseArticleWriteProps) => {
   const [thumbnailImgUrl, setThumbnailImgUrl] = useState<string>('');
   const [errors, setErrors] = useState<FieldErrors>({});
 
+  const [enContentEnabled, setEnContentEnabled] = useState(false);
+
   const [fetchLoading, setFetchLoading] = useState(false);
   const [submitLoading, setSubmitLoading] = useState(false);
 
@@ -177,6 +179,11 @@ const useArticleWrite = (props?: UseArticleWriteProps) => {
 
     const newData = getCurrentContents();
 
+    if (enContentEnabled) {
+      const translateData = await translate();
+      if (translateData) newData.intl = translateData;
+    }
+
     const res = await api.client.archive.createArticle(newData as PostArticle | ShortsArticle);
     if (res.data?.success) {
       router.replace(`/write?pathname=${res.data.item.pathname}`);
@@ -199,8 +206,12 @@ const useArticleWrite = (props?: UseArticleWriteProps) => {
 
     const updateData = { id: article.id, ...updateContents };
 
-    const translateData = await translate();
-    if (translateData) updateData.intl = translateData;
+    if (enContentEnabled) {
+      const translateData = await translate();
+      if (translateData) updateData.intl = translateData;
+    } else {
+      updateData.intl = null;
+    }
 
     const res = await api.client.archive.updateArticle(updateData);
 
@@ -210,7 +221,7 @@ const useArticleWrite = (props?: UseArticleWriteProps) => {
     }
 
     setSubmitLoading(false);
-  }, [article, checkValues, getCurrentContents]);
+  }, [article, checkValues, getCurrentContents, enContentEnabled]);
 
   const setArticleContents = useCallback((article: PostArticle | ShortsArticle) => {
     setFetchLoading(true);
@@ -224,6 +235,8 @@ const useArticleWrite = (props?: UseArticleWriteProps) => {
       setUpdatedDate(parseDateTime(dayjs(article.updated_date).format('YYYY-MM-DDTHH:mm:ss')));
       setKeywords(article.keywords ?? '');
       setThumbnailImgUrl(article.thumbnail_img_url ?? '');
+
+      setEnContentEnabled(!!article.intl?.en);
 
       editorRef.current?.setMarkdown(article.content);
     } else {
@@ -302,6 +315,8 @@ const useArticleWrite = (props?: UseArticleWriteProps) => {
       createArticle,
       updateArticle,
       getCurrentContents,
+      enContentEnabled,
+      setEnContentEnabled,
     }),
     [
       article,
@@ -320,6 +335,7 @@ const useArticleWrite = (props?: UseArticleWriteProps) => {
       createArticle,
       updateArticle,
       getCurrentContents,
+      enContentEnabled,
     ],
   );
 

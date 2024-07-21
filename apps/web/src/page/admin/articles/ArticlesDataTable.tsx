@@ -103,6 +103,16 @@ const ArticlesDataTable = (props: ArticlesDataTableProps) => {
       },
       { key: 'title', title: 'Title', cellStyle: 'font-bold' },
       {
+        key: 'intl',
+        title: 'intl',
+        render: ({ item }) => {
+          if (item.intl?.en) {
+            return <p>🇺🇸</p>;
+          }
+          return null;
+        },
+      },
+      {
         key: 'published_date',
         title: 'Published',
         valueParser: (value) => dayjs(value as number).format('YYYY-MM-DD\nHH:mm:ss'),

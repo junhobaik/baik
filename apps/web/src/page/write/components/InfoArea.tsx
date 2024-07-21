@@ -3,7 +3,8 @@
 // apps/web/src/page/write/components/InfoArea.tsx
 import React from 'react';
 
-import { Button, DateInput, Input, Select, SelectItem } from '@nextui-org/react';
+import { Button, DateInput, Input, Select, SelectItem, Switch } from '@nextui-org/react';
+import clsx from 'clsx';
 import styled from 'styled-components';
 
 import useArticleWrite from '../hooks/useArticleWrite';
@@ -37,7 +38,8 @@ const InfoArea = (props: InfoAreaProps) => {
     removeError,
     createArticle,
     updateArticle,
-    getCurrentContents,
+    enContentEnabled,
+    setEnContentEnabled,
   } = props.hook;
 
   return (
@@ -128,6 +130,30 @@ const InfoArea = (props: InfoAreaProps) => {
             onFocus={() => removeError('thumbnailImgUrl')}
           />
         </div>
+
+        <Switch
+          isSelected={enContentEnabled}
+          onValueChange={setEnContentEnabled}
+          classNames={{
+            base: clsx(
+              'inline-flex flex-row-reverse w-full max-w-md bg-gray-100 hover:bg-gray-200 items-center mt-2',
+              'justify-between cursor-pointer rounded-lg gap-2 p-4',
+              'data-[selected=true]:border-none',
+            ),
+            wrapper: 'p-0 h-4 overflow-visible',
+            thumb: clsx(
+              'w-6 h-6 border-2 shadow-lg',
+              'group-data-[hover=true]:border-primary',
+              'group-data-[selected=true]:ml-6',
+              'group-data-[pressed=true]:w-7',
+              'group-data-[selected]:group-data-[pressed]:ml-4',
+            ),
+          }}
+        >
+          <div className="flex flex-col gap-1">
+            <p className="text-sm text-gray-600">English Content Enabled</p>
+          </div>
+        </Switch>
       </div>
 
       <div className="submits">

@@ -23,7 +23,7 @@ export interface ArticleBase {
       title: string;
       content: string;
     };
-  };
+  } | null;
   keywords?: string;
   pathname?: string;
   url?: string;
