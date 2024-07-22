@@ -1,11 +1,14 @@
 'use client';
 
-import React, { useEffect, useMemo } from 'react';
+import React, { useLayoutEffect, useMemo } from 'react';
 
 import Link from 'next/link';
 
 import { Article } from '@baik/types';
+import { useSetAtom } from 'jotai';
 import { Session } from 'next-auth';
+
+import { enEnabled } from '@/store';
 
 interface ArchiveScreenProps {
   session: Session | null;
@@ -15,6 +18,11 @@ interface ArchiveScreenProps {
 
 const ArchiveScreen = (props: ArchiveScreenProps) => {
   const { session, articles, lang } = props;
+  const setEnEnabled = useSetAtom(enEnabled);
+
+  useLayoutEffect(() => {
+    setEnEnabled(true);
+  }, []);
 
   const parsedArticles = useMemo(() => {
     const filteredArticles = lang === 'ko' ? articles : articles.filter((article) => !!article.intl?.en);
