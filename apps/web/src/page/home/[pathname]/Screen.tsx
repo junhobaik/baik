@@ -1,11 +1,13 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect } from 'react';
 
 import { Article } from '@baik/types';
+import { useAtom } from 'jotai';
 import { Session } from 'next-auth';
 
 import MDContent from '@/components/MDContent';
+import { enEnabled } from '@/store';
 
 interface ArticleScreenProps {
   session: Session | null;
@@ -14,6 +16,11 @@ interface ArticleScreenProps {
 
 const ArticleScreen = (props: ArticleScreenProps) => {
   const { session, article } = props;
+  const [headerEnEnabled, setHeaderEnEnabled] = useAtom(enEnabled);
+
+  useEffect(() => {
+    setHeaderEnEnabled(!!article.intl?.en);
+  }, [article]);
 
   return (
     <div>

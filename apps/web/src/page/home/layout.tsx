@@ -12,6 +12,7 @@ import { Registries } from './components/registries';
 import '@junhobaik/ui/css';
 import '@/styles/globals.css';
 import { variables } from '@/configs';
+import { headers } from 'next/headers';
 
 export const viewport: Viewport = {
   width: 'device-width',
@@ -31,15 +32,18 @@ const RootLayout = async ({
   children: React.ReactNode;
 }>) => {
   const session = await auth();
+  const headersList = headers();
+  const headerPathname = headersList.get('x-pathname') || '';
+  const lang = headerPathname === '/en' ? 'en' : 'ko';
 
   if (!session)
     return (
-      <html lang="kr" className="light min-h-full h-full">
-        <body className="min-h-full h-full">
+      <html lang={lang} className="light">
+        <body>
           <Providers>
             <Registries>
-              <ArchiveHeader />
-              <main className="w-[1200px] mx-auto">{children}</main>
+              <ArchiveHeader lang={lang} />
+              <main className="w-full xl:w-[1200px] min-h-screen mx-auto overflow-x-hidden">{children}</main>
               <ArchiveFooter />
             </Registries>
           </Providers>
@@ -48,7 +52,7 @@ const RootLayout = async ({
     );
 
   return (
-    <html lang="kr" className="light min-h-full h-full">
+    <html lang={lang} className="light min-h-full h-full">
       <body className="min-h-full h-full">
         <Providers>
           <Registries>
