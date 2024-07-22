@@ -40,7 +40,7 @@ export const generateMetadata = async ({ params }: Props): Promise<Metadata> => 
 };
 
 const ArticleLayout = async ({ children, params }: { children: React.ReactNode; params: { pathname: string } }) => {
-  return <>{children}</>;
+  return children;
 };
 
 ArticleLayout.generateMetadata = generateMetadata;
