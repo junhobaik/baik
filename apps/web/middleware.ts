@@ -19,6 +19,8 @@ const addXPathnameHeader = (request: NextRequest): Headers => {
 };
 
 const middleware = async (request: NextRequest): Promise<NextResponse> => {
+  const country = request.geo?.country ?? 'KR';
+
   const headers = addXPathnameHeader(request);
   const { pathname } = request.nextUrl;
 
@@ -32,8 +34,12 @@ const middleware = async (request: NextRequest): Promise<NextResponse> => {
 
   if (isMatch(pathname, MATCHERS.SIGN_IN)) {
     if (session) {
-      return NextResponse.redirect(new URL('/', request.url));
+      return NextResponse.redirect(new URL(`/`, request.url));
     }
+  }
+
+  if (country !== 'KR') {
+    return NextResponse.redirect(new URL(`/en/${pathname}`, request.url));
   }
 
   return NextResponse.next({ request: { headers } });
