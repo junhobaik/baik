@@ -42,7 +42,7 @@ const useSearchArticles = (props: UseSearchArticlesProps): UseSearchArticlesResu
       index
         .search<Article>(searchValue, {
           hitsPerPage: hitsPerPage,
-          ...(publishedOnly && { filters: 'published:true' }),
+          ...(publishedOnly && { filters: 'status:published' }),
         })
         .then(({ hits }) => {
           const items = parseHits(hits);
