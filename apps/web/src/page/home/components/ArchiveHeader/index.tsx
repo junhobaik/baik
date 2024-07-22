@@ -7,12 +7,13 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 
 import { Button } from '@junhobaik/ui';
-import { Dropdown, DropdownItem, DropdownMenu, DropdownTrigger } from '@nextui-org/react';
-import { IconChevronDown, IconLogin2 } from '@tabler/icons-react';
+import { Dropdown, DropdownItem, DropdownMenu, DropdownTrigger, Spacer } from '@nextui-org/react';
+import { IconChevronDown } from '@tabler/icons-react';
 import { useAtomValue } from 'jotai';
-import { signIn } from 'next-auth/react';
 
 import { enEnabled } from '@/store';
+
+import SearchDialog from '../SearchDialog';
 
 const ArchiveHeader = ({ lang = 'ko' }: { lang?: 'ko' | 'en' }) => {
   const router = useRouter();
@@ -39,10 +40,18 @@ const ArchiveHeader = ({ lang = 'ko' }: { lang?: 'ko' | 'en' }) => {
         </Link>
 
         <div className="flex items-center">
+          <SearchDialog />
+
+          <Spacer x={1} />
+
           {!enAvailable && lang === 'en' ? null : (
             <Dropdown className="w-16">
               <DropdownTrigger>
-                <Button variant="light" size="xs">
+                <Button
+                  variant="flat"
+                  size="xs"
+                  radius="xl"
+                >
                   <IconChevronDown size={14} />
                   {lang === 'en' ? <div>🇺🇸</div> : <div>🇰🇷</div>}
                 </Button>
