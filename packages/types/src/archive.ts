@@ -29,6 +29,8 @@ export interface ArticleBase {
   url?: string;
   site?: ClipSite;
   thumbnail_img_url?: string;
+  is_recommended?: boolean;
+  tags?: string[];
 }
 
 export interface PostArticleBase extends ArticleBase {
@@ -43,6 +45,7 @@ export interface ShortsArticleBase extends ArticleBase {
   pathname: string;
   url?: never;
   site?: never;
+  is_recommended?: never;
 }
 
 export interface ClipArticleBase extends ArticleBase {
@@ -52,6 +55,7 @@ export interface ClipArticleBase extends ArticleBase {
   site: ClipSite;
   pathname?: never;
   keywords?: never;
+  is_recommended?: never;
 }
 
 export interface ArticleGSIAttributes {
