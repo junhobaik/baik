@@ -120,23 +120,6 @@ const Sidebar = ({ session }: { session: Session }) => {
         </div>
       </div>
 
-      <div className="section-divider">
-        <p className="section-divider--text">Dev</p>
-        <div className="section-divider--line"></div>
-      </div>
-
-      <div className="section-container">
-        <p className="section-title">Test</p>
-        <div>
-          <Link className={`styled-link ${pathname === '/api-test' ? 'active' : ''}`} href={'/api-test'}>
-            <span className="icon-wrapper">
-              <IconTestPipe size={20} />
-            </span>
-            <p className="link-text">API Test</p>
-          </Link>
-        </div>
-      </div>
-
       <div className="foot-container">
         <Button fullWidth variant="light" startContent={<IconLogout size={18} />} onClick={() => signOut()}>
           Sign Out
