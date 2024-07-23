@@ -148,6 +148,7 @@ const Sidebar = ({ session }: { session: Session }) => {
 
 const SidebarStyled = styled.div`
   width: 240px;
+  min-width: 240px;
   overflow-y: auto;
   padding-top: 24px;
   transition: width 0.1s;
@@ -172,6 +173,7 @@ const SidebarStyled = styled.div`
 
   &.collapsed {
     width: 52px;
+    min-width: 52px;
     overflow: hidden;
 
     .logo-text,
