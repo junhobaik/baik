@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { useRouter } from 'next/navigation';
 
@@ -17,6 +17,21 @@ const SearchDialog = () => {
   const [selectedIndex, setSelectedIndex] = useState(0);
 
   const { items } = useSearchArticles({ searchValue, hitsPerPage: 10, publishedOnly: true });
+
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if ((event.ctrlKey || event.metaKey) && event.key === 'k') {
+        event.preventDefault();
+        setIsOpen(true);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, []);
 
   const toggleModal = useCallback(() => setIsOpen((prev) => !prev), []);
 
@@ -80,10 +95,10 @@ const SearchDialog = () => {
         onClick={toggleModal}
         size="xs"
         radius="xl"
-        startContent={<IconSearch size={16} />}
+        startContent={<IconSearch size={16} className="min-w-[16px]" />}
         endContent={<Kbd keys={['command']}>K</Kbd>}
       >
-        <p className="hidden sm:flex">Quick Search</p>
+        <p className="w-0 sm:w-full overflow-hidden transition-width">Quick Search</p>
       </Button>
 
       <Modal
