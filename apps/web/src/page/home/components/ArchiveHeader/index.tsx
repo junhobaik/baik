@@ -32,11 +32,11 @@ const ArchiveHeader = ({ lang = 'ko' }: { lang?: 'ko' | 'en' }) => {
   }, [enAvailable, currentLang]);
 
   return (
-    <header className="sticky top-0 flex justify-center h-16 z-10 bg-clip-padding backdrop-filter backdrop-blur-lg bg-opacity-0 border-b">
+    <header className="sticky top-0 flex justify-center h-16 z-50 bg-clip-padding backdrop-filter backdrop-blur-lg bg-opacity-0 border-b">
       <div className="flex items-center justify-between w-[92%]">
         <Link className="flex items-center" href="/">
           <Image width={20} height={20} src="/icon.png" alt="" />
-          <p className="ml-1 text-md font-semibold">Baik's Archive</p>
+          <p className="ml-1 text-md font-semibold">Baik</p>
         </Link>
 
         <div className="flex items-center">
@@ -47,11 +47,7 @@ const ArchiveHeader = ({ lang = 'ko' }: { lang?: 'ko' | 'en' }) => {
           {!enAvailable && lang === 'en' ? null : (
             <Dropdown className="w-16">
               <DropdownTrigger>
-                <Button
-                  variant="flat"
-                  size="xs"
-                  radius="xl"
-                >
+                <Button variant="flat" size="xs" radius="xl">
                   <IconChevronDown size={14} />
                   {lang === 'en' ? <div>🇺🇸</div> : <div>🇰🇷</div>}
                 </Button>
