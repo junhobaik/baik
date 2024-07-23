@@ -33,7 +33,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
   return (
     <JotaiProvider>
       <QueryClientProvider client={queryClient}>
-        <NextUIProvider className="h-full min-h-full">{children}</NextUIProvider>
+        <NextUIProvider>{children}</NextUIProvider>
       </QueryClientProvider>
     </JotaiProvider>
   );
