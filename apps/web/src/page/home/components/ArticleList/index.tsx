@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
 import { Article, ArticleType } from '@baik/types';
+import { IconFilter } from '@tabler/icons-react';
 import clsx from 'clsx';
 import dayjs from 'dayjs';
 import { Session } from 'next-auth';
@@ -20,7 +21,17 @@ interface ArticleListProps {
   filter: { value: FilterType; set: Dispatch<SetStateAction<FilterType>> };
 }
 
-const Chip = ({ type }: { type: ArticleType }) => {
+const Chip = ({
+  type,
+  disabled = false,
+  onClick,
+  className = '',
+}: {
+  type: ArticleType;
+  disabled?: boolean;
+  onClick?: () => unknown;
+  className?: string;
+}) => {
   return (
     <div
       className={clsx([
@@ -28,7 +39,11 @@ const Chip = ({ type }: { type: ArticleType }) => {
         type === 'post' && 'bg-blue-500 text-white',
         type === 'shorts' && 'bg-rose-400 text-white',
         type === 'clip' && 'bg-green-500 text-white',
+        disabled && '!bg-gray-200 !text-gray-500',
+        !!onClick && 'cursor-pointer',
+        className,
       ])}
+      onClick={onClick}
     >
       {type === 'post' && 'Post'}
       {type === 'shorts' && 'Shorts'}
@@ -61,6 +76,19 @@ const ArticleList = (props: ArticleListProps) => {
     const parent = e.currentTarget.parentNode?.parentNode?.parentNode as HTMLDivElement;
     const target = parent.querySelector('._thumbnail > img') as HTMLElement | null;
     if (target) target.style.transform = 'scale(1)';
+  };
+
+  const toggleFilterType = (targetType: ArticleType) => {
+    filter.set((prev) => {
+      let type = [...prev.type];
+
+      if (type.includes(targetType)) {
+        type = type.filter((t) => t !== targetType);
+      } else {
+        type = [...type, targetType];
+      }
+      return { ...prev, type };
+    });
   };
 
   const renderArticleContent = useCallback(
@@ -138,9 +166,36 @@ const ArticleList = (props: ArticleListProps) => {
   );
 
   return (
-    <div className="pt-8">
-      <div className="sticky top-16 z-10 border border-dotted h-12 bg-white"></div>
-      <ul className="mt-2">{parsedArticles.map(renderArticleContent)}</ul>
+    <div className="pt-8 flex-grow">
+      <div className="sticky top-16 z-10 border-b h-12 bg-white flex items-center">
+        <div className="flex items-center">
+          <IconFilter className="text-gray-500 mr-4" size={20} />
+
+          <Chip
+            type="post"
+            className="mr-2 px-3 py-1 opacity-70 hover:opacity-100"
+            disabled={!filter.value.type.includes('post')}
+            onClick={() => toggleFilterType('post')}
+          />
+          <Chip
+            type="shorts"
+            className="mr-2 px-3 py-1 opacity-70 hover:opacity-100"
+            disabled={!filter.value.type.includes('shorts')}
+            onClick={() => toggleFilterType('shorts')}
+          />
+          <Chip
+            type="clip"
+            className="mr-2 px-3 py-1 opacity-70 hover:opacity-100"
+            disabled={!filter.value.type.includes('clip')}
+            onClick={() => toggleFilterType('clip')}
+          />
+        </div>
+      </div>
+      <div className="sticky top-28 z-10 h-8">
+        <div className="bg-white h-2"></div>
+        <div className="h-6 bg-gradient-to-b from-white to-transparent"></div>
+      </div>
+      <ul>{parsedArticles.map(renderArticleContent)}</ul>
     </div>
   );
 };

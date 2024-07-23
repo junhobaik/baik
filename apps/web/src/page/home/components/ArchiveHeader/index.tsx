@@ -32,7 +32,7 @@ const ArchiveHeader = ({ lang = 'ko' }: { lang?: 'ko' | 'en' }) => {
   }, [enAvailable, currentLang]);
 
   return (
-    <header className="sticky top-0 flex justify-center h-16 z-50 bg-clip-padding backdrop-filter backdrop-blur-lg bg-opacity-0 border-b">
+    <header className="sticky top-0 flex justify-center h-16 z-50 bg-white border-b">
       <div className="flex items-center justify-between w-[92%]">
         <Link className="flex items-center" href="/">
           <Image width={20} height={20} src="/icon.png" alt="" />

@@ -3,6 +3,7 @@
 import React, { useLayoutEffect, useMemo, useState } from 'react';
 
 import { Article, ArticleStatus, ArticleType } from '@baik/types';
+import clsx from 'clsx';
 import { useSetAtom } from 'jotai';
 import { Session } from 'next-auth';
 
@@ -23,7 +24,7 @@ export interface FilterType {
 }
 
 const ArchiveScreen = (props: ArchiveScreenProps) => {
-  const { session, articles, lang } = props;
+  const { session, articles, lang = 'ko' } = props;
   const setEnEnabled = useSetAtom(enEnabled);
 
   const [filter, setFilter] = useState<FilterType>({
@@ -35,22 +36,31 @@ const ArchiveScreen = (props: ArchiveScreenProps) => {
     setEnEnabled(true);
   }, []);
 
-  const parsedArticles: Article[] = useMemo(() => {
-    const filteredArticles = lang === 'ko' ? articles : articles.filter((article) => !!article.intl?.en);
+  const parsedArticles = useMemo(() => {
+    const enFiltered = lang === 'ko' ? articles : articles.filter((article) => !!article.intl?.en);
+    const ordered = enFiltered.sort((a, b) => b.updated_date - a.updated_date);
+    const parsedOrdered = ordered.map((article) => ({
+      ...article,
+      title: (lang === 'en' ? article.intl?.en?.title : article.title) ?? '',
+      content: (lang === 'en' ? article.intl?.en?.content : article.content) ?? '',
+    }));
 
-    return filteredArticles.map((article) => {
-      return {
-        ...article,
-        title: (lang === 'en' ? article.intl?.en?.title : article.title) ?? '',
-        content: (lang === 'en' ? article.intl?.en?.content : article.content) ?? '',
-      };
+    const filtered = parsedOrdered.filter((article) => {
+      if (!filter.type.includes(article.type)) return false;
+      if (!filter.status.includes(article.status)) return false;
+      return true;
     });
-  }, [articles, lang]);
+
+    return {
+      ordered: parsedOrdered,
+      filtered: filtered,
+    };
+  }, [articles, lang, filter]);
 
   return (
-    <div className="flex">
-      <ArticleList articles={parsedArticles} session={session} filter={{ value: filter, set: setFilter }} />
-      <ArchiveSidebar />
+    <div className={clsx(['flex', session ? 'w-[92%] mx-auto' : ''])}>
+      <ArticleList articles={parsedArticles.filtered} session={session} filter={{ value: filter, set: setFilter }} />
+      <ArchiveSidebar articles={parsedArticles.ordered} />
     </div>
   );
 };

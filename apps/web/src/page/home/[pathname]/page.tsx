@@ -67,7 +67,7 @@ const ArchiveArticlePage = async ({ params }: { params: { pathname: string } }) 
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }} />
-      <ArticleScreen session={session} article={parsedArticle} />
+      <ArticleScreen session={session} article={parsedArticle} lang={lang}/>
     </>
   );
 };

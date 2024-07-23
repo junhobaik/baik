@@ -9,6 +9,7 @@ import api from '@/api';
 import { variables } from '@/configs';
 import { markdownToPlainText } from '@/utils';
 
+import ArchiveHeader from '../ArchiveHeader';
 import ArchiveScreen from './Screen';
 
 interface ArchiveProps {
@@ -83,6 +84,7 @@ const ArchivePage = async (props: ArchiveProps) => {
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }} />
+      {session ? <ArchiveHeader lang={lang} /> : null}
       <ArchiveScreen session={session} articles={articles} lang={lang} />
     </>
   );

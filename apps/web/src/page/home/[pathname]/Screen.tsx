@@ -9,13 +9,16 @@ import { Session } from 'next-auth';
 import MDContent from '@/components/MDContent';
 import { enEnabled } from '@/store';
 
+import ArchiveHeader from '../components/ArchiveHeader';
+
 interface ArticleScreenProps {
   session: Session | null;
   article: Article;
+  lang?: 'en' | 'ko';
 }
 
 const ArticleScreen = (props: ArticleScreenProps) => {
-  const { session, article } = props;
+  const { session, article, lang = 'ko' } = props;
   const [headerEnEnabled, setHeaderEnEnabled] = useAtom(enEnabled);
 
   useEffect(() => {
@@ -24,6 +27,7 @@ const ArticleScreen = (props: ArticleScreenProps) => {
 
   return (
     <div>
+      {session ? <ArchiveHeader lang={lang} /> : null}
       <div className="flex flex-col max-w-[720px] mx-auto py-4">
         <p className="text-3xl">{article.title}</p>
         <MDContent content={article.content} codeBlockType="sandpack" />
