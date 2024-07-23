@@ -1,14 +1,15 @@
 'use client';
 
-import React, { useLayoutEffect, useMemo } from 'react';
+import React, { useLayoutEffect, useMemo, useState } from 'react';
 
-import Link from 'next/link';
-
-import { Article } from '@baik/types';
+import { Article, ArticleStatus, ArticleType } from '@baik/types';
 import { useSetAtom } from 'jotai';
 import { Session } from 'next-auth';
 
 import { enEnabled } from '@/store';
+
+import ArchiveSidebar from '../ArchiveSidebar';
+import ArticleList from '../ArticleList';
 
 interface ArchiveScreenProps {
   session: Session | null;
@@ -16,43 +17,40 @@ interface ArchiveScreenProps {
   lang?: 'en' | 'ko';
 }
 
+export interface FilterType {
+  type: ArticleType[];
+  status: ArticleStatus[];
+}
+
 const ArchiveScreen = (props: ArchiveScreenProps) => {
   const { session, articles, lang } = props;
   const setEnEnabled = useSetAtom(enEnabled);
+
+  const [filter, setFilter] = useState<FilterType>({
+    type: ['post', 'shorts', 'clip'],
+    status: session ? ['published', 'private', 'draft'] : ['published'],
+  });
 
   useLayoutEffect(() => {
     setEnEnabled(true);
   }, []);
 
-  const parsedArticles = useMemo(() => {
+  const parsedArticles: Article[] = useMemo(() => {
     const filteredArticles = lang === 'ko' ? articles : articles.filter((article) => !!article.intl?.en);
 
     return filteredArticles.map((article) => {
       return {
         ...article,
-        title: lang === 'en' ? article.intl?.en?.title : article.title,
-        content: lang === 'en' ? article.intl?.en?.content : article.content,
+        title: (lang === 'en' ? article.intl?.en?.title : article.title) ?? '',
+        content: (lang === 'en' ? article.intl?.en?.content : article.content) ?? '',
       };
     });
   }, [articles, lang]);
 
-  const articlesList = parsedArticles.map((article) => {
-    if (article.type === 'clip') {
-      <Link href={`/${article.url}`} key={article.id}>
-        <li key={`article-${article.id}`}>{article.title}</li>
-      </Link>;
-    }
-
-    return (
-      <Link href={`/${article.pathname}`} key={article.id}>
-        <li key={`article-${article.id}`}>{article.title}</li>
-      </Link>
-    );
-  });
-
   return (
-    <div>
-      <ul>{articlesList}</ul>
+    <div className="flex">
+      <ArticleList articles={parsedArticles} session={session} filter={{ value: filter, set: setFilter }} />
+      <ArchiveSidebar />
     </div>
   );
 };
