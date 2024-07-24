@@ -160,6 +160,8 @@ const ClipScreen = ({ session }: ClipScreenProps) => {
       toast.success('Clip saved successfully');
       await delay(1500);
       resetAllFields();
+    } else {
+      toast.error('Failed to save clip');
     }
 
     setSaveLoading(false);
