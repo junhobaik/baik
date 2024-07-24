@@ -9,6 +9,7 @@ import ArchiveFooter from './components/ArchiveFooter';
 import ArchiveHeader from './components/ArchiveHeader';
 import { Providers } from './components/providers';
 import { Registries } from './components/registries';
+import { Toaster } from 'react-hot-toast';
 
 import '@junhobaik/ui/css';
 import '@/styles/globals.css';
@@ -68,6 +69,7 @@ const RootLayout = async ({
               <Sidebar session={session} />
               <div className="flex-1 overflow-y-auto">{children}</div>
             </main>
+            <Toaster position="bottom-center" />
           </Registries>
         </Providers>
       </body>
