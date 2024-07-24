@@ -18,7 +18,6 @@ import {
   IconNews,
   IconPaperclip,
   IconRss,
-  IconTestPipe,
 } from '@tabler/icons-react';
 import { useAtom } from 'jotai';
 import { Session } from 'next-auth';
@@ -132,7 +131,12 @@ const Sidebar = ({ session }: { session: Session }) => {
       </div>
 
       <div className="foot-container">
-        <Button fullWidth variant="light" startContent={<IconLogout size={18} />} onClick={() => signOut()}>
+        <Button
+          fullWidth
+          variant="light"
+          startContent={<IconLogout size={18} />}
+          onClick={() => signOut({ callbackUrl: '/', redirect: true })}
+        >
           Sign Out
         </Button>
       </div>
