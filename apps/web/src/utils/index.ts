@@ -1,6 +1,10 @@
 import { convert } from 'html-to-text';
 import { marked } from 'marked';
 
+export const delay = (ms: number) => {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+};
+
 export const copyClipboard = async (value: string) => {
   try {
     await navigator.clipboard.writeText(value);
@@ -115,4 +119,30 @@ export const calculateDynamoDBSize = (item: any): number => {
 
   const bytes = getSize(item);
   return Number((bytes / 1024).toFixed(2));
+};
+
+export const getOriginFromUrl = (url: string, exception?: string): string => {
+  try {
+    const urlObject = new URL(url);
+    const origin = `${urlObject.protocol}//${urlObject.hostname}`;
+
+    if (exception) {
+      const normalizedException = exception.startsWith('/') ? exception : `/${exception}`;
+      return `${origin}${normalizedException}`;
+    }
+
+    return origin;
+  } catch (error) {
+    console.error('Invalid URL:', error);
+    return '';
+  }
+};
+
+export const isValidURL = (url: string): boolean => {
+  try {
+    new URL(url);
+    return true;
+  } catch (error) {
+    return false;
+  }
 };
