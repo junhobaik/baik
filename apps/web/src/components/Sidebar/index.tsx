@@ -16,6 +16,7 @@ import {
   IconHome,
   IconLogout,
   IconNews,
+  IconPaperclip,
   IconRss,
   IconTestPipe,
 } from '@tabler/icons-react';
@@ -75,12 +76,22 @@ const Sidebar = ({ session }: { session: Session }) => {
             <p className="link-text">Archive</p>
           </Link>
         </div>
+
         <div>
           <Link className={`styled-link ${pathname === '/write' ? 'active' : ''}`} href={'/write'}>
             <span className="icon-wrapper">
               <IconEdit size={20} />
             </span>
             <p className="link-text">Write</p>
+          </Link>
+        </div>
+
+        <div>
+          <Link className={`styled-link ${pathname === '/clip' ? 'active' : ''}`} href={'/clip'}>
+            <span className="icon-wrapper">
+              <IconPaperclip size={20} />
+            </span>
+            <p className="link-text">Clip</p>
           </Link>
         </div>
       </div>

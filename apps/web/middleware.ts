@@ -6,7 +6,7 @@ import { match } from 'path-to-regexp';
 import { auth } from '@/auth';
 
 const MATCHERS = {
-  AUTH: ['/admin/*', '/write'],
+  AUTH: ['/admin/*', '/write', '/clip'],
   SIGN_IN: ['/api/auth/signout/*', '/api/auth/signin/*'],
 };
 
