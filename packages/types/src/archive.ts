@@ -13,6 +13,7 @@ export interface ClipSite {
 
 export interface ArticleBase {
   title: string;
+  description?: string;
   content: string;
   status: ArticleStatus;
   type: ArticleType;
@@ -31,6 +32,7 @@ export interface ArticleBase {
   thumbnail_img_url?: string;
   is_recommended?: boolean;
   tags?: string[];
+  origin_title?: string;
 }
 
 export interface PostArticleBase extends ArticleBase {
@@ -38,6 +40,7 @@ export interface PostArticleBase extends ArticleBase {
   pathname: string;
   url?: never;
   site?: never;
+  origin_title?: never;
 }
 
 export interface ShortsArticleBase extends ArticleBase {
@@ -46,13 +49,14 @@ export interface ShortsArticleBase extends ArticleBase {
   url?: never;
   site?: never;
   is_recommended?: never;
+  origin_title?: never;
 }
 
 export interface ClipArticleBase extends ArticleBase {
   type: 'clip';
   url: string;
-  origin_title: string;
   site: ClipSite;
+  description?: never;
   pathname?: never;
   keywords?: never;
   is_recommended?: never;
