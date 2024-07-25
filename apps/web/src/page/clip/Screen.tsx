@@ -145,6 +145,7 @@ const ClipScreen = ({ session }: ClipScreenProps) => {
       origin_title: article.origin_title || undefined,
       content: article.content || '',
       url: url,
+      thumbnail_img_url: article.thumbnail_img_url || '',
       site: {
         title: article.site?.title || '',
         link: article.site?.link || '',
