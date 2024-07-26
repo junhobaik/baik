@@ -4,12 +4,13 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
 import { Article, ArticleType } from '@baik/types';
-import { IconFilter } from '@tabler/icons-react';
+import { IconBroadcast, IconFilter, IconLock, IconPencil } from '@tabler/icons-react';
 import clsx from 'clsx';
 import dayjs from 'dayjs';
 import { Session } from 'next-auth';
 import styled from 'styled-components';
 
+import TypeChip from '@/components/TypeChip';
 import { variables } from '@/configs';
 import { markdownToPlainText } from '@/utils';
 
@@ -20,37 +21,6 @@ interface ArticleListProps {
   articles: Article[];
   filter: { value: FilterType; set: Dispatch<SetStateAction<FilterType>> };
 }
-
-const Chip = ({
-  type,
-  disabled = false,
-  onClick,
-  className = '',
-}: {
-  type: ArticleType;
-  disabled?: boolean;
-  onClick?: () => unknown;
-  className?: string;
-}) => {
-  return (
-    <div
-      className={clsx([
-        'inline-flex px-2 py-[2px] text-xs rounded-lg select-none',
-        type === 'post' && 'bg-blue-500 text-white',
-        type === 'shorts' && 'bg-rose-400 text-white',
-        type === 'clip' && 'bg-green-500 text-white',
-        disabled && '!bg-gray-200 !text-gray-500',
-        !!onClick && 'cursor-pointer',
-        className,
-      ])}
-      onClick={onClick}
-    >
-      {type === 'post' && 'Post'}
-      {type === 'shorts' && 'Shorts'}
-      {type === 'clip' && 'Clip'}
-    </div>
-  );
-};
 
 const ArticleList = (props: ArticleListProps) => {
   const { session, articles, filter } = props;
@@ -101,11 +71,41 @@ const ArticleList = (props: ArticleListProps) => {
       const faviconUrl = article.site?.favicon_url;
 
       return (
-        <ArticleItem key={`article-list-item-${article.id}`} className="">
-          <div className="flex justify-between py-6">
+        <ArticleItem key={`article-list-item-${article.id}`} $type={article.type} className="py-6">
+          <div
+            className={clsx([
+              'flex justify-between',
+              {
+                'pl-4 border-l-4': !!session,
+                'border-orange-400': !!session && article.status === 'draft',
+                'border-transparent': !!session && article.status === 'published',
+                'border-red-600': !!session && article.status === 'private',
+              },
+            ])}
+          >
             <div className="py-1 w-full">
               <div className="flex items-center max-h-6">
-                <Chip type={article.type} />
+                {session ? (
+                  <>
+                    {article.status === 'published' && (
+                      <div className="mr-2">
+                        <IconBroadcast size={18} className="text-green-600" />
+                      </div>
+                    )}
+                    {article.status === 'private' && (
+                      <div className="mr-2">
+                        <IconLock size={18} className="text-red-600" />
+                      </div>
+                    )}
+                    {article.status === 'draft' && (
+                      <div className="mr-2">
+                        <IconPencil size={18} className="text-orange-400" stroke={2} />
+                      </div>
+                    )}
+                  </>
+                ) : null}
+
+                <TypeChip type={article.type} />
               </div>
 
               <div className="mt-2">
@@ -118,11 +118,13 @@ const ArticleList = (props: ArticleListProps) => {
                   rel={article.type === 'clip' ? 'noopener noreferrer' : ''}
                 >
                   <p className={clsx(['_title', 'text-xl font-semibold w-full'])}>{article.title}</p>
-                  {article.type === 'clip' && article.title !== article.origin_title ? (
-                    <p className="text-sm text-gray-500">[Original title] {article.origin_title}</p>
-                  ) : null}
 
-                  <p className="mt-2 line-clamp-1 text-sm text-gray-500 font-light w-full">{plainContent}</p>
+                  <div className="mt-2">
+                    {article.type === 'clip' && article.title !== article.origin_title ? (
+                      <p className="text-sm text-gray-500 mb-1">{article.origin_title}</p>
+                    ) : null}
+                    <p className="line-clamp-1 text-sm text-gray-500 font-light w-full">{plainContent}</p>
+                  </div>
                 </Link>
 
                 <div className="mt-4 flex text-sm font-light text-gray-600">
@@ -130,9 +132,9 @@ const ArticleList = (props: ArticleListProps) => {
                   <span className="mx-1 text-gray-400">|</span>
 
                   {article.site?.title ? (
-                    <Link href={article.site.link} target="_blank" className="flex items-center hover:text-blue-700">
+                    <Link href={article.site.link} target="_blank" className="flex items-center hover:text-green-800">
                       {!!faviconUrl && <img src={faviconUrl} alt="" className="w-4 h-4 mr-1" />}
-                      <p>{article.site?.title}</p>
+                      <p className="font-normal line-clamp-1">{article.site?.title}</p>
                     </Link>
                   ) : (
                     <div className="flex items-center">
@@ -147,13 +149,19 @@ const ArticleList = (props: ArticleListProps) => {
                 <div
                   className={clsx([
                     '_thumbnail',
-                    'min-w-40 w-40 aspect-[4/3] overflow-hidden flex justify-center items-center',
+                    'mt-7 overflow-hidden flex justify-center items-center rounded-lg',
+                    'min-w-24 w-24 aspect-[4/3]',
+                    'sm:min-w-40 sm:w-40 sm:aspect-[1.91/1]',
                   ])}
                 >
                   <img
                     src={article.thumbnail_img_url}
                     alt={article.title}
-                    className="min-w-40 w-40 aspect-[4/3] object-cover"
+                    className={clsx([
+                      'border object-cover',
+                      'min-w-24 w-24 aspect-[4/3]',
+                      'sm:min-w-40 sm:w-40 sm:aspect-[1.91/1]',
+                    ])}
                   />
                 </div>
               ) : null}
@@ -171,19 +179,19 @@ const ArticleList = (props: ArticleListProps) => {
         <div className="flex items-center">
           <IconFilter className="text-gray-500 mr-4" size={20} />
 
-          <Chip
+          <TypeChip
             type="post"
             className="mr-2 px-3 py-1 opacity-70 hover:opacity-100"
             disabled={!filter.value.type.includes('post')}
             onClick={() => toggleFilterType('post')}
           />
-          <Chip
+          <TypeChip
             type="shorts"
             className="mr-2 px-3 py-1 opacity-70 hover:opacity-100"
             disabled={!filter.value.type.includes('shorts')}
             onClick={() => toggleFilterType('shorts')}
           />
-          <Chip
+          <TypeChip
             type="clip"
             className="mr-2 px-3 py-1 opacity-70 hover:opacity-100"
             disabled={!filter.value.type.includes('clip')}
@@ -200,7 +208,7 @@ const ArticleList = (props: ArticleListProps) => {
   );
 };
 
-const ArticleItem = styled.li`
+const ArticleItem = styled.li<{ $type: ArticleType }>`
   ._thumbnail > img {
     transform: scale(1);
     transition: transform 0.2s;
@@ -209,7 +217,18 @@ const ArticleItem = styled.li`
   @media (hover: hover) {
     ._article-link:hover {
       ._title {
-        color: #1671ef;
+        color: ${({ $type }) => {
+          switch ($type) {
+            case 'post':
+              return '#2563eb';
+            case 'shorts':
+              return '#e11d48';
+            case 'clip':
+              return '#16a34a';
+            default:
+              return 'black';
+          }
+        }};
       }
     }
   }
