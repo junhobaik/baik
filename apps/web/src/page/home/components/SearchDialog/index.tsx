@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
 import { Button, Input } from '@junhobaik/ui';
@@ -7,6 +8,7 @@ import { Kbd, Modal, ModalBody, ModalContent, ModalHeader } from '@nextui-org/re
 import { IconSearch } from '@tabler/icons-react';
 import clsx from 'clsx';
 
+import TypeChip from '@/components/TypeChip';
 import useSearchArticles from '@/hooks/useSearchArticles';
 
 const SearchDialog = () => {
@@ -79,8 +81,16 @@ const SearchDialog = () => {
     return (
       <ul>
         {items.map((article, i) => (
-          <li key={`search-item-${article.id}`} className={clsx('px-4 py-2', { 'bg-gray-200': selectedIndex === i })}>
-            <p>{article.title}</p>
+          <li key={`search-item-${article.id}`}>
+            <Link
+              href={`/${article.pathname}`}
+              className={clsx('px-4 py-2 flex justify-between items-center cursor-pointer', 'hover:bg-gray-200', {
+                'bg-gray-200': selectedIndex === i,
+              })}
+            >
+              <p>{article.title}</p>
+              <TypeChip type={article.type} />
+            </Link>
           </li>
         ))}
       </ul>
