@@ -10,7 +10,7 @@ export default defineConfig({
   bundle: true,
   dts: false,
   external: ['@aws-sdk/client-dynamodb', '@aws-sdk/client-s3', '@aws-sdk/lib-dynamodb', '@aws-sdk/util-dynamodb'],
-  noExternal: ['uuid', 'openai'],
+  noExternal: ['uuid', 'openai', 'open-graph-scraper'],
   entry: ['src/index.ts'],
   outDir: 'dist',
   format: ['esm'],
