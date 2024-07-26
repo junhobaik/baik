@@ -58,7 +58,7 @@ const ArchiveScreen = (props: ArchiveScreenProps) => {
   }, [articles, lang, filter]);
 
   return (
-    <div className={clsx(['flex', session ? 'w-[92%] mx-auto' : ''])}>
+    <div className={clsx(['flex', session ? 'w-[92%] max-w-[1280px] mx-auto' : ''])}>
       <ArticleList articles={parsedArticles.filtered} session={session} filter={{ value: filter, set: setFilter }} />
       <ArchiveSidebar articles={parsedArticles.ordered} />
     </div>
