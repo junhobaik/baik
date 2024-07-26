@@ -1,5 +1,6 @@
 import { ActionResult } from '@baik/types';
 import https from 'https';
+import ogs from 'open-graph-scraper';
 import { OpenAI } from 'openai';
 import { ChatCompletionMessageParam } from 'openai/resources/index.mjs';
 import { URL } from 'url';
@@ -57,8 +58,8 @@ const translate = async ({
   }
 };
 
-const getOpenGraphData = async ({ url }: { url: string }): Promise<ActionResult> => {
-  return new Promise((resolve) => {
+const extractOpenGraphData = (url: string): Promise<{ [key: string]: string }> => {
+  return new Promise((resolve, reject) => {
     const parsedUrl = new URL(url);
 
     const options = {
@@ -75,9 +76,7 @@ const getOpenGraphData = async ({ url }: { url: string }): Promise<ActionResult>
       });
 
       res.on('end', () => {
-        console.log(data);
         const ogData: { [key: string]: string } = {};
-
         const ogRegex = /<meta\s+(?:property|name)=["']og:([^"']+)["']\s+content=["']([^"']+)["']/gi;
 
         let match;
@@ -85,35 +84,78 @@ const getOpenGraphData = async ({ url }: { url: string }): Promise<ActionResult>
           ogData[match[1].toLowerCase()] = match[2]; // 키를 소문자로 저장
         }
 
-        if (Object.keys(ogData).length === 0) {
-          resolve({
-            message: 'No Open Graph data found',
-            error: {
-              code: 'UTILS>OG_DATA_NOT_FOUND',
-              message: 'The requested URL does not contain Open Graph metadata',
-            },
-          });
-        } else {
-          resolve({
-            data: { item: ogData, success: true },
-            message: 'Successfully retrieved Open Graph data',
-          });
-        }
+        resolve(ogData);
       });
     });
 
     req.on('error', (error) => {
-      resolve({
-        message: 'Failed to retrieve Open Graph data',
-        error: {
-          code: 'UTILS>OG_DATA_ERROR',
-          message: error.message,
-        },
-      });
+      reject(error);
     });
 
     req.end();
   });
+};
+
+const extractOpenGraphDataUseScraper = async (url: string): Promise<{ [key: string]: string } | null> => {
+  const response = await fetch(url, { redirect: 'follow' });
+  const finalUrl = response.url;
+
+  const options = { url: finalUrl };
+  const { result, error } = await ogs(options);
+
+  if (result) {
+    const ogData: { [key: string]: string } = {};
+    if (result.ogTitle) ogData.title = result.ogTitle;
+    if (result.ogDescription) ogData.description = result.ogDescription;
+    if (result.ogImage && result.ogImage[0].url) ogData.image = result.ogImage[0].url;
+    ogData.url = result.ogUrl || finalUrl;
+    return ogData;
+  }
+
+  if (error) {
+    console.error('Error fetching Open Graph data:', error);
+    return null;
+  }
+
+  return null;
+};
+
+const getOpenGraphData = async ({ url }: { url: string }): Promise<ActionResult> => {
+  try {
+    let ogData = await extractOpenGraphData(url);
+
+    // If no data is found using extractOpenGraphData, try extractOpenGraphDataUseScraper
+    if (Object.keys(ogData).length === 0) {
+      console.log('No Open Graph data found using extractOpenGraphData. Trying extractOpenGraphDataUseScraper...');
+      const scraperData = await extractOpenGraphDataUseScraper(url);
+      if (scraperData) {
+        ogData = scraperData;
+      }
+    }
+
+    if (Object.keys(ogData).length === 0) {
+      return {
+        message: 'No Open Graph data found',
+        error: {
+          code: 'UTILS>OG_DATA_NOT_FOUND',
+          message: 'The requested URL does not contain Open Graph metadata',
+        },
+      };
+    } else {
+      return {
+        data: { item: ogData, success: true },
+        message: 'Successfully retrieved Open Graph data',
+      };
+    }
+  } catch (error) {
+    return {
+      message: 'Failed to retrieve Open Graph data',
+      error: {
+        code: 'UTILS>OG_DATA_ERROR',
+        message: error instanceof Error ? error.message : String(error),
+      },
+    };
+  }
 };
 
 const getSiteData = async ({ url }: { url: string }): Promise<ActionResult> => {
