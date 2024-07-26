@@ -41,11 +41,7 @@ const ClipScreen = ({ session }: ClipScreenProps) => {
   const [autoCompleteLoading, setAutoCompleteLoading] = useState(false);
   const [saveLoading, setSaveLoading] = useState(false);
 
-  const resetAllFields = useCallback(() => {
-    setUrl('');
-    setStatus('published');
-    setTitle('');
-    setClipDate(parseDateTime(dayjs().format('YYYY-MM-DDTHH:mm:ss')));
+  const resetArticle = useCallback(() => {
     setArticle({
       origin_title: '',
       content: '',
@@ -57,6 +53,14 @@ const ClipScreen = ({ session }: ClipScreenProps) => {
         favicon_url: '',
       },
     });
+  }, []);
+
+  const resetAllFields = useCallback(() => {
+    setUrl('');
+    setStatus('published');
+    setTitle('');
+    setClipDate(parseDateTime(dayjs().format('YYYY-MM-DDTHH:mm:ss')));
+    resetArticle();
     setErrors({});
   }, []);
 
@@ -80,8 +84,10 @@ const ClipScreen = ({ session }: ClipScreenProps) => {
     setAutoCompleteLoading(true);
     try {
       const origin = getOriginFromUrl(url);
+
       const [ogResult, siteResult] = await Promise.all([getOpenGraphData(url), getSiteData(origin)]);
 
+      resetArticle();
       setTitle((prev) => ogResult?.title ?? prev);
       setArticle((prevArticle) => ({
         ...prevArticle,
