@@ -121,14 +121,20 @@ export const calculateDynamoDBSize = (item: any): number => {
   return Number((bytes / 1024).toFixed(2));
 };
 
-export const getOriginFromUrl = (url: string, exception?: string): string => {
+export const getOriginFromUrl = (url: string): string => {
+  const exceptionHostnames = ['velog.io'];
+
   try {
     const urlObject = new URL(url);
-    const origin = `${urlObject.protocol}//${urlObject.hostname}`;
 
-    if (exception) {
-      const normalizedException = exception.startsWith('/') ? exception : `/${exception}`;
-      return `${origin}${normalizedException}`;
+    const { protocol, hostname, pathname } = urlObject;
+    const origin = `${protocol}//${hostname}`;
+
+    if (exceptionHostnames.includes(hostname)) {
+      if (hostname === 'velog.io') {
+        return `${origin}${pathname.split('/').slice(0, 2).join('/')}/posts`;
+      }
+      return `${origin}${pathname.split('/').slice(0, 2).join('/')}`;
     }
 
     return origin;
