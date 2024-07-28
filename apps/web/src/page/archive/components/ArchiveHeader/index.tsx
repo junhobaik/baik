@@ -34,7 +34,7 @@ const ArchiveHeader = ({ lang = 'ko' }: { lang?: 'ko' | 'en' }) => {
   return (
     <header className="sticky top-0 flex justify-center h-16 z-50 bg-white border-b">
       <div className="flex items-center justify-between w-[92%]">
-        <Link className="flex items-center" href="/">
+        <Link className="flex items-center" href="/archive">
           <Image width={20} height={20} src="/icon.png" alt="" />
           <p className="ml-1 text-md font-semibold">Baik</p>
         </Link>
@@ -56,16 +56,16 @@ const ArchiveHeader = ({ lang = 'ko' }: { lang?: 'ko' | 'en' }) => {
               <DropdownMenu
                 aria-label="Change Country"
                 selectionMode="single"
-                selectedKeys={[currentLang]}
+                selectedKeys={[lang]}
                 disabledKeys={disabledIntlKeys}
               >
-                <DropdownItem key="ko" color="primary" href={`/${pathname.replace('/en', '')}`}>
+                <DropdownItem key="ko" color="primary" href={`${pathname.replace('/en', '')}`}>
                   🇰🇷 한국어
                 </DropdownItem>
                 <DropdownItem
                   key="en"
                   color="primary"
-                  href={`${pathname}/en`}
+                  href={`${pathname.replace('archive', 'archive/en')}`}
                   className={!enAvailable ? 'line-through' : ''}
                 >
                   🇺🇸 English

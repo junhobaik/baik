@@ -21,7 +21,7 @@ const ArchiveLayout = async ({
 }>) => {
   const headersList = headers();
   const headerPathname = headersList.get('x-pathname') || '';
-  const lang = headerPathname === '/archive/en' ? 'en' : 'ko';
+  const lang = headerPathname.startsWith('/archive/en') ? 'en' : 'ko';
 
   return (
     <>
