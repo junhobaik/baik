@@ -65,7 +65,7 @@ const ArchiveHeader = ({ lang = 'ko' }: { lang?: 'ko' | 'en' }) => {
                 <DropdownItem
                   key="en"
                   color="primary"
-                  href={`/en${pathname}`}
+                  href={`${pathname}/en`}
                   className={!enAvailable ? 'line-through' : ''}
                 >
                   🇺🇸 English

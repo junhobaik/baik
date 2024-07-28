@@ -17,7 +17,7 @@ import ArticleScreen from './Screen';
 const ArchiveArticlePage = async ({ params }: { params: { pathname: string } }) => {
   const headersList = headers();
   const headerPathname = headersList.get('x-pathname') || '';
-  const lang = headerPathname.startsWith('/en/') ? 'en' : 'ko';
+  const lang = headerPathname.startsWith('/archive/en/') ? 'en' : 'ko';
 
   const session = await auth();
 
@@ -67,7 +67,7 @@ const ArchiveArticlePage = async ({ params }: { params: { pathname: string } }) 
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }} />
-      <ArticleScreen session={session} article={parsedArticle} lang={lang}/>
+      <ArticleScreen article={parsedArticle} />
     </>
   );
 };

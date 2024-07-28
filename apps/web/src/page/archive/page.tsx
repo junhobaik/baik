@@ -2,20 +2,17 @@
 
 import React from 'react';
 
+import { headers } from 'next/headers';
+
 import { Article } from '@baik/types';
 import { Session } from 'next-auth';
 
 import api from '@/api';
+import { auth } from '@/auth';
 import { variables } from '@/configs';
 import { markdownToPlainText } from '@/utils';
 
-import ArchiveHeader from '../ArchiveHeader';
-import ArchiveScreen from './Screen';
-
-interface ArchiveProps {
-  session: Session | null;
-  lang: 'en' | 'ko';
-}
+import ArchiveScreen from './components/ArchiveScreen';
 
 const fetchArticles = async (session: Session | null) => {
   let articles: Article[];
@@ -31,8 +28,12 @@ const fetchArticles = async (session: Session | null) => {
   return articles;
 };
 
-const ArchivePage = async (props: ArchiveProps) => {
-  const { session, lang } = props;
+const ArchivePage = async () => {
+  const session = await auth();
+  const headersList = headers();
+  const headerPathname = headersList.get('x-pathname') || '';
+  const lang = headerPathname === '/archive/en' ? 'en' : 'ko';
+
   const articles = await fetchArticles(session);
 
   const structuredData = {
@@ -84,7 +85,6 @@ const ArchivePage = async (props: ArchiveProps) => {
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }} />
-      {session ? <ArchiveHeader lang={lang} /> : null}
       <ArchiveScreen session={session} articles={articles} lang={lang} />
     </>
   );

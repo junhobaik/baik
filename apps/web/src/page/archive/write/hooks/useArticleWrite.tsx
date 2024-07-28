@@ -186,7 +186,7 @@ const useArticleWrite = (props?: UseArticleWriteProps) => {
 
     const res = await api.client.archive.createArticle(newData as PostArticle | ShortsArticle);
     if (res.data?.success) {
-      router.replace(`/write?pathname=${res.data.item.pathname}`);
+      router.replace(`/archive/write?pathname=${res.data.item.pathname}`);
       query.refetch();
     }
 
@@ -256,7 +256,7 @@ const useArticleWrite = (props?: UseArticleWriteProps) => {
         if (item) {
           setArticle(item);
         } else {
-          router.replace('/write');
+          router.replace('/archive/write');
         }
       } else {
         setArticle(null);

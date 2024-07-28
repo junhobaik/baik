@@ -12,6 +12,7 @@ import {
   IconBox,
   IconChevronLeft,
   IconChevronRight,
+  IconDashboard,
   IconEdit,
   IconHome,
   IconLogout,
@@ -54,11 +55,23 @@ const Sidebar = ({ session }: { session: Session }) => {
       </div>
 
       <div className="section-container">
+        <p className="section-title">Home</p>
+        <div>
+          <Link className={`styled-link ${pathname === '/' ? 'active' : ''}`} href={'/'}>
+            <span className="icon-wrapper">
+              <IconHome size={20} />
+            </span>
+            <p className="link-text">Home</p>
+          </Link>
+        </div>
+      </div>
+
+      <div className="section-container">
         <p className="section-title">Dashboard</p>
         <div>
           <Link className={`styled-link ${pathname === '/dashboard' ? 'active' : ''}`} href={'/dashboard'}>
             <span className="icon-wrapper">
-              <IconHome size={20} />
+              <IconDashboard size={20} />
             </span>
             <p className="link-text">Dashboard</p>
           </Link>
@@ -68,7 +81,7 @@ const Sidebar = ({ session }: { session: Session }) => {
       <div className="section-container">
         <p className="section-title">Archive</p>
         <div>
-          <Link className={`styled-link ${pathname === '/' ? 'active' : ''}`} href={'/'}>
+          <Link className={`styled-link ${pathname === '/archive' ? 'active' : ''}`} href={'/archive'}>
             <span className="icon-wrapper">
               <IconBox size={20} />
             </span>
@@ -77,7 +90,7 @@ const Sidebar = ({ session }: { session: Session }) => {
         </div>
 
         <div>
-          <Link className={`styled-link ${pathname === '/write' ? 'active' : ''}`} href={'/write'}>
+          <Link className={`styled-link ${pathname === '/archive/write' ? 'active' : ''}`} href={'/archive/write'}>
             <span className="icon-wrapper">
               <IconEdit size={20} />
             </span>
@@ -86,11 +99,11 @@ const Sidebar = ({ session }: { session: Session }) => {
         </div>
 
         <div>
-          <Link className={`styled-link ${pathname === '/clip' ? 'active' : ''}`} href={'/clip'}>
+          <Link className={`styled-link ${pathname === '/archive/webclip' ? 'active' : ''}`} href={'/archive/webclip'}>
             <span className="icon-wrapper">
               <IconPaperclip size={20} />
             </span>
-            <p className="link-text">Clip</p>
+            <p className="link-text">WebClip</p>
           </Link>
         </div>
       </div>

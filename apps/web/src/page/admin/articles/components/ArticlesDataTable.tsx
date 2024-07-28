@@ -132,7 +132,7 @@ const ArticlesDataTable = (props: ArticlesDataTableProps) => {
               color="primary"
               isDisabled={!item.pathname}
               onClick={() => {
-                router.push('/write?pathname=' + item.pathname);
+                router.push('/archive/write?pathname=' + item.pathname);
               }}
             >
               Edit

@@ -11,7 +11,8 @@
     "Regexes",
     "sandpack",
     "treeshake",
-    "tsup"
+    "tsup",
+    "webclip"
   ],
   "typescript.tsdk": "node_modules/typescript/lib"
 }

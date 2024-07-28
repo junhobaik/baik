@@ -6,7 +6,7 @@ import { headers } from 'next/headers';
 
 import { auth } from '@/auth';
 
-import ArchivePage from './components/ArchivePage';
+// import ArchivePage from './components/ArchivePage';
 
 const Home = async (props: any) => {
   const session = await auth();
@@ -14,7 +14,7 @@ const Home = async (props: any) => {
   const headerPathname = headersList.get('x-pathname') || '';
   const lang = headerPathname === '/en' ? 'en' : 'ko';
 
-  return <ArchivePage session={session} lang={lang} />;
+  return <div>home</div>;
 };
 
 export default Home;

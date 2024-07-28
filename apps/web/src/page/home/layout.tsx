@@ -5,8 +5,7 @@ import { auth } from '@/auth';
 import localFont from 'next/font/local';
 
 import Sidebar from '../../components/Sidebar';
-import ArchiveFooter from './components/ArchiveFooter';
-import ArchiveHeader from './components/ArchiveHeader';
+
 import { Providers } from './components/providers';
 import { Registries } from './components/registries';
 import { Toaster } from 'react-hot-toast';
@@ -50,11 +49,7 @@ const RootLayout = async ({
       <html lang={lang} className="light">
         <body className={fontPretendard.className}>
           <Providers>
-            <Registries>
-              <ArchiveHeader lang={lang} />
-              <main className="w-[92%] xl:max-w-[1280px] min-h-screen mx-auto">{children}</main>
-              <ArchiveFooter />
-            </Registries>
+            <Registries>{children}</Registries>
           </Providers>
         </body>
       </html>
@@ -69,6 +64,7 @@ const RootLayout = async ({
               <Sidebar session={session} />
               <div className="flex-1 overflow-y-auto">{children}</div>
             </main>
+
             <Toaster position="bottom-center" />
           </Registries>
         </Providers>

@@ -27,7 +27,7 @@ const ArchiveSidebar = (props: ArchiveSidebarProps) => {
         <p className="text-sm text-gray-500 mb-2">Recent Posts</p>
         {filteredPosts.recent.map((article) => {
           return (
-            <Link href={`${pathname}${pathname.endsWith('/') ? '' : '/'}${article.pathname}`}>
+            <Link href={`${pathname}${pathname.endsWith('/') ? '' : '/'}article/${article.pathname}`}>
               <p key={`recent-article-item-${article.id}`} className="py-1 text-gray-800 hover:text-blue-500">
                 {article.title}
               </p>

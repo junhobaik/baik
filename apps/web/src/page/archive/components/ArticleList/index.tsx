@@ -14,7 +14,7 @@ import TypeChip from '@/components/TypeChip';
 import { variables } from '@/configs';
 import { markdownToPlainText } from '@/utils';
 
-import { FilterType } from '../ArchivePage/Screen';
+import { FilterType } from '../ArchiveScreen';
 
 interface ArticleListProps {
   session: Session | null;
@@ -66,7 +66,9 @@ const ArticleList = (props: ArticleListProps) => {
       const plainContent = markdownToPlainText(article.content);
       const date = dayjs(article.updated_date).format('YYYY.MM.DD');
       const path =
-        article.type === 'clip' ? article.url : `${pathname}${pathname.endsWith('/') ? '' : '/'}${article.pathname}`;
+        article.type === 'clip'
+          ? article.url
+          : `${pathname}${pathname.endsWith('/') ? '' : '/'}${article.pathname}`;
 
       const faviconUrl = article.site?.favicon_url;
 
