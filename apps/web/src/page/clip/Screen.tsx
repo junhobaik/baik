@@ -4,10 +4,10 @@ import React, { useCallback, useEffect, useLayoutEffect, useMemo, useState } fro
 
 import { useSearchParams } from 'next/navigation';
 
-import { ClipArticle, ClipArticleBase } from '@baik/types';
+import { ClipArticle, ClipArticleBase, RssFeedItemBase } from '@baik/types';
 import { parseDateTime } from '@internationalized/date';
 import { Button, Card, DateInput, DateValue, Image, Input, Select, SelectItem, Textarea } from '@nextui-org/react';
-import { IconSparkles, IconWorld } from '@tabler/icons-react';
+import { IconPaperclip, IconSparkles, IconWorld } from '@tabler/icons-react';
 import dayjs from 'dayjs';
 import { Session } from 'next-auth';
 import toast from 'react-hot-toast';
@@ -40,6 +40,7 @@ const ClipScreen = ({ session }: ClipScreenProps) => {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [autoCompleteLoading, setAutoCompleteLoading] = useState(false);
   const [saveLoading, setSaveLoading] = useState(false);
+  const [rssFeed, setRssFeed] = useState<RssFeedItemBase | null>(null);
 
   const resetArticle = useCallback(() => {
     setArticle({
@@ -53,6 +54,7 @@ const ClipScreen = ({ session }: ClipScreenProps) => {
         favicon_url: '',
       },
     });
+    setRssFeed(null);
   }, []);
 
   const resetAllFields = useCallback(() => {
@@ -74,6 +76,11 @@ const ClipScreen = ({ session }: ClipScreenProps) => {
     return res.data?.item ?? null;
   }, []);
 
+  const getRSSFeedUrl = useCallback(async (url: string) => {
+    const res = await api.client.utils.getRSSFeedUrl({ url });
+    return res.data?.item ?? null;
+  }, []);
+
   const fetchInfos = useCallback(async () => {
     if (!url) return;
     if (!isValidURL(url)) {
@@ -85,7 +92,11 @@ const ClipScreen = ({ session }: ClipScreenProps) => {
     try {
       const origin = getOriginFromUrl(url);
 
-      const [ogResult, siteResult] = await Promise.all([getOpenGraphData(url), getSiteData(origin)]);
+      const [ogResult, siteResult, rssResult] = await Promise.all([
+        getOpenGraphData(url),
+        getSiteData(origin),
+        getRSSFeedUrl(url),
+      ]);
 
       resetArticle();
       setTitle((prev) => ogResult?.title ?? prev);
@@ -101,6 +112,20 @@ const ClipScreen = ({ session }: ClipScreenProps) => {
           favicon_url: siteResult?.favicon_url || prevArticle.site?.favicon_url || '',
         },
       }));
+
+      if (rssResult) {
+        setRssFeed({
+          type: 'rss',
+          url: rssResult,
+          data: {
+            title: siteResult?.title ?? '',
+            description: ogResult?.description ?? '',
+            favicon_url: siteResult?.favicon_url,
+            // TODO:
+            items: [],
+          },
+        });
+      }
     } catch (error) {
       console.error('Error fetching article data:', error);
     } finally {
@@ -174,6 +199,10 @@ const ClipScreen = ({ session }: ClipScreenProps) => {
     setSaveLoading(false);
   }, [url, title, status, article, validateClipData, clipDate]);
 
+  const handleAddRssFeed = () => {
+    // TODO:
+  };
+
   const thumbnailElement = useMemo(() => {
     if (article.thumbnail_img_url) {
       return <Image src={article.thumbnail_img_url} alt="Thumbnail" className="w-full h-auto object-cover" />;
@@ -210,7 +239,12 @@ const ClipScreen = ({ session }: ClipScreenProps) => {
 
   return (
     <div className="max-w-3xl mx-auto p-4">
-      <h1 className="text-2xl font-bold mb-4">WebClip</h1>
+      <div className="flex items-center mb-4">
+        <IconPaperclip size={24} className="mr-1 text-gray-700" />
+        <h1 className="text-2xl font-bold">WebClip</h1>
+      </div>
+
+      {/* Clip fields */}
       <Card className="p-4 mb-4">
         <div className="flex mb-4">
           <Input
@@ -291,6 +325,8 @@ const ClipScreen = ({ session }: ClipScreenProps) => {
           />
         </div>
       </Card>
+
+      {/* Generated Info */}
       <Card className="p-4 mb-4">
         <div className="flex mb-4">
           <div className="flex-grow mr-4">
@@ -329,6 +365,25 @@ const ClipScreen = ({ session }: ClipScreenProps) => {
           <Input label="Site URL" value={article.site?.link || ''} readOnly className="mb-2" />
         </div>
       </Card>
+
+      {/* RSS Feed */}
+      {!!rssFeed && (
+        <Card className="mb-4 p-4">
+          <div className="mb-1">
+            <p className="text-lg font-semibold">Found RSS feed</p>
+          </div>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center">
+              {faviconElement}
+              <span className="font-bold">{rssFeed.data.title || rssFeed.url}</span>
+            </div>
+            <Button variant="flat" color="secondary" size="sm" onClick={handleAddRssFeed}>
+              Add RSS Feed
+            </Button>
+          </div>
+        </Card>
+      )}
+
       <Button fullWidth color="primary" onClick={saveClip} isLoading={saveLoading}>
         Add Clip
       </Button>

@@ -47,3 +47,15 @@ export const getSiteData = async ({ url }: { url: string }): Promise<ActionResul
 
   return await request(param);
 };
+
+export const getRSSFeedUrl = async ({ url }: { url: string }): Promise<ActionResult> => {
+  const param = {
+    module: 'utils',
+    action: 'getRSSFeedUrl',
+    payload: {
+      url,
+    },
+  };
+
+  return await request(param);
+};
