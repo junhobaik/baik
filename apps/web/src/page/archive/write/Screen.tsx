@@ -57,7 +57,7 @@ const WriteScreenStyled = styled.div`
   max-width: calc(720px + 280px);
   margin: 0 auto;
 
-  @media screen and (max-width: 641px) {
+  @media screen and (max-width: 769px) {
     flex-direction: column;
     height: auto;
     padding: 12px 8px;
@@ -96,7 +96,7 @@ const WriteScreenStyled = styled.div`
     display: flex;
     flex-direction: column;
 
-    @media screen and (max-width: 641px) {
+    @media screen and (max-width: 769px) {
       width: 100%;
     }
 
@@ -104,7 +104,7 @@ const WriteScreenStyled = styled.div`
       flex-grow: 1;
       overflow-y: auto;
 
-      @media screen and (max-width: 641px) {
+      @media screen and (max-width: 769px) {
         height: 680px;
       }
     }
