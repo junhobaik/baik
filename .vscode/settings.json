@@ -8,6 +8,7 @@
     "katex",
     "mdxeditor",
     "nextui",
+    "Regexes",
     "sandpack",
     "treeshake",
     "tsup"
