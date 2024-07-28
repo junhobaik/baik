@@ -12,7 +12,7 @@ const fetchArticles = async (): Promise<Article[]> => {
 const generateArticleEntry = (article: Article): MetadataRoute.Sitemap[number] | null => {
   if (article.type === 'clip') return null;
 
-  const url = `${variables.SITE_URL_PRD}/${article.pathname}`;
+  const url = `${variables.SITE_URL_PRD}/archive/${article.pathname}`;
 
   const entry: MetadataRoute.Sitemap[number] = {
     url: url,
@@ -25,7 +25,7 @@ const generateArticleEntry = (article: Article): MetadataRoute.Sitemap[number] |
     entry.alternates = {
       languages: {
         ko: url,
-        en: `${variables.SITE_URL_PRD}/en/${article.pathname}`,
+        en: `${variables.SITE_URL_PRD}/archive/en/${article.pathname}`,
       },
     };
   }
@@ -41,8 +41,8 @@ const generateStaticPages = (): MetadataRoute.Sitemap => [
     priority: 1,
     alternates: {
       languages: {
-        ko: variables.SITE_URL_PRD,
-        en: `${variables.SITE_URL_PRD}/en`,
+        ko: `${variables.SITE_URL_PRD}/archive`,
+        en: `${variables.SITE_URL_PRD}/archive/en`,
       },
     },
   },
