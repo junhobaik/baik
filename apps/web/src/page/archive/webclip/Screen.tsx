@@ -133,14 +133,6 @@ const ClipScreen = ({ session }: ClipScreenProps) => {
     }
   }, [getOpenGraphData, getSiteData, url]);
 
-  const handleInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
-    setArticle((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  }, []);
-
   const validateClipData = useCallback(() => {
     setErrors({});
     const newErrors: Record<string, string> = {};
@@ -283,7 +275,7 @@ const ClipScreen = ({ session }: ClipScreenProps) => {
             label="Title"
             name="title"
             value={title}
-            onChange={handleInputChange}
+            onChange={(e) => setTitle(e.target.value)}
             isRequired
             fullWidth
             color="primary"
@@ -330,19 +322,11 @@ const ClipScreen = ({ session }: ClipScreenProps) => {
       <Card className="p-4 mb-4">
         <div className="flex mb-4">
           <div className="flex-grow mr-4">
-            <Input
-              label="Original Title"
-              name="origin_title"
-              value={article.origin_title}
-              onChange={handleInputChange}
-              className="mb-2"
-              readOnly
-            />
+            <Input label="Original Title" name="origin_title" value={article.origin_title} className="mb-2" readOnly />
             <Textarea
               label="Description"
               name="content"
               value={article.content}
-              onChange={handleInputChange}
               className="mb-2"
               maxRows={2}
               readOnly
