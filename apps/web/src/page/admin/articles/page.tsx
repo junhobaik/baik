@@ -8,7 +8,7 @@ import { Input } from '@nextui-org/react';
 import useArticles from '@/hooks/useArticles';
 import useSearchArticles from '@/hooks/useSearchArticles';
 
-import ArticlesDataTable from './ArticlesDataTable';
+import ArticlesDataTable from './components/ArticlesDataTable';
 
 const AdminArticles = () => {
   const { data, query } = useArticles();

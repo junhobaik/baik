@@ -4,7 +4,7 @@ import React from 'react';
 
 import useBookmarkGroups from '@/hooks/useBookmarkGroups';
 
-import BookmarkDataTable from './BookmarkDataTable';
+import BookmarkDataTable from './components/BookmarkDataTable';
 
 const AdminBookmarks = () => {
   const { data, query } = useBookmarkGroups();

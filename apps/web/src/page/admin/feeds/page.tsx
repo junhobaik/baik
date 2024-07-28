@@ -4,7 +4,7 @@ import React from 'react';
 
 import useFeeds from '@/hooks/useFeeds';
 
-import FeedDataTable from './FeedsDataTable';
+import FeedDataTable from './components/FeedsDataTable';
 
 const AdminFeedsPage = () => {
   const { data, query } = useFeeds();
