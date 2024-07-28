@@ -5,6 +5,8 @@ import { OpenAI } from 'openai';
 import { ChatCompletionMessageParam } from 'openai/resources/index.mjs';
 import { URL } from 'url';
 
+import { extractRSSFeedUrl } from '../../utils';
+
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
@@ -251,6 +253,25 @@ const getSiteData = async ({ url }: { url: string }): Promise<ActionResult> => {
   });
 };
 
+const getRSSFeedUrl = async ({ url }: { url: string }): Promise<ActionResult> => {
+  const feedUrl = await extractRSSFeedUrl(url);
+
+  if (feedUrl) {
+    return {
+      data: { item: feedUrl, success: true },
+      message: 'Successfully retrieved RSS feed URL',
+    };
+  }
+
+  return {
+    message: 'Failed to retrieve RSS feed URL',
+    error: {
+      code: 'UTILS>RSS_FEED_URL_ERROR',
+      message: 'RSS feed URL not found',
+    },
+  };
+};
+
 export default {
   translate: {
     run: translate,
@@ -262,6 +283,10 @@ export default {
   },
   getSiteData: {
     run: getSiteData,
+    skip_auth: false,
+  },
+  getRSSFeedUrl: {
+    run: getRSSFeedUrl,
     skip_auth: false,
   },
 };

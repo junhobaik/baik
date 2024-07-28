@@ -1,6 +1,8 @@
 // src/utils.ts
-import modules from './modules';
-import auth from './modules/auth';
+import modules from '../modules';
+import auth from '../modules/auth';
+
+export * from './etc.ts';
 
 export type ModulesType = typeof modules;
 export type Modules = keyof ModulesType;
