@@ -3,10 +3,8 @@
 import React, { forwardRef } from 'react';
 
 import {
-  AdmonitionDirectiveDescriptor,
-  // BlockTypeSelect,
-  BoldItalicUnderlineToggles,
-  // ChangeAdmonitionType,
+  AdmonitionDirectiveDescriptor, // BlockTypeSelect,
+  BoldItalicUnderlineToggles, // ChangeAdmonitionType,
   ChangeCodeMirrorLanguage,
   CodeToggle,
   ConditionalContents,
@@ -18,8 +16,7 @@ import {
   InsertCodeBlock,
   InsertImage,
   InsertSandpack,
-  InsertTable,
-  // InsertThematicBreak,
+  InsertTable, // InsertThematicBreak,
   // ListsToggle,
   MDXEditor,
   type MDXEditorMethods,
@@ -46,6 +43,8 @@ import {
   toolbarPlugin,
 } from '@mdxeditor/editor';
 import styled from 'styled-components';
+
+import api from '@/api';
 
 import '@mdxeditor/editor/style.css';
 
@@ -83,6 +82,25 @@ const MDEditor = forwardRef<MDXEditorMethods | null, MDEditorProps>((props, ref)
     return ['note', 'tip', 'danger', 'info', 'caution'].includes(
       (node as DirectiveNode).getMdastNode().name as AdmonitionKind,
     );
+  };
+
+  const imageUploadHandler = async (file: File) => {
+    try {
+      const reader = new FileReader();
+      const filePromise = new Promise<string>((resolve, reject) => {
+        reader.onload = (e) => resolve(e.target?.result as string);
+        reader.onerror = (e) => reject(e);
+      });
+      reader.readAsDataURL(file);
+
+      const base64File = await filePromise;
+
+      const res = await api.client.storage.uploadImage({ file: base64File, filename: file.name });
+
+      return Promise.resolve(res.data?.item);
+    } catch (error) {
+      return Promise.reject(error);
+    }
   };
 
   return (
@@ -127,7 +145,8 @@ const MDEditor = forwardRef<MDXEditorMethods | null, MDEditorProps>((props, ref)
           sandpackPlugin({ sandpackConfig: simpleSandpackConfig }),
 
           imagePlugin({
-            imageAutocompleteSuggestions: [''],
+            imageUploadHandler,
+            imageAutocompleteSuggestions: [],
           }),
 
           directivesPlugin({ directiveDescriptors: [AdmonitionDirectiveDescriptor] }),
