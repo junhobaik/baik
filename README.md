@@ -1,6 +1,12 @@
 # baik 🚧
 
+
+[🔗 임시 도메인(https://baik-web.vercel.app)](https://baik-web.vercel.app)
+
+---
+
 **개인 웹 페이지**
+
 - Archive
   - Blog
   - Archive (Save Webclip)
