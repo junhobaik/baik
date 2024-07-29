@@ -290,9 +290,8 @@ const getAllArticles = async (args: {
   limit?: number;
   lastEvaluatedKey?: Record<string, any>;
 }): Promise<ActionResult> => {
-  const { orderBy = 'created_at', limit = 50, lastEvaluatedKey } = args;
+  const { limit = 50, lastEvaluatedKey } = args;
 
-  const sortKey = orderBy === 'created_at' ? 'GSI1SK' : 'GSI2SK';
   const params = {
     tableName,
     indexName: 'AllArticlesIndex',
@@ -300,7 +299,7 @@ const getAllArticles = async (args: {
     expressionAttributeValues: {
       ':gsi1pk': 'ARTICLE',
     },
-    scanIndexForward: orderBy === 'created_at',
+    scanIndexForward: false,
     limit,
     exclusiveStartKey: lastEvaluatedKey,
   };
@@ -333,7 +332,7 @@ const getArticlesByStatus = async (args: {
   limit?: number;
   lastEvaluatedKey?: Record<string, any>;
 }): Promise<ActionResult> => {
-  const { status, orderBy = 'created_at', limit = 50, lastEvaluatedKey } = args;
+  const { status, limit = 50, lastEvaluatedKey } = args;
 
   const params = {
     tableName,
@@ -342,7 +341,7 @@ const getArticlesByStatus = async (args: {
     expressionAttributeValues: {
       ':gsi3pk': `TYPE#*#STATUS#${status}`,
     },
-    scanIndexForward: orderBy === 'created_at',
+    scanIndexForward: false,
     limit,
     exclusiveStartKey: lastEvaluatedKey,
   };
@@ -375,7 +374,7 @@ const getArticlesByType = async (args: {
   limit?: number;
   lastEvaluatedKey?: Record<string, any>;
 }): Promise<ActionResult> => {
-  const { type, orderBy = 'created_at', limit = 50, lastEvaluatedKey } = args;
+  const { type, limit = 50, lastEvaluatedKey } = args;
 
   const params = {
     tableName,
@@ -384,7 +383,7 @@ const getArticlesByType = async (args: {
     expressionAttributeValues: {
       ':gsi3pk': `TYPE#${type}#STATUS#*`,
     },
-    scanIndexForward: orderBy === 'created_at',
+    scanIndexForward: false,
     limit,
     exclusiveStartKey: lastEvaluatedKey,
   };
@@ -418,7 +417,7 @@ const getArticlesByTypeStatus = async (args: {
   limit?: number;
   lastEvaluatedKey?: Record<string, any>;
 }): Promise<ActionResult> => {
-  const { type, status, orderBy = 'created_at', limit = 50, lastEvaluatedKey } = args;
+  const { type, status, limit = 50, lastEvaluatedKey } = args;
 
   const params = {
     tableName,
@@ -427,7 +426,7 @@ const getArticlesByTypeStatus = async (args: {
     expressionAttributeValues: {
       ':gsi3pk': `TYPE#${type}#STATUS#${status}`,
     },
-    scanIndexForward: orderBy === 'created_at',
+    scanIndexForward: false,
     limit,
     exclusiveStartKey: lastEvaluatedKey,
   };
@@ -496,9 +495,8 @@ const getAllArticlesPublic = async (args?: {
   limit?: number;
   lastEvaluatedKey?: Record<string, any>;
 }): Promise<ActionResult> => {
-  const { orderBy = 'created_at', limit = 50, lastEvaluatedKey } = args || {};
+  const { limit = 50, lastEvaluatedKey } = args || {};
 
-  const sortKey = orderBy === 'created_at' ? 'GSI1SK' : 'GSI2SK';
   const params = {
     tableName,
     indexName: 'AllArticlesIndex',
@@ -512,6 +510,7 @@ const getAllArticlesPublic = async (args?: {
       ':status': 'published',
     },
     limit,
+    scanIndexForward: false,
     exclusiveStartKey: lastEvaluatedKey,
   };
 
@@ -553,6 +552,7 @@ const getArticleByPathnamePublic = async (args: { pathname: string }): Promise<A
       ':gsi4sk': `PATHNAME#${pathname}`,
       ':status': 'published',
     },
+    scanIndexForward: false,
     limit: 1,
   };
 
