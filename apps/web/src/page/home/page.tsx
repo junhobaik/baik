@@ -2,19 +2,24 @@
 
 import React from 'react';
 
-import { headers } from 'next/headers';
+import Link from 'next/link';
+
+import { Button } from '@nextui-org/react';
 
 import { auth } from '@/auth';
 
-// import ArchivePage from './components/ArchivePage';
-
 const Home = async (props: any) => {
   const session = await auth();
-  const headersList = headers();
-  const headerPathname = headersList.get('x-pathname') || '';
-  const lang = headerPathname === '/en' ? 'en' : 'ko';
 
-  return <div>home</div>;
+  return (
+    <div className="h-screen w-screen flex items-center justify-center">
+      <Link href="/archive">
+        <Button size="lg" color="primary">
+          Go to Archive(Blog)
+        </Button>
+      </Link>
+    </div>
+  );
 };
 
 export default Home;
