@@ -38,7 +38,7 @@ const SearchDialog = () => {
   const toggleModal = useCallback(() => setIsOpen((prev) => !prev), []);
 
   const prefetchArticle = useCallback(() => {
-    if (items[selectedIndex]) router.prefetch(`/${items[selectedIndex].pathname}`);
+    if (items[selectedIndex]) router.prefetch(`/archive/${items[selectedIndex].pathname}`);
   }, [items, selectedIndex, router]);
 
   const handleInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
@@ -63,7 +63,7 @@ const SearchDialog = () => {
           break;
         case 'Enter':
           if (items.length && items[selectedIndex]) {
-            router.push(`/${items[selectedIndex].pathname}`);
+            router.push(`/archive/${items[selectedIndex].pathname}`);
             setIsOpen(false);
           }
           break;
