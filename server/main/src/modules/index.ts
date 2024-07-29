@@ -2,6 +2,7 @@
 import archive from './archive';
 import auth from './auth';
 import dashboard from './dashboard';
+import storage from './storage';
 import utils from './utils';
 
 export default {
@@ -9,4 +10,5 @@ export default {
   dashboard,
   archive,
   utils,
+  storage,
 };

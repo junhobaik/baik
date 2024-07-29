@@ -1,4 +1,4 @@
-// src/utils.ts
+// server/main/src/utils/index.ts
 import modules from '../modules';
 import auth from '../modules/auth';
 

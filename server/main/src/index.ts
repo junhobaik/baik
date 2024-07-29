@@ -1,4 +1,4 @@
-// src/index.ts
+// server/main/src/index.ts
 import type { APIGatewayProxyEventV2, APIGatewayProxyResultV2, Context } from 'aws-lambda';
 
 import { type EventBody, runModuleAction } from './utils';

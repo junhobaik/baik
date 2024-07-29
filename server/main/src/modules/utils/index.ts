@@ -1,3 +1,4 @@
+// server/main/src/modules/utils/index.ts
 import { ActionResult } from '@baik/types';
 import https from 'https';
 import ogs from 'open-graph-scraper';
