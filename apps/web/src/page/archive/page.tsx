@@ -5,7 +5,7 @@ import React from 'react';
 import { headers } from 'next/headers';
 
 import { Article } from '@baik/types';
-import { Session } from 'next-auth';
+import { type Session } from 'next-auth';
 
 import api from '@/api';
 import { auth } from '@/auth';

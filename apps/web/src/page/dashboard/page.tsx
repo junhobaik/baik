@@ -2,9 +2,10 @@
 
 import React from 'react';
 
-import { Session } from 'next-auth';
+import { type Session } from 'next-auth';
 
 import api from '@/api';
+import { auth } from '@/auth';
 
 import DashboardScreen from './Screen';
 
@@ -14,8 +15,10 @@ const fetchBookmarkGroupList = async () => {
   return bookmarkGroups;
 };
 
-const Dashboard = async (props: { session: Session }) => {
-  const { session } = props;
+interface DashboardProps {}
+
+const Dashboard = async (props: DashboardProps) => {
+  const session = await auth();
 
   const bookmarkGroupList = await fetchBookmarkGroupList();
 

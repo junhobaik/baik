@@ -21,7 +21,7 @@ import {
   IconRss,
 } from '@tabler/icons-react';
 import { useAtom } from 'jotai';
-import { Session } from 'next-auth';
+import { type Session } from 'next-auth';
 import { signOut } from 'next-auth/react';
 import styled from 'styled-components';
 

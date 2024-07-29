@@ -7,7 +7,7 @@ import { Article, ArticleType } from '@baik/types';
 import { IconBroadcast, IconFilter, IconLock, IconPencil } from '@tabler/icons-react';
 import clsx from 'clsx';
 import dayjs from 'dayjs';
-import { Session } from 'next-auth';
+import { type Session } from 'next-auth';
 import styled from 'styled-components';
 
 import TypeChip from '@/components/TypeChip';

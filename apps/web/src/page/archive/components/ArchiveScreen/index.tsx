@@ -5,7 +5,7 @@ import React, { useLayoutEffect, useMemo, useState } from 'react';
 import { Article, ArticleStatus, ArticleType } from '@baik/types';
 import clsx from 'clsx';
 import { useSetAtom } from 'jotai';
-import { Session } from 'next-auth';
+import { type Session } from 'next-auth';
 
 import { enEnabled } from '@/store';
 

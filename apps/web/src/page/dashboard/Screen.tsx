@@ -1,10 +1,10 @@
 import React from 'react';
 
 import { BookmarkGroup } from '@baik/types';
-import { Session } from 'next-auth';
+import { type Session } from 'next-auth';
 
 interface DashboardScreenProps {
-  session: Session;
+  session: Session | null;
   bookmarkGroupList: BookmarkGroup[];
 }
 

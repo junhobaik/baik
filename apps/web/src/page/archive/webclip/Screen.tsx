@@ -9,17 +9,14 @@ import { parseDateTime } from '@internationalized/date';
 import { Button, Card, DateInput, DateValue, Image, Input, Select, SelectItem, Textarea } from '@nextui-org/react';
 import { IconPaperclip, IconSparkles, IconWorld } from '@tabler/icons-react';
 import dayjs from 'dayjs';
-import { Session } from 'next-auth';
 import toast from 'react-hot-toast';
 
 import api from '@/api';
 import { delay, getOriginFromUrl, isValidURL } from '@/utils';
 
-interface ClipScreenProps {
-  session: Session;
-}
+interface ClipScreenProps {}
 
-const ClipScreen = ({ session }: ClipScreenProps) => {
+const ClipScreen = (props: ClipScreenProps) => {
   const searchParams = useSearchParams();
 
   const [url, setUrl] = useState('');
