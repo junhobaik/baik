@@ -12,7 +12,7 @@ import dayjs from 'dayjs';
 import toast from 'react-hot-toast';
 
 import api from '@/api';
-import { delay, getOriginFromUrl, isValidURL } from '@/utils';
+import { delay, getOriginFromUrl, isValidURL, parseYoutubeShareLink } from '@/utils';
 
 interface ClipScreenProps {}
 
@@ -85,14 +85,22 @@ const ClipScreen = (props: ClipScreenProps) => {
       return;
     }
 
+    let _url = url;
+
+    if (_url.startsWith('https://youtu.be')) {
+      const parsedUrl = parseYoutubeShareLink(_url);
+      setUrl(parsedUrl);
+      _url = parsedUrl;
+    }
+
     setAutoCompleteLoading(true);
     try {
-      const origin = getOriginFromUrl(url);
+      const origin = getOriginFromUrl(_url);
 
       const [ogResult, siteResult, rssResult] = await Promise.all([
-        getOpenGraphData(url),
+        getOpenGraphData(_url),
         getSiteData(origin),
-        getRSSFeedUrl(url),
+        getRSSFeedUrl(_url),
       ]);
 
       resetArticle();
