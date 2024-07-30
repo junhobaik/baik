@@ -103,7 +103,14 @@ const extractOpenGraphDataUseScraper = async (url: string): Promise<{ [key: stri
   const response = await fetch(url, { redirect: 'follow' });
   const finalUrl = response.url;
 
-  const options = { url: finalUrl };
+  const userAgent =
+    'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/112.0.0.0 Safari/537.36';
+  const options = {
+    url: finalUrl,
+    timeout: 29,
+    onlyGetOpenGraphInfo: true,
+    fetchOptions: { headers: { 'user-agent': userAgent } },
+  };
   const { result, error } = await ogs(options);
 
   if (result) {
@@ -127,9 +134,7 @@ const getOpenGraphData = async ({ url }: { url: string }): Promise<ActionResult>
   try {
     let ogData = await extractOpenGraphData(url);
 
-    // If no data is found using extractOpenGraphData, try extractOpenGraphDataUseScraper
     if (Object.keys(ogData).length === 0) {
-      console.log('No Open Graph data found using extractOpenGraphData. Trying extractOpenGraphDataUseScraper...');
       const scraperData = await extractOpenGraphDataUseScraper(url);
       if (scraperData) {
         ogData = scraperData;
