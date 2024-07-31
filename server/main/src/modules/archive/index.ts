@@ -37,9 +37,9 @@ const createArticle = async (args: CreateArticleArgs): Promise<ActionResult> => 
     GSI1PK: 'ARTICLE',
     GSI1SK: `ARTICLE#${now}`,
     GSI2PK: 'ARTICLE',
-    GSI2SK: `UPDATED#${now}#${id}`,
+    GSI2SK: `UPDATED#${args.updated_date}#${id}`,
     GSI3PK: `TYPE#${args.type}#STATUS#${args.status}`,
-    GSI3SK: `UPDATED#${now}#${id}`,
+    GSI3SK: `UPDATED#${args.updated_date}#${id}`,
   };
 
   let newArticle: Article;
@@ -132,9 +132,11 @@ const updateArticle = async (args: UpdateArticleArgs): Promise<ActionResult> => 
       expressionAttributeValues[':GSI3PK'] = `TYPE#${newType}#STATUS#${newStatus}`;
     }
 
-    updateExpression += `, GSI3SK = :GSI3SK, GSI2SK = :GSI2SK`;
-    expressionAttributeValues[':GSI3SK'] = `UPDATED#${now}#${id}`;
-    expressionAttributeValues[':GSI2SK'] = `UPDATED#${now}#${id}`;
+    if (updateData.updated_date) {
+      updateExpression += `, GSI3SK = :GSI3SK, GSI2SK = :GSI2SK`;
+      expressionAttributeValues[':GSI3SK'] = `UPDATED#${updateData.updated_date}#${id}`;
+      expressionAttributeValues[':GSI2SK'] = `UPDATED#${updateData.updated_date}#${id}`;
+    }
 
     if (updateData.pathname) {
       updateExpression += `, GSI4SK = :GSI4SK`;
@@ -290,14 +292,14 @@ const getAllArticles = async (args: {
   limit?: number;
   lastEvaluatedKey?: Record<string, any>;
 }): Promise<ActionResult> => {
-  const { limit = 50, lastEvaluatedKey } = args;
+  const { orderBy = 'created_at', limit = 50, lastEvaluatedKey } = args;
 
   const params = {
     tableName,
-    indexName: 'AllArticlesIndex',
-    keyConditionExpression: 'GSI1PK = :gsi1pk',
+    indexName: orderBy === 'created_at' ? 'AllArticlesIndex' : 'UpdatedDateIndex',
+    keyConditionExpression: orderBy === 'created_at' ? 'GSI1PK = :pk' : 'GSI2PK = :pk',
     expressionAttributeValues: {
-      ':gsi1pk': 'ARTICLE',
+      ':pk': 'ARTICLE',
     },
     scanIndexForward: false,
     limit,
@@ -328,7 +330,6 @@ const getAllArticles = async (args: {
 
 const getArticlesByStatus = async (args: {
   status: string;
-  orderBy?: 'created_at' | 'updated_date';
   limit?: number;
   lastEvaluatedKey?: Record<string, any>;
 }): Promise<ActionResult> => {
@@ -370,7 +371,6 @@ const getArticlesByStatus = async (args: {
 
 const getArticlesByType = async (args: {
   type: string;
-  orderBy?: 'created_at' | 'updated_date';
   limit?: number;
   lastEvaluatedKey?: Record<string, any>;
 }): Promise<ActionResult> => {
@@ -413,7 +413,6 @@ const getArticlesByType = async (args: {
 const getArticlesByTypeStatus = async (args: {
   type: string;
   status: string;
-  orderBy?: 'created_at' | 'updated_date';
   limit?: number;
   lastEvaluatedKey?: Record<string, any>;
 }): Promise<ActionResult> => {
@@ -495,22 +494,22 @@ const getAllArticlesPublic = async (args?: {
   limit?: number;
   lastEvaluatedKey?: Record<string, any>;
 }): Promise<ActionResult> => {
-  const { limit = 50, lastEvaluatedKey } = args || {};
+  const { orderBy = 'created_at', limit = 50, lastEvaluatedKey } = args || {};
 
   const params = {
     tableName,
-    indexName: 'AllArticlesIndex',
-    keyConditionExpression: 'GSI1PK = :gsi1pk',
+    indexName: orderBy === 'created_at' ? 'AllArticlesIndex' : 'UpdatedDateIndex',
+    keyConditionExpression: orderBy === 'created_at' ? 'GSI1PK = :pk' : 'GSI2PK = :pk',
     filterExpression: '#status = :status',
     expressionAttributeNames: {
       '#status': 'status',
     },
     expressionAttributeValues: {
-      ':gsi1pk': 'ARTICLE',
+      ':pk': 'ARTICLE',
       ':status': 'published',
     },
-    limit,
     scanIndexForward: false,
+    limit,
     exclusiveStartKey: lastEvaluatedKey,
   };
 
@@ -552,7 +551,6 @@ const getArticleByPathnamePublic = async (args: { pathname: string }): Promise<A
       ':gsi4sk': `PATHNAME#${pathname}`,
       ':status': 'published',
     },
-    scanIndexForward: false,
     limit: 1,
   };
 
