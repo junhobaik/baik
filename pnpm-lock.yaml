@@ -247,11 +247,11 @@ importers:
   server/main:
     dependencies:
       open-graph-scraper:
-        specifier: ^6.7.0
-        version: 6.7.0
+        specifier: ^6.7.1
+        version: 6.7.1
       openai:
-        specifier: ^4.52.7
-        version: 4.52.7
+        specifier: ^4.53.2
+        version: 4.53.2
       uuid:
         specifier: ^10.0.0
         version: 10.0.0
@@ -5884,12 +5884,12 @@ packages:
     resolution: {integrity: sha512-kbpaSSGJTWdAY5KPVeMOKXSrPtr8C8C7wodJbcsd51jRnmD+GZu8Y0VoU6Dm5Z4vWr0Ig/1NKuWRKf7j5aaYSg==}
     engines: {node: '>=6'}
 
-  open-graph-scraper@6.7.0:
-    resolution: {integrity: sha512-LZAvVNhQ4J52W363ccK8/PkLMQYlrplLx+apBpipdclcdBIr2RS421tKk6SCJMxxoVPFngGwuAKJMvKb97Z7Cg==}
+  open-graph-scraper@6.7.1:
+    resolution: {integrity: sha512-F/1WeiXPB8vDOwjpQaI/dLDFwOh1L2+zDmbL+vKsKt3F9pWqDNpS+yLeeeFRXrRkMwHk6ZAhsieoBLkCvkCbjw==}
     engines: {node: '>=18.0.0'}
 
-  openai@4.52.7:
-    resolution: {integrity: sha512-dgxA6UZHary6NXUHEDj5TWt8ogv0+ibH+b4pT5RrWMjiRZVylNwLcw/2ubDrX5n0oUmHX/ZgudMJeemxzOvz7A==}
+  openai@4.53.2:
+    resolution: {integrity: sha512-ohYEv6OV3jsFGqNrgolDDWN6Ssx1nFg6JDJQuaBFo4SL2i+MBoOQ16n2Pq1iBF5lH1PKnfCIOfqAGkmzPvdB9g==}
     hasBin: true
 
   optionator@0.9.4:
@@ -6779,10 +6779,6 @@ packages:
 
   web-namespaces@2.0.1:
     resolution: {integrity: sha512-bKr1DkiNa2krS7qxNtdrtHAmzuYGFQLiQ13TsorsdT6ULTkPLKuu5+GsFpDlg6JFjUTwX2DyhMPG2be8uPrqsQ==}
-
-  web-streams-polyfill@3.3.3:
-    resolution: {integrity: sha512-d2JWLCivmZYTSIoge9MsgFCZrt571BikcWGYkjC1khllbTeDlGqZ2D8vD8E/lJa8WGWbb7Plm8/XJYV7IJHZZw==}
-    engines: {node: '>= 8'}
 
   web-streams-polyfill@4.0.0-beta.3:
     resolution: {integrity: sha512-QW95TCTaHmsYfHDybGMwO5IJIM93I/6vTRk+daHTWFPhwh+C8Cg7j7XyKrwrj8Ib6vYXe0ocYNrmzY4xAAN6ug==}
@@ -15301,14 +15297,14 @@ snapshots:
     dependencies:
       mimic-fn: 2.1.0
 
-  open-graph-scraper@6.7.0:
+  open-graph-scraper@6.7.1:
     dependencies:
       chardet: 2.0.0
       cheerio: 1.0.0-rc.12
       iconv-lite: 0.6.3
       undici: 6.19.4
 
-  openai@4.52.7:
+  openai@4.53.2:
     dependencies:
       '@types/node': 18.19.41
       '@types/node-fetch': 2.6.11
@@ -15317,7 +15313,6 @@ snapshots:
       form-data-encoder: 1.7.2
       formdata-node: 4.4.1
       node-fetch: 2.7.0
-      web-streams-polyfill: 3.3.3
     transitivePeerDependencies:
       - encoding
 
@@ -16343,8 +16338,6 @@ snapshots:
   w3c-keyname@2.2.8: {}
 
   web-namespaces@2.0.1: {}
-
-  web-streams-polyfill@3.3.3: {}
 
   web-streams-polyfill@4.0.0-beta.3: {}
 
