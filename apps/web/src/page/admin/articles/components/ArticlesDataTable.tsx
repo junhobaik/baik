@@ -61,6 +61,7 @@ const ArticlesDataTable = (props: ArticlesDataTableProps) => {
           return (
             <Select
               aria-label="Status"
+              disabledKeys={item.type === 'clip' ? ['draft'] : []}
               items={[
                 { label: '🟢 공개', value: 'published' },
                 { label: '🔴 비공개', value: 'private' },
