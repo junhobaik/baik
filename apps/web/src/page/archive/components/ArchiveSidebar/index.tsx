@@ -27,10 +27,7 @@ const ArchiveSidebar = (props: ArchiveSidebarProps) => {
         <p className="text-sm text-gray-500 mb-2">Recent Posts</p>
         {filteredPosts.recent.map((article) => {
           return (
-            <Link
-              href={`${pathname}${pathname.endsWith('/') ? '' : '/'}article/${article.pathname}`}
-              key={`sidebar-recent-${article.id}`}
-            >
+            <Link href={`${pathname}/${article.pathname}`} key={`sidebar-recent-${article.id}`}>
               <p key={`recent-article-item-${article.id}`} className="py-1 text-gray-800 hover:text-blue-500">
                 {article.title}
               </p>
@@ -41,10 +38,7 @@ const ArchiveSidebar = (props: ArchiveSidebarProps) => {
         <p className="text-sm text-gray-500 mb-2 mt-12">Recommended Posts</p>
         {filteredPosts.recommended.map((article) => {
           return (
-            <Link
-              href={`${pathname}${pathname.endsWith('/') ? '' : '/'}${article.pathname}`}
-              key={`sidebar-recommended-${article.id}`}
-            >
+            <Link href={`${pathname}/${article.pathname}`} key={`sidebar-recommended-${article.id}`}>
               <p key={`recent-article-item-${article.id}`} className="py-1 text-gray-800 hover:text-blue-500">
                 {article.title}
               </p>
