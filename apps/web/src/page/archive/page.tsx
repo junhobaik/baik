@@ -18,10 +18,10 @@ const fetchArticles = async (session: Session | null) => {
   let articles: Article[];
 
   if (session) {
-    const res = await api.server.archive.getAllArticles();
+    const res = await api.server.archive.getAllArticles({ orderBy: 'updated_date' });
     articles = res.data?.items ?? [];
   } else {
-    const res = await api.server.archive.getAllArticlesPublic();
+    const res = await api.server.archive.getAllArticlesPublic({ orderBy: 'updated_date' });
     articles = res.data?.items ?? [];
   }
 

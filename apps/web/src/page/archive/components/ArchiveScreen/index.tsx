@@ -38,8 +38,7 @@ const ArchiveScreen = (props: ArchiveScreenProps) => {
 
   const parsedArticles = useMemo(() => {
     const enFiltered = lang === 'ko' ? articles : articles.filter((article) => !!article.intl?.en);
-    const ordered = enFiltered.sort((a, b) => b.updated_date - a.updated_date);
-    const parsedOrdered = ordered.map((article) => ({
+    const parsedOrdered = enFiltered.map((article) => ({
       ...article,
       title: (lang === 'en' ? article.intl?.en?.title : article.title) ?? '',
       content: (lang === 'en' ? article.intl?.en?.content : article.content) ?? '',

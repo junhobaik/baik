@@ -26,6 +26,7 @@ const useArticles = (props?: UseArticlesProps): UseArticlesResult => {
     try {
       const res = await api.client.archive.getAllArticles({
         limit: limit,
+        orderBy: 'updated_date',
         lastEvaluatedKey: pageParam,
       });
       if (!res.data?.items) {
