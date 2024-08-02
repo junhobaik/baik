@@ -40,6 +40,8 @@ const InfoArea = (props: InfoAreaProps) => {
     updateArticle,
     enContentEnabled,
     setEnContentEnabled,
+    description,
+    setDescription,
   } = props.hook;
 
   return (
@@ -115,6 +117,15 @@ const InfoArea = (props: InfoAreaProps) => {
           isInvalid={!!errors.updatedDate}
           errorMessage={errors.updatedDate?.message}
           onFocus={() => removeError('updatedDate')}
+        />
+
+        <Input
+          className="mb-4"
+          label="Description"
+          variant="flat"
+          size="sm"
+          value={description}
+          onValueChange={setDescription}
         />
 
         <Input label="Keywords" size="sm" value={keywords} onValueChange={setKeywords} />

@@ -53,6 +53,7 @@ const useArticleWrite = (props?: UseArticleWriteProps) => {
   const [keywords, setKeywords] = useState<string>('');
   const [thumbnailImgUrl, setThumbnailImgUrl] = useState<string>('');
   const [errors, setErrors] = useState<FieldErrors>({});
+  const [description, setDescription] = useState<string>('');
 
   const [enContentEnabled, setEnContentEnabled] = useState(false);
 
@@ -93,6 +94,7 @@ const useArticleWrite = (props?: UseArticleWriteProps) => {
     setUpdatedDate(null);
     setKeywords('');
     setThumbnailImgUrl('');
+    setDescription('');
 
     editorRef.current?.setMarkdown('');
   }, []);
@@ -112,11 +114,13 @@ const useArticleWrite = (props?: UseArticleWriteProps) => {
       published_date: publishedDateTimestamp,
       updated_date: updatedDateTimestamp,
     };
+
+    if (description) updateData.description = description;
     if (keywords) updateData.keywords = keywords;
     if (thumbnailImgUrl) updateData.thumbnail_img_url = thumbnailImgUrl;
 
     return updateData;
-  }, [title, type, status, pathname, publishedDate, updatedDate, keywords, thumbnailImgUrl]);
+  }, [title, type, status, pathname, publishedDate, updatedDate, keywords, thumbnailImgUrl, description]);
 
   const checkValues = useCallback(async () => {
     const newErrors: FieldErrors = {};
@@ -235,6 +239,7 @@ const useArticleWrite = (props?: UseArticleWriteProps) => {
       setUpdatedDate(parseDateTime(dayjs(article.updated_date).format('YYYY-MM-DDTHH:mm:ss')));
       setKeywords(article.keywords ?? '');
       setThumbnailImgUrl(article.thumbnail_img_url ?? '');
+      setDescription(article.description ?? '');
 
       setEnContentEnabled(!!article.intl?.en);
 
@@ -317,6 +322,8 @@ const useArticleWrite = (props?: UseArticleWriteProps) => {
       getCurrentContents,
       enContentEnabled,
       setEnContentEnabled,
+      description,
+      setDescription,
     }),
     [
       article,
@@ -336,6 +343,7 @@ const useArticleWrite = (props?: UseArticleWriteProps) => {
       updateArticle,
       getCurrentContents,
       enContentEnabled,
+      description,
     ],
   );
 

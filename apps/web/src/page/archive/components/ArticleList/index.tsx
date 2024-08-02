@@ -66,9 +66,7 @@ const ArticleList = (props: ArticleListProps) => {
       const plainContent = markdownToPlainText(article.content);
       const date = dayjs(article.updated_date).format('YYYY.MM.DD');
       const path =
-        article.type === 'clip'
-          ? article.url
-          : `${pathname}${pathname.endsWith('/') ? '' : '/'}${article.pathname}`;
+        article.type === 'clip' ? article.url : `${pathname}${pathname.endsWith('/') ? '' : '/'}${article.pathname}`;
 
       const faviconUrl = article.site?.favicon_url;
 
@@ -125,7 +123,9 @@ const ArticleList = (props: ArticleListProps) => {
                     {article.type === 'clip' && article.title !== article.origin_title ? (
                       <p className="text-sm text-gray-500 mb-1">{article.origin_title}</p>
                     ) : null}
-                    <p className="line-clamp-1 text-sm text-gray-500 font-light w-full">{plainContent}</p>
+                    <p className="line-clamp-1 text-sm text-gray-500 font-light w-full">
+                      {article.description || plainContent}
+                    </p>
                   </div>
                 </Link>
 
