@@ -87,10 +87,17 @@ const ClipScreen = (props: ClipScreenProps) => {
 
     let _url = url;
 
-    if (_url.startsWith('https://youtu.be')) {
-      const parsedUrl = parseYoutubeShareLink(_url);
-      setUrl(parsedUrl);
-      _url = parsedUrl;
+    try {
+      const _urlObj = new URL(_url);
+      if (_urlObj.hostname === 'youtu.be') {
+        const parsedUrl = parseYoutubeShareLink(_url);
+        setUrl(parsedUrl);
+        _url = parsedUrl;
+      }
+    } catch (error) {
+      console.error('Error parsing URL:', error);
+      setErrors({ url: 'Invalid URL' });
+      return;
     }
 
     setAutoCompleteLoading(true);
