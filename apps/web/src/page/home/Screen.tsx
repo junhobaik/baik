@@ -5,14 +5,13 @@ import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 
-import { Button, ButtonGroup, ButtonProps } from '@nextui-org/react';
+import { Button, ButtonGroup } from '@nextui-org/react';
 import * as reactSpring from '@react-spring/three';
 import * as drei from '@react-three/drei';
 import * as fiber from '@react-three/fiber';
 import {
   IconBrandAndroid,
   IconBrandApple,
-  IconBrandAppstore,
   IconBrandChrome,
   IconBrandGithub,
   IconBrandLinkedin,
@@ -87,10 +86,9 @@ const data: {
       },
       {
         text: 'Scroll Browser',
-        href: 'https://devarchive.me',
+        href: 'https://apps.apple.com/kr/app/scroll-browser-auto-scroll/id6596762930',
         target: '_blank',
         Icon: IconBrandApple,
-        isDisabled: true,
         mainPlatform: 'ios',
         otherPlatform: {
           android: {
@@ -152,9 +150,12 @@ const HomeScreen = (props: HomeScreenProps) => {
 
       <div
         className={clsx([
-          'fixed top-[120px] bg-white rounded-[100%]',
+          'fixed top-[120px] rounded-[100%]',
           'w-[calc((100vh-120px)*2)] h-[calc((100vh-120px)*2)]',
           'sm:w-[640px] sm:h-[calc(100vh-120px-32px)] sm:rounded-t-[64px] sm:rounded-b-[48px]',
+          'shadow-zinc-900/20 shadow-xl',
+          ' bg-white',
+          // 'bg-clip-padding backdrop-filter backdrop-blur-3xl saturate-100 backdrop-contrast-100 bg-white/95',
         ])}
       />
 
@@ -178,7 +179,7 @@ const HomeScreen = (props: HomeScreenProps) => {
         ])}
       >
         <div className="flex flex-col items-center h-[128px]">
-          <p className="text-2xl text-[#0093e9] font-bold">Junho Baik</p>
+          <p className="text-2xl text-[#2222bb] font-bold">Junho Baik</p>
           <p className="text-md text-gray-500">Frontend Engineer</p>
 
           <div className="mt-8 flex justify-around w-[320px]">
@@ -200,9 +201,10 @@ const HomeScreen = (props: HomeScreenProps) => {
           {data.map((v) => {
             return (
               <ItemStyled>
-                <div className={clsx(['relative mb-4 flex flex-col items-center justify-center w-full'])}>
-                  <p className="text-gray-500/80 font-semibold text-sm bg-white px-2 z-10">{v.title}</p>
-                  <div className="h-[1px] w-[calc(100%-16px)] bg-gray-300 absolute" />
+                <div className={clsx(['relative mb-4 flex items-center justify-center w-full'])}>
+                  <div className="h-[1px] bg-gray-300 flex-grow" />
+                  <p className="text-gray-500/80 font-semibold text-sm px-2 z-10">{v.title}</p>
+                  <div className="h-[1px] bg-gray-300 flex-grow" />
                 </div>
 
                 <ul className="list">
@@ -218,8 +220,8 @@ const HomeScreen = (props: HomeScreenProps) => {
                         item.isDisabled
                           ? ''
                           : {
-                              'bg-[#0094e9] text-white': !item.isDeprecated,
-                              'bg-[#0094e9a5] text-white': item.isDeprecated,
+                              'bg-[#5606ff] text-white': !item.isDeprecated,
+                              'bg-[#5606ffa5] text-white': item.isDeprecated,
                             },
                       ),
                     };
