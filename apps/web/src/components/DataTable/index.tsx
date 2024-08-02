@@ -236,7 +236,6 @@ const DataTable = <T extends DefaultDBAttributes>(props: DataTableProps<T>) => {
     return {
       variant,
       color,
-      loading: isLoading,
       isLoading,
       isDisabled: !hasNextItems,
     };
@@ -272,7 +271,14 @@ const DataTable = <T extends DefaultDBAttributes>(props: DataTableProps<T>) => {
           </TableStyled>
         </TableWrapper>
         <PaginationContainer>
-          <Button fullWidth onClick={handleLoadMore} {...paginationButtonProps}>
+          <Button
+            fullWidth
+            onClick={handleLoadMore}
+            variant={paginationButtonProps.variant}
+            color={paginationButtonProps.color}
+            isLoading={paginationButtonProps.isLoading}
+            disabled={paginationButtonProps.isDisabled}
+          >
             {isLoading && 'Loading...'}
             {!isLoading && hasNextItems && 'Load more'}
             {!isLoading && !hasNextItems && 'No more items'}
