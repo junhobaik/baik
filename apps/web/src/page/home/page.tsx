@@ -4,7 +4,7 @@ import React from 'react';
 
 import { auth } from '@/auth';
 
-import HomeScreen from './components/HomeScreen';
+import HomeScreen from './Screen';
 
 const Home = async (props: any) => {
   const session = await auth();
