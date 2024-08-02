@@ -38,8 +38,8 @@ const middleware = async (request: NextRequest): Promise<NextResponse> => {
     }
   }
 
-  if (country !== 'KR') {
-    return NextResponse.redirect(new URL(`/en/${pathname}`, request.url));
+  if (country !== 'KR' && pathname === '/archive') {
+    return NextResponse.redirect(new URL(`/archive/en`, request.url));
   }
 
   return NextResponse.next({ request: { headers } });
