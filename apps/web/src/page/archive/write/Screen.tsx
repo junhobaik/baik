@@ -49,7 +49,7 @@ const WriteScreen = () => {
 
 const WriteScreenStyled = styled.div`
   width: 100%;
-  height: 100vh;
+  height: calc(100vh - 64px - 68px);
   overflow-x: hidden;
   overflow-y: hidden;
   display: flex;

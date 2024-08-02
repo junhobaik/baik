@@ -26,7 +26,7 @@ const ArchiveLayout = async ({
   return (
     <>
       <ArchiveHeader lang={lang} />
-      <main className="w-[92%] xl:max-w-[1280px] min-h-screen mx-auto">{children}</main>
+      <main className="w-[92%] xl:max-w-[1280px] min-h-[calc(100vh-134px)] mx-auto">{children}</main>
       <ArchiveFooter />
     </>
   );
