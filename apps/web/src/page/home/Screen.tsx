@@ -6,6 +6,9 @@ import Image from 'next/image';
 import Link from 'next/link';
 
 import { Button, ButtonGroup, ButtonProps } from '@nextui-org/react';
+import * as reactSpring from '@react-spring/three';
+import * as drei from '@react-three/drei';
+import * as fiber from '@react-three/fiber';
 import {
   IconBrandAndroid,
   IconBrandApple,
@@ -15,14 +18,13 @@ import {
   IconBrandLinkedin,
   IconBrowser,
   IconLink,
-  IconLockSquareRounded,
-  IconLogin,
   IconMail,
   IconUserCog,
 } from '@tabler/icons-react';
 import clsx from 'clsx';
 import { Session } from 'next-auth';
 import { signIn } from 'next-auth/react';
+import { ShaderGradient, ShaderGradientCanvas } from 'shadergradient';
 import styled from 'styled-components';
 
 interface HomeScreenProps {
@@ -107,29 +109,52 @@ const SocialLink = ({ href, icon }: SocialLinkProps) => (
   </Link>
 );
 
+const ShaderBackground = () => {
+  return (
+    <ShaderGradientCanvas
+      importedFiber={{ ...fiber, ...drei, ...reactSpring }}
+      style={{
+        position: 'absolute',
+        top: 0,
+        pointerEvents: 'none',
+      }}
+    >
+      <ShaderGradient
+        control="query"
+        urlString="https://www.shadergradient.co/customize?animate=on&axesHelper=on&bgColor1=%23000000&bgColor2=%23000000&brightness=1.1&cAzimuthAngle=180&cDistance=3.9&cPolarAngle=115&cameraZoom=1&color1=%235606FF&color2=%23FE8989&color3=%23000000&destination=onCanvas&embedMode=off&envPreset=city&format=gif&fov=40&frameRate=10&grain=off&lightType=3d&pixelDensity=1&positionX=-0.5&positionY=0.1&positionZ=0&range=disabled&rangeEnd=40&rangeStart=0&reflection=0.1&rotationX=0&rotationY=0&rotationZ=235&shader=defaults&type=waterPlane&uAmplitude=0&uDensity=1.1&uFrequency=5.5&uSpeed=0.1&uStrength=2.4&uTime=0.2&wireframe=false"
+      />
+    </ShaderGradientCanvas>
+  );
+};
+
 const HomeScreen = (props: HomeScreenProps) => {
   const { session } = props;
 
   return (
     <HomeStyled className="fixed h-screen w-screen flex items-center justify-center">
-      <div
-        className={clsx([
-          'fixed right-2 top-3 flex justify-end items-center py-1 pr-2 pl-3 text-white/70 hover:text-white cursor-pointer',
-          'border-2 border-transparent hover:border-white/70 rounded-full',
-          'max-w-[40px] hover:max-w-full overflow-hidden transition-all',
-        ])}
-        onClick={() => signIn()}
-      >
-        <p className="mr-2 whitespace-nowrap">Administrator login</p>
-        <div className="min-w-[24px]">
-          <IconUserCog size={24} />
+      <ShaderBackground />
+
+      {!!session && (
+        <div
+          className={clsx([
+            'fixed right-2 top-3 flex justify-end items-center py-1 pr-2 pl-3 text-white/70 hover:text-white cursor-pointer',
+            'border-2 border-transparent hover:border-white/70 rounded-full',
+            'max-w-[40px] hover:max-w-full overflow-hidden transition-all',
+          ])}
+          onClick={() => signIn()}
+        >
+          <p className="mr-2 whitespace-nowrap">Administrator login</p>
+          <div className="min-w-[24px]">
+            <IconUserCog size={24} />
+          </div>
         </div>
-      </div>
+      )}
+
       <div
         className={clsx([
           'fixed top-[120px] bg-white rounded-[100%]',
           'w-[calc((100vh-120px)*2)] h-[calc((100vh-120px)*2)]',
-          'sm:w-[640px] sm:h-[calc(100vh-120px-32px)] sm:rounded-[16px]',
+          'sm:w-[640px] sm:h-[calc(100vh-120px-32px)] sm:rounded-t-[64px] sm:rounded-b-[48px]',
         ])}
       />
 
@@ -312,8 +337,25 @@ const ItemStyled = styled.div`
 `;
 
 const HomeStyled = styled.div`
-  background-color: #0093e9;
-  background-image: linear-gradient(116deg, #0093e9 0%, #80d0c7 100%);
+  /* background-color: #0093e9;
+  background-image: linear-gradient(116deg, #0093e9 0%, #80d0c7 100%); */
+
+  background-color: #5606ff;
+  background-image: linear-gradient(
+    to right top,
+    #5606ff,
+    #7a00b6,
+    #740078,
+    #5b0047,
+    #3a0024,
+    #3c0e24,
+    #3d1a25,
+    #3c2429,
+    #683b42,
+    #98535b,
+    #ca6d73,
+    #fe8989
+  );
 `;
 
 export default HomeScreen;
