@@ -134,10 +134,10 @@ const HomeScreen = (props: HomeScreenProps) => {
     <HomeStyled className="fixed h-screen w-screen flex items-center justify-center">
       <ShaderBackground />
 
-      {!!session && (
+      {!session && (
         <div
           className={clsx([
-            'fixed right-2 top-3 flex justify-end items-center py-1 pr-2 pl-3 text-white/70 hover:text-white cursor-pointer',
+            'fixed right-2 top-3 z-10 flex justify-end items-center py-1 pr-2 pl-3 text-white/70 hover:text-white cursor-pointer',
             'border-2 border-transparent hover:border-white/70 rounded-full',
             'max-w-[40px] hover:max-w-full overflow-hidden transition-all',
           ])}
@@ -152,7 +152,7 @@ const HomeScreen = (props: HomeScreenProps) => {
 
       <div
         className={clsx([
-          'fixed top-[120px] bg-white rounded-[100%]',
+          'fixed top-[120px] bg-white rounded-[100%] mx-auto',
           'w-[calc((100vh-120px)*2)] h-[calc((100vh-120px)*2)]',
           'sm:w-[640px] sm:h-[calc(100vh-120px-32px)] sm:rounded-t-[64px] sm:rounded-b-[48px]',
         ])}
