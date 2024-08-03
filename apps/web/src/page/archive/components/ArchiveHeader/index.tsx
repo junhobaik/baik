@@ -73,7 +73,7 @@ const ArchiveHeader = ({ lang = 'ko' }: { lang?: 'ko' | 'en' }) => {
                   onClick={(e) => {
                     e.preventDefault();
                     Cookies.set('language', 'ko');
-                    router.push('/archive');
+                    router.push(pathname.replace('/en', ''));
                     router.refresh();
                   }}
                 >
@@ -87,7 +87,7 @@ const ArchiveHeader = ({ lang = 'ko' }: { lang?: 'ko' | 'en' }) => {
                   onClick={(e) => {
                     e.preventDefault();
                     Cookies.set('language', 'en');
-                    router.push('/archive/en');
+                    router.push(pathname.replace('archive', 'archive/en'));
                     router.refresh();
                   }}
                 >
