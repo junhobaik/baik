@@ -60,22 +60,30 @@ const useArticleWrite = (props?: UseArticleWriteProps) => {
   const [fetchLoading, setFetchLoading] = useState(false);
   const [submitLoading, setSubmitLoading] = useState(false);
 
-  const translate = useCallback(async () => {
-    const titleTranslateRes = await api.client.utils.translate({ text: title, language: 'en' });
-    if (!titleTranslateRes.data?.success) return null;
+  const translate = useCallback(async (): Promise<{
+    title: string;
+    content: string;
+    description?: string;
+  } | null> => {
+    const translateText = async (text: string): Promise<string | undefined> => {
+      const response = await api.client.utils.translate({ text });
+      return response.data?.success ? response.data.item : undefined;
+    };
 
-    const content = editorRef.current?.getMarkdown();
-    if (content) {
-      const contentTranslateRes = await api.client.utils.translate({ text: content, language: 'en' });
-      if (contentTranslateRes.data?.success) {
-        return {
-          en: { title: titleTranslateRes.data.item, content: contentTranslateRes.data.item },
-        };
-      }
-    }
+    const [translatedTitle, translatedDescription, translatedContent] = await Promise.all([
+      translateText(title),
+      description ? translateText(description) : undefined,
+      editorRef.current?.getMarkdown() ? translateText(editorRef.current.getMarkdown()) : undefined,
+    ]);
 
-    return null;
-  }, [title]);
+    if (!translatedTitle || !translatedContent) return null;
+
+    return {
+      title: translatedTitle,
+      description: translatedDescription,
+      content: translatedContent,
+    };
+  }, [title, description]);
 
   const removeError = useCallback((key: string) => {
     setErrors((prev) => {
@@ -185,7 +193,7 @@ const useArticleWrite = (props?: UseArticleWriteProps) => {
 
     if (enContentEnabled) {
       const translateData = await translate();
-      if (translateData) newData.intl = translateData;
+      if (translateData) newData.intl = { en: translateData };
     }
 
     const res = await api.client.archive.createArticle(newData as PostArticle | ShortsArticle);
@@ -212,7 +220,7 @@ const useArticleWrite = (props?: UseArticleWriteProps) => {
 
     if (enContentEnabled) {
       const translateData = await translate();
-      if (translateData) updateData.intl = translateData;
+      if (translateData) updateData.intl = { en: translateData };
     } else {
       updateData.intl = null;
     }
@@ -225,7 +233,7 @@ const useArticleWrite = (props?: UseArticleWriteProps) => {
     }
 
     setSubmitLoading(false);
-  }, [article, checkValues, getCurrentContents, enContentEnabled]);
+  }, [article, checkValues, getCurrentContents, enContentEnabled, translate]);
 
   const setArticleContents = useCallback((article: PostArticle | ShortsArticle) => {
     setFetchLoading(true);

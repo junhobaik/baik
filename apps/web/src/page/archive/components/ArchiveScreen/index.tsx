@@ -42,6 +42,7 @@ const ArchiveScreen = (props: ArchiveScreenProps) => {
       ...article,
       title: (lang === 'en' ? article.intl?.en?.title : article.title) ?? '',
       content: (lang === 'en' ? article.intl?.en?.content : article.content) ?? '',
+      description: (lang === 'en' ? article.intl?.en?.description : article.description) ?? '',
     }));
 
     const filtered = parsedOrdered.filter((article) => {

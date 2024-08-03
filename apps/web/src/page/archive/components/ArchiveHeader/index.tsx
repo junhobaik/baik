@@ -34,7 +34,7 @@ const ArchiveHeader = ({ lang = 'ko' }: { lang?: 'ko' | 'en' }) => {
   return (
     <header className="sticky top-0 flex justify-center h-16 z-50 bg-white border-b">
       <div className="flex items-center justify-between w-[92%]">
-        <Link className="flex items-center" href="/archive">
+        <Link className="flex items-center" href={pathname.startsWith('/archive/en') ? '/archive/en' : '/archive'}>
           <Image width={20} height={20} src="/icon.png" alt="" />
           <p className="ml-1 text-md font-semibold">Baik</p>
         </Link>

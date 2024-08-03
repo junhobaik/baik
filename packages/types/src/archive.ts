@@ -23,6 +23,7 @@ export interface ArticleBase {
     en?: {
       title: string;
       content: string;
+      description?: string;
     };
   } | null;
   keywords?: string;
@@ -56,7 +57,7 @@ export interface ClipArticleBase extends ArticleBase {
   type: 'clip';
   url: string;
   site: ClipSite;
-  description?: never;
+  // description?: never;
   pathname?: never;
   keywords?: never;
   is_recommended?: never;

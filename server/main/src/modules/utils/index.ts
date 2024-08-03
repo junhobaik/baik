@@ -12,35 +12,57 @@ const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
-const translate = async ({
-  text,
-  language,
-  option,
-}: {
-  text: string;
-  language: string;
-  option?: string;
-}): Promise<ActionResult> => {
+const requestGpt = async ({ system, user }: { system: string[] | string; user: string }): Promise<ActionResult> => {
+  try {
+    let systemMessages: ChatCompletionMessageParam[] = [];
+    if (typeof system === 'string') {
+      systemMessages = [{ role: 'system', content: system }];
+    } else if (Array.isArray(system)) {
+      systemMessages = system.map((s) => ({ role: 'system', content: s }));
+    }
+
+    const completion = await openai.chat.completions.create({
+      model: 'gpt-4o-mini',
+      messages: [...systemMessages, { role: 'user', content: user }],
+      temperature: 0.7,
+      max_tokens: 10000,
+      top_p: 1,
+    });
+
+    const responseText = completion.choices[0].message.content;
+
+    return {
+      data: { item: responseText, success: true },
+      message: 'Successfully requested GPT',
+    };
+  } catch (error) {
+    return {
+      message: 'Failed to request GPT',
+      error: {
+        code: 'UTILS>REQUEST_GPT_ERROR',
+        message: error instanceof Error ? error.message : String(error),
+      },
+    };
+  }
+};
+
+const translate = async ({ text, option }: { text: string; option?: string }): Promise<ActionResult> => {
   try {
     const prompt = text;
 
     const systemMessages: ChatCompletionMessageParam[] = [
       {
         role: 'system',
-        content: `You will be provided with a sentence in Korean, and your task is to translate it into ${language}.`,
-      },
-      {
-        role: 'system',
-        content: `If it's text in Markdown format, translate it without breaking the formatting`,
+        content: `Translate my message into English exactly as it is, without adding, omitting, or changing any content, and ensure the Markdown format remains intact.`,
       },
     ];
     if (option) systemMessages.push({ role: 'system', content: option });
 
     const completion = await openai.chat.completions.create({
-      model: 'gpt-3.5-turbo',
+      model: 'gpt-4o-mini',
       messages: [...systemMessages, { role: 'user', content: prompt }],
       temperature: 0.7,
-      max_tokens: 1000,
+      max_tokens: 10000,
       top_p: 1,
     });
 
@@ -279,6 +301,10 @@ const getRSSFeedUrl = async ({ url }: { url: string }): Promise<ActionResult> =>
 };
 
 export default {
+  requestGpt: {
+    run: requestGpt,
+    skip_auth: false,
+  },
   translate: {
     run: translate,
     skip_auth: false,
