@@ -20,6 +20,7 @@ const addXPathnameHeader = (request: NextRequest): Headers => {
 
 const middleware = async (request: NextRequest): Promise<NextResponse> => {
   const country = request.geo?.country ?? 'KR';
+  const language = request.cookies.get('language')?.value ?? country === 'KR' ? 'ko' : 'en';
 
   const headers = addXPathnameHeader(request);
   const { pathname } = request.nextUrl;
@@ -38,7 +39,7 @@ const middleware = async (request: NextRequest): Promise<NextResponse> => {
     }
   }
 
-  if (country !== 'KR' && pathname === '/archive') {
+  if (pathname === '/archive' && country !== 'KR' && language !== 'ko') {
     return NextResponse.redirect(new URL(`/archive/en`, request.url));
   }
 

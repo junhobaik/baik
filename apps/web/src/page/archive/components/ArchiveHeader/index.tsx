@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useMemo, useState } from 'react';
+import React, { useMemo } from 'react';
 
 import Image from 'next/image';
 import Link from 'next/link';
@@ -10,6 +10,7 @@ import { Button } from '@junhobaik/ui';
 import { Dropdown, DropdownItem, DropdownMenu, DropdownTrigger, Spacer } from '@nextui-org/react';
 import { IconChevronDown } from '@tabler/icons-react';
 import { useAtomValue } from 'jotai';
+import Cookies from 'js-cookie';
 
 import { enEnabled } from '@/store';
 
@@ -19,7 +20,6 @@ const ArchiveHeader = ({ lang = 'ko' }: { lang?: 'ko' | 'en' }) => {
   const router = useRouter();
   const pathname = usePathname();
 
-  const [currentLang, setCurrentLang] = useState(lang);
   const enAvailable = useAtomValue(enEnabled);
 
   const disabledIntlKeys = useMemo(() => {
@@ -29,7 +29,7 @@ const ArchiveHeader = ({ lang = 'ko' }: { lang?: 'ko' | 'en' }) => {
     if (!enAvailable || lang === 'en') keys.add('en');
 
     return keys;
-  }, [enAvailable, currentLang]);
+  }, [enAvailable, lang]);
 
   return (
     <header className="sticky top-0 flex justify-center h-16 z-50 bg-white border-b">
@@ -45,7 +45,14 @@ const ArchiveHeader = ({ lang = 'ko' }: { lang?: 'ko' | 'en' }) => {
           <Spacer x={1} />
 
           {!enAvailable && lang === 'en' ? null : (
-            <Dropdown className="w-16">
+            <Dropdown
+              className="w-16"
+              onOpenChange={(isOpen) => {
+                if (isOpen && lang === 'ko') {
+                  router.prefetch('/archive/en');
+                }
+              }}
+            >
               <DropdownTrigger>
                 <Button variant="flat" size="xs" radius="xl">
                   <IconChevronDown size={14} />
@@ -59,7 +66,17 @@ const ArchiveHeader = ({ lang = 'ko' }: { lang?: 'ko' | 'en' }) => {
                 selectedKeys={[lang]}
                 disabledKeys={disabledIntlKeys}
               >
-                <DropdownItem key="ko" color="primary" href={`${pathname.replace('/en', '')}`}>
+                <DropdownItem
+                  key="ko"
+                  color="primary"
+                  href={`${pathname.replace('/en', '')}`}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    Cookies.set('language', 'ko');
+                    router.push('/archive');
+                    router.refresh();
+                  }}
+                >
                   🇰🇷 한국어
                 </DropdownItem>
                 <DropdownItem
@@ -67,6 +84,12 @@ const ArchiveHeader = ({ lang = 'ko' }: { lang?: 'ko' | 'en' }) => {
                   color="primary"
                   href={`${pathname.replace('archive', 'archive/en')}`}
                   className={!enAvailable ? 'line-through' : ''}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    Cookies.set('language', 'en');
+                    router.push('/archive/en');
+                    router.refresh();
+                  }}
                 >
                   🇺🇸 English
                 </DropdownItem>
