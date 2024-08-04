@@ -9,6 +9,7 @@ import Sidebar from '../../components/Sidebar';
 import { Providers } from './components/providers';
 import { Registries } from './components/registries';
 import { Toaster } from 'react-hot-toast';
+import { GoogleTagManager } from '@next/third-parties/google';
 
 import '@junhobaik/ui/css';
 import '@/styles/globals.css';
@@ -47,6 +48,7 @@ const RootLayout = async ({
   if (!session)
     return (
       <html lang={lang} className="light">
+        <GoogleTagManager gtmId="GTM-5XQJ5M9D" />
         <body className={fontPretendard.className}>
           <Providers>
             <Registries>{children}</Registries>
