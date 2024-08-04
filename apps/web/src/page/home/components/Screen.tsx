@@ -28,6 +28,7 @@ const ShaderBackground = () => {
       style={{
         position: 'fixed',
         top: 0,
+        height: '120vh',
         pointerEvents: 'none',
       }}
     >
