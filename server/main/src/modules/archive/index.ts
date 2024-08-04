@@ -494,45 +494,62 @@ const getAllArticlesPublic = async (args?: {
   limit?: number;
   lastEvaluatedKey?: Record<string, any>;
 }): Promise<ActionResult> => {
-  const { orderBy = 'created_at', limit = 50, lastEvaluatedKey } = args || {};
+  const { orderBy = 'updated_date', limit = 50, lastEvaluatedKey } = args || {};
 
-  const params = {
-    tableName,
-    indexName: orderBy === 'created_at' ? 'AllArticlesIndex' : 'UpdatedDateIndex',
-    keyConditionExpression: orderBy === 'created_at' ? 'GSI1PK = :pk' : 'GSI2PK = :pk',
-    filterExpression: '#status = :status',
-    expressionAttributeNames: {
-      '#status': 'status',
-    },
-    expressionAttributeValues: {
-      ':pk': 'ARTICLE',
-      ':status': 'published',
-    },
-    scanIndexForward: false,
-    limit,
-    exclusiveStartKey: lastEvaluatedKey,
-  };
+  const items: any[] = [];
+  let currentLastEvaluatedKey = lastEvaluatedKey;
 
-  try {
-    const result = await db.queryItems(params);
-    return {
-      data: {
-        success: true,
-        items: result.items,
-        lastEvaluatedKey: result.lastEvaluatedKey,
+  while (true) {
+    const params = {
+      tableName,
+      indexName: orderBy === 'created_at' ? 'AllArticlesIndex' : 'UpdatedDateIndex',
+      keyConditionExpression: orderBy === 'created_at' ? 'GSI1PK = :pk' : 'GSI2PK = :pk',
+      filterExpression: '#status = :status',
+      expressionAttributeNames: {
+        '#status': 'status',
       },
-      message: 'Articles retrieved successfully',
-    };
-  } catch (error) {
-    console.error('Error retrieving all articles:', error);
-    return {
-      message: 'Failed to retrieve all articles',
-      error: {
-        code: 'ARCHIVE>ARTICLE>RETRIEVE_ALL_ERROR',
-        message: error instanceof Error ? error.message : String(error),
+      expressionAttributeValues: {
+        ':pk': 'ARTICLE',
+        ':status': 'published',
       },
+      scanIndexForward: false,
+      limit: 100,
+      exclusiveStartKey: currentLastEvaluatedKey,
     };
+
+    try {
+      const result = await db.queryItems(params);
+      items.push(...(result.items || []));
+      currentLastEvaluatedKey = result.lastEvaluatedKey;
+
+      if (items.length >= limit || !currentLastEvaluatedKey) break;
+    } catch (error) {
+      console.error('Error retrieving articles:', error);
+      return {
+        message: 'Failed to retrieve articles',
+        error: {
+          code: 'ARCHIVE>ARTICLE>RETRIEVE_ALL_ERROR',
+          message: error instanceof Error ? error.message : String(error),
+        },
+      };
+    }
   }
+
+  // 최종적으로 정렬된 결과를 반환합니다.
+  const sortedItems = items.sort((a, b) => {
+    const dateA = new Date(a[orderBy]).getTime();
+    const dateB = new Date(b[orderBy]).getTime();
+    return dateB - dateA; // 내림차순 정렬
+  });
+
+  return {
+    data: {
+      success: true,
+      items: sortedItems.slice(0, limit),
+      lastEvaluatedKey: items.length > limit ? currentLastEvaluatedKey : undefined,
+    },
+    message: 'Articles retrieved successfully',
+  };
 };
 
 const getArticleByPathnamePublic = async (args: { pathname: string }): Promise<ActionResult> => {

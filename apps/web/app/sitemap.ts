@@ -5,7 +5,7 @@ import api from '@/api';
 import { variables } from '@/configs';
 
 const fetchArticles = async (): Promise<Article[]> => {
-  const res = await api.server.archive.getAllArticlesPublic();
+  const res = await api.server.archive.getAllArticlesPublic({ orderBy: 'updated_date' });
   return res.data?.items ?? [];
 };
 
