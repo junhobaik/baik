@@ -1,2 +1,9 @@
 User-agent: *
-Disallow: /
+Allow: /
+Allow: /archive
+Allow: /archive/*
+Disallow: /archive/write
+Disallow: /archive/webclip
+Disallow: *
+
+Sitemap: https://baik.dev/sitemap.xml
