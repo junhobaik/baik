@@ -14,7 +14,12 @@ const ArchiveFooter = (props: ArchiveFooterProps) => {
     <footer className="flex justify-center w-full relative text-center text-sm text-gray-700 mt-auto px-4 pt-8 pb-4">
       <p className="">© {year} Junho Baik. All rights reserved.</p>
 
-      <div className="absolute right-4 text-gray-400 hover:text-gray-600" onClick={() => signIn()} role="button">
+      <div
+        className="absolute right-4 text-gray-400 hover:text-gray-600"
+        onClick={() => signIn()}
+        role="button"
+        aria-label="Sign in"
+      >
         <IconLogin2 size={18} />
       </div>
     </footer>
