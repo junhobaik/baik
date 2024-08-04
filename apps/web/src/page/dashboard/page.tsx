@@ -7,7 +7,7 @@ import { type Session } from 'next-auth';
 import api from '@/api';
 import { auth } from '@/auth';
 
-import DashboardScreen from './Screen';
+import DashboardScreen from './components/Screen';
 
 const fetchBookmarkGroupList = async () => {
   const bookmarksRes = await api.server.dashboard.getAllBookmarkGroups();
