@@ -1,5 +1,5 @@
 import { HomeLayout } from '@/page';
 
-export const { metadata, viewport } = HomeLayout;
+export const { generateMetadata, viewport } = HomeLayout;
 
 export default HomeLayout;

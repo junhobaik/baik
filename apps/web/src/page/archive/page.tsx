@@ -36,12 +36,27 @@ const ArchivePage = async () => {
 
   const articles = await fetchArticles(session);
 
+  const url = {
+    en: variables.ARCHIVE_URL_EN,
+    ko: variables.ARCHIVE_URL,
+  };
+
+  const title = {
+    en: variables.ARCHIVE_TITLE_EN,
+    ko: variables.ARCHIVE_TITLE,
+  };
+
+  const description = {
+    en: variables.ARCHIVE_DESCRIPTION_EN,
+    ko: variables.ARCHIVE_DESCRIPTION,
+  };
+
   const structuredData = {
     '@context': 'https://schema.org',
     '@type': 'Blog',
-    url: variables.SITE_URL,
-    name: variables.SITE_TITLE,
-    description: variables.SITE_DESCRIPTION,
+    url: url[lang],
+    name: title[lang],
+    description: description[lang],
     author: {
       '@type': 'Person',
       name: variables.MY_NAME,
@@ -49,37 +64,40 @@ const ArchivePage = async () => {
     publisher: {
       '@type': 'Person',
       name: variables.MY_NAME,
-      // TODO: about, my-page 구현 후 수정
       url: variables.SITE_URL,
-      // TODO: 프로필 이미지 기능 추가 후 추가
-      // image: {
-      //   '@type': 'ImageObject',
-      //   url: 'https://.../profile-image.jpg',
-      // },
+      image: {
+        '@type': 'ImageObject',
+        url: 'https://d25sqaee97ji3k.cloudfront.net/0816bcfe-3f37-4982-90a8-e825ba5663a8.png',
+      },
     },
-    mainEntity: {
-      '@type': 'ItemList',
-      itemListElement: articles.map((article, index) => {
+    blogPost: articles
+      .map((article) => {
+        if (article.type === 'clip') return null;
+        if (lang === 'en' && !article.intl?.en) return null;
+
+        const articleTitle = article.intl && lang === 'en' ? article.intl.en?.title : article.title;
         const content = (lang === 'en' ? article.intl?.en?.content : article.content) ?? '';
         const plainContent = markdownToPlainText(content);
+        const articleDescription = (lang === 'en' ? article.intl?.en?.description : article.description) ?? '';
+        const articleUrl = `${variables.SITE_URL}/archive${lang === 'en' ? '/en' : ''}/${article.pathname}`;
 
         return {
           '@type': 'BlogPosting',
-          position: index + 1,
-          url: article.type === 'clip' ? article.url : `https://yourblog.com/${article.pathname}`,
-          headline: article.intl && lang === 'en' ? article.intl.en?.title : article.title,
+          url: articleUrl,
+          headline: articleTitle,
           datePublished: new Date(article.published_date).toISOString(),
           dateModified: new Date(article.updated_date).toISOString(),
           author: {
             '@type': 'Person',
             name: variables.MY_NAME,
           },
-          image: article.thumbnail_img_url ?? '',
+          image: article.thumbnail_img_url ? [article.thumbnail_img_url] : undefined,
           keywords: article.keywords,
+          abstract: articleDescription,
           articleBody: plainContent,
         };
-      }),
-    },
+      })
+      .filter((v): v is NonNullable<typeof v> => v !== null),
   };
 
   return (

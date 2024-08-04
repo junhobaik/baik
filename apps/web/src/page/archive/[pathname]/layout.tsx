@@ -75,12 +75,6 @@ export const generateMetadata = async ({ params }: Props): Promise<Metadata> => 
       locale: lang === 'en' ? 'en_US' : 'ko_KR',
       type: 'article',
     },
-    twitter: {
-      card: 'summary_large_image',
-      title: title.default,
-      description: description.default || content.default.slice(0, 140) || '',
-      images: item?.thumbnail_img_url ? [item.thumbnail_img_url] : [],
-    },
   };
 };
 

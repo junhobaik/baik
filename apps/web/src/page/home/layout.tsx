@@ -24,10 +24,41 @@ export const viewport: Viewport = {
   viewportFit: 'cover',
 };
 
-export const metadata: Metadata = {
-  title: variables.SITE_TITLE,
-  description: variables.SITE_DESCRIPTION,
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const headersList = headers();
+  const headerPathname = headersList.get('x-pathname') || '';
+  const lang = headerPathname === '/en' ? 'en' : 'ko';
+
+  const title = {
+    en: variables.SITE_TITLE,
+    ko: variables.SITE_TITLE_EN,
+  };
+
+  const description = {
+    en: variables.SITE_DESCRIPTION_EN,
+    ko: variables.SITE_DESCRIPTION,
+  };
+
+  return {
+    title: title[lang],
+    description: description[lang],
+    alternates: {
+      canonical: `${variables.SITE_URL}${lang === 'en' ? '/en' : ''}`,
+      languages: {
+        'en-US': `${variables.SITE_URL}/en`,
+        'ko-KR': `${variables.SITE_URL}`,
+      },
+    },
+    openGraph: {
+      title: title[lang],
+      description: description[lang],
+      url: `${variables.SITE_URL}${lang === 'en' ? '/en' : ''}`,
+      siteName: title[lang],
+      locale: lang === 'en' ? 'en_US' : 'ko_KR',
+      type: 'website',
+    },
+  };
+}
 
 const fontPretendard = localFont({
   src: '../../../public/fonts/PretendardVariable.woff2',
@@ -48,7 +79,7 @@ const RootLayout = async ({
   if (!session)
     return (
       <html lang={lang} className="light">
-        <GoogleTagManager gtmId="GTM-5XQJ5M9D" />
+        {process.env.NODE_ENV !== 'development' && <GoogleTagManager gtmId="GTM-5XQJ5M9D" />}
         <body className={fontPretendard.className}>
           <Providers>
             <Registries>{children}</Registries>
@@ -75,7 +106,7 @@ const RootLayout = async ({
   );
 };
 
-RootLayout.metadata = metadata;
+RootLayout.generateMetadata = generateMetadata;
 RootLayout.viewport = viewport;
 
 export default RootLayout;
