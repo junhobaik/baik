@@ -67,7 +67,7 @@ const ArchivePage = async () => {
       url: variables.SITE_URL,
       image: {
         '@type': 'ImageObject',
-        url: 'https://d25sqaee97ji3k.cloudfront.net/0816bcfe-3f37-4982-90a8-e825ba5663a8.png',
+        url: variables.MY_PROFILE_IMG_URL,
       },
     },
     blogPost: articles

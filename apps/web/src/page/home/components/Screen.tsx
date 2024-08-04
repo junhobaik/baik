@@ -15,6 +15,8 @@ import { signIn } from 'next-auth/react';
 import { ShaderGradient, ShaderGradientCanvas } from 'shadergradient';
 import styled from 'styled-components';
 
+import { variables } from '@/configs';
+
 import LinkList from './LinkList';
 
 interface HomeScreenProps {
@@ -126,7 +128,7 @@ const HomeScreen = (props: HomeScreenProps) => {
       <ContentStyled>
         <div ref={profileContainerRef} className="profile-container">
           <Image
-            src="https://d25sqaee97ji3k.cloudfront.net/0816bcfe-3f37-4982-90a8-e825ba5663a8.png"
+            src={variables.MY_PROFILE_IMG_URL}
             width={100}
             height={100}
             className="rounded-full shadow-md shadow-slate-400/50"
@@ -139,7 +141,7 @@ const HomeScreen = (props: HomeScreenProps) => {
 
         <div className={clsx('floating-profile-container', { active: isProfileHide })} onClick={scrollTop}>
           <Image
-            src="https://d25sqaee97ji3k.cloudfront.net/0816bcfe-3f37-4982-90a8-e825ba5663a8.png"
+            src={variables.MY_PROFILE_IMG_URL}
             width={36}
             height={36}
             className="rounded-full mr-2"

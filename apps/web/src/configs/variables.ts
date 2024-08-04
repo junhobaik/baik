@@ -31,3 +31,4 @@ export const ARCHIVE_DESCRIPTION_EN =
   'An archive(blog) webpage by front-end developer Junho Baik, featuring blog posts written by Junho Baik and a collection of useful external articles.';
 
 export const MY_NAME = 'Junho Baik';
+export const MY_PROFILE_IMG_URL = 'https://d25sqaee97ji3k.cloudfront.net/0816bcfe-3f37-4982-90a8-e825ba5663a8.png';

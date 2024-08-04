@@ -1,5 +1,6 @@
 import React, { Dispatch, SetStateAction, useCallback, useMemo } from 'react';
 
+import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
@@ -140,6 +141,13 @@ const ArticleList = (props: ArticleListProps) => {
                     </Link>
                   ) : (
                     <div className="flex items-center">
+                      <Image
+                        src={variables.MY_PROFILE_IMG_URL}
+                        alt="Baik Profile Image"
+                        className="mr-1 rounded-full shadow-sm shadow-gray-400/50"
+                        width={16}
+                        height={16}
+                      />
                       <p>{variables.MY_NAME}</p>
                     </div>
                   )}
