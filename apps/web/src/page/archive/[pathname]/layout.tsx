@@ -1,5 +1,7 @@
 import React from 'react';
 
+import { headers } from 'next/headers';
+
 import { Article } from '@baik/types';
 import type { Metadata } from 'next';
 
@@ -14,6 +16,10 @@ type Props = {
 
 export const generateMetadata = async ({ params }: Props): Promise<Metadata> => {
   const session = await auth();
+  const headersList = headers();
+  const headerPathname = headersList.get('x-pathname') || '';
+
+  const lang = headerPathname.startsWith('/archive/en/') ? 'en' : 'ko';
 
   let res, item: Article | undefined;
 
@@ -25,21 +31,60 @@ export const generateMetadata = async ({ params }: Props): Promise<Metadata> => 
     item = res.data?.item;
   }
 
-  const content = markdownToPlainText(item?.content ?? '');
+  const title = {
+    default: lang === 'en' ? item?.intl?.en?.title : item?.title,
+    en: item?.intl?.en?.title,
+    ko: item?.title,
+  };
+  const description = {
+    default: lang === 'en' ? item?.intl?.en?.description : item?.description,
+    en: item?.intl?.en?.description,
+    ko: item?.description,
+  };
+  const content = {
+    default: markdownToPlainText((lang === 'en' ? item?.intl?.en?.content : item?.content) ?? ''),
+    en: markdownToPlainText(item?.intl?.en?.content ?? ''),
+    ko: markdownToPlainText(item?.content ?? ''),
+  };
+
+  const alternateUrls = {
+    en: `${variables.SITE_URL}/archive/en/${params.pathname}`,
+    ko: `${variables.SITE_URL}/archive/${params.pathname}`,
+  };
 
   return {
-    title: item?.title ? `${item.title}${variables.SITE_TITLE_SUFFIX}` : variables.SITE_TITLE,
-    description: content.slice(0, 140) ?? '',
+    title: title.default ? `${title.default}${variables.SITE_TITLE_SUFFIX}` : variables.SITE_TITLE,
+    description: description.default || content.default.slice(0, 140) || '',
     alternates: {
-      canonical: `${variables.SITE_URL}/${item?.pathname}`,
+      canonical: alternateUrls[lang as 'en' | 'ko'],
+      languages: {
+        'en-US': alternateUrls.en,
+        'ko-KR': alternateUrls.ko,
+      },
     },
     openGraph: {
-      images: item?.thumbnail_img_url ?? '',
+      title: {
+        default: title.default ?? variables.SITE_TITLE,
+        template: `%s${variables.SITE_TITLE_SUFFIX}`,
+        absolute: title.default ? `${title.default}${variables.SITE_TITLE_SUFFIX}` : variables.SITE_TITLE,
+      },
+      description: description.default || content.default.slice(0, 140) || '',
+      url: alternateUrls[lang as 'en' | 'ko'],
+      siteName: variables.SITE_TITLE,
+      images: item?.thumbnail_img_url ? [{ url: item.thumbnail_img_url }] : [],
+      locale: lang === 'en' ? 'en_US' : 'ko_KR',
+      type: 'article',
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: title.default,
+      description: description.default || content.default.slice(0, 140) || '',
+      images: item?.thumbnail_img_url ? [item.thumbnail_img_url] : [],
     },
   };
 };
 
-const ArticleLayout = async ({ children, params }: { children: React.ReactNode; params: { pathname: string } }) => {
+const ArticleLayout = async ({ children }: { children: React.ReactNode; params: { pathname: string } }) => {
   return children;
 };
 

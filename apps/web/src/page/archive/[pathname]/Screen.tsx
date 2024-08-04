@@ -31,7 +31,7 @@ const ArticleScreen = (props: ArticleScreenProps) => {
             className="w-full aspect-[1.91/1] object-cover rounded-2xl mb-6"
           />
         )}
-        <p className="text-3xl font-semibold text-gray-800 mb-4">{article.title}</p>
+        <h1 className="text-3xl font-semibold text-gray-800 mb-4">{article.title}</h1>
         <p className="mb-12 text-gray-500">{dayjs(article.updated_date).format('YYYY.MM.DD')}</p>
 
         <MDContent content={article.content} codeBlockType="sandpack" />
