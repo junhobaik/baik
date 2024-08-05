@@ -12,7 +12,7 @@ import MDContent from '@/components/MDContent';
 import TypeChip from '@/components/TypeChip';
 import { enEnabled } from '@/store';
 
-const DynamicComments = dynamic(() => import('./components/Comments'), { ssr: false });
+const DynamicComments = dynamic(() => import('./Comments'), { ssr: false });
 
 interface ArticleScreenProps {
   article: Article;
