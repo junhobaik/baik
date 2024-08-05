@@ -6,7 +6,7 @@ export const runtime = 'edge';
 
 export const alt = "Article - Baik's archive";
 
-const divide = 4;
+const divide = 1;
 
 export const size = {
   width: 1200 / divide,
@@ -16,14 +16,13 @@ export const size = {
 export const contentType = 'image/png';
 
 export default async function Image({ params }: { params: { pathname: string } }) {
-  const font = fetch(new URL('/public/fonts/Pretendard-Bold.ttf', import.meta.url)).then((res) => res.arrayBuffer());
+  // const font = fetch(new URL('/public/fonts/PretendardVariable.woff2', import.meta.url)).then((res) => res.arrayBuffer());
 
   const article = await api.server.archive.getArticleByPathnamePublic({ pathname: params.pathname });
   const title = article.data?.item?.title ?? '';
 
   return new ImageResponse(
     (
-      // ImageResponse JSX element
       <div
         style={{
           fontSize: 64 / divide,
@@ -34,7 +33,7 @@ export default async function Image({ params }: { params: { pathname: string } }
           flexDirection: 'column',
           alignItems: 'center',
           justifyContent: 'center',
-          fontFamily: 'Pretendard',
+          fontFamily: 'sans-serif',
           paddingTop: 80 / divide,
           paddingRight: 64 / divide,
           paddingBottom: 0,
@@ -97,14 +96,14 @@ export default async function Image({ params }: { params: { pathname: string } }
     ),
     {
       ...size,
-      fonts: [
-        {
-          name: 'Pretendard',
-          data: await font,
-          style: 'normal',
-          weight: 700,
-        },
-      ],
+      // fonts: [
+      //   {
+      //     name: 'Pretendard',
+      //     data: await font,
+      //     style: 'normal',
+      //     weight: 700,
+      //   },
+      // ],
     },
   );
 }
