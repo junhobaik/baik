@@ -12,7 +12,7 @@ import api from '@/api';
 import { auth } from '@/auth';
 import { markdownToPlainText } from '@/utils';
 
-import ArticleScreen from './Screen';
+import ArticleScreen from './components/Screen';
 
 const ArchiveArticlePage = async ({ params }: { params: { pathname: string } }) => {
   const headersList = headers();
