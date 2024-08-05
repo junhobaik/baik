@@ -57,7 +57,6 @@ export interface ClipArticleBase extends ArticleBase {
   type: 'clip';
   url: string;
   site: ClipSite;
-  // description?: never;
   pathname?: never;
   keywords?: never;
   is_recommended?: never;
@@ -65,13 +64,6 @@ export interface ClipArticleBase extends ArticleBase {
 
 export interface ArticleGSIAttributes {
   GSI1PK: string;
-  GSI1SK: string;
-  GSI2PK: string;
-  GSI2SK: string;
-  GSI3PK: string;
-  GSI3SK: string;
-  GSI4PK: string;
-  GSI4SK: string;
 }
 
 export type PostArticle = PostArticleBase & DefaultDBAttributes & ArticleGSIAttributes;

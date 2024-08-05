@@ -28,6 +28,7 @@ const useArticles = (props?: UseArticlesProps): UseArticlesResult => {
         limit: limit,
         orderBy: 'updated_date',
         lastEvaluatedKey: pageParam,
+        sortOrder: 'desc',
       });
       if (!res.data?.items) {
         throw new Error('Not found, bookmarkGroups');

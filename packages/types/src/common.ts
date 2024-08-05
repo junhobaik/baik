@@ -4,7 +4,7 @@ export type DataTypes = 'bookmarkGroup' | 'feed' | 'article';
 
 export interface DefaultDBAttributes {
   pk: string;
-  sk: string;
+  sk?: string | number;
   id: string;
   data_type: DataTypes;
   created_at: number;

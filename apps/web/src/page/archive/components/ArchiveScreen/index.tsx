@@ -1,9 +1,10 @@
 'use client';
 
-import React, { useLayoutEffect, useMemo, useState } from 'react';
+import React, { useEffect, useLayoutEffect, useMemo, useState } from 'react';
 
 import { Article, ArticleStatus, ArticleType } from '@baik/types';
 import clsx from 'clsx';
+import dayjs from 'dayjs';
 import { useSetAtom } from 'jotai';
 import { type Session } from 'next-auth';
 
@@ -25,6 +26,11 @@ export interface FilterType {
 
 const ArchiveScreen = (props: ArchiveScreenProps) => {
   const { session, articles, lang = 'ko' } = props;
+
+  useEffect(() => {
+    console.log(articles);
+  }, [articles]);
+
   const setEnEnabled = useSetAtom(enEnabled);
 
   const [filter, setFilter] = useState<FilterType>({

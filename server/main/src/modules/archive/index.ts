@@ -1,13 +1,5 @@
 // server/main/src/modules/archive/index.ts
-import type {
-  ActionResult,
-  Article,
-  ArticleBase,
-  ClipArticle,
-  DataTypes,
-  PostArticle,
-  ShortsArticle,
-} from '@baik/types';
+import type { ActionResult, Article, ArticleBase } from '@baik/types';
 import { v4 as uuidv4 } from 'uuid';
 
 import db from '../../db';
@@ -21,63 +13,34 @@ type CreateArticleArgs = ArticleBase & {
   site?: { title: string; link: string; favicon_url?: string; description?: string };
 };
 
-type UpdateArticleArgs = { id: string } & Partial<CreateArticleArgs>;
+type UpdateArticleArgs = { id: string } & Partial<Omit<Article, 'pk'>>;
 
 const createArticle = async (args: CreateArticleArgs): Promise<ActionResult> => {
-  const now = Date.now();
   const id = uuidv4();
-
-  const commonAttributes = {
+  const now = Date.now();
+  const gsi1pk = `${args.type}/${args.status}`;
+  const item = {
     pk: `ARTICLE#${id}`,
-    sk: `ARTICLE#${now}`,
     id,
-    data_type: 'article' as DataTypes,
+    ...args,
+    data_type: 'article',
+    GSI1PK: gsi1pk,
     created_at: now,
     updated_at: now,
-    GSI1PK: 'ARTICLE',
-    GSI1SK: `ARTICLE#${now}`,
-    GSI2PK: 'ARTICLE',
-    GSI2SK: `UPDATED#${args.updated_date}#${id}`,
-    GSI3PK: `TYPE#${args.type}#STATUS#${args.status}`,
-    GSI3SK: `UPDATED#${args.updated_date}#${id}`,
-  };
-
-  let newArticle: Article;
-
-  if (args.type === 'clip') {
-    newArticle = {
-      ...commonAttributes,
-      ...args,
-      GSI4PK: 'ARTICLE',
-      GSI4SK: `URL#${args.url}`,
-    } as ClipArticle;
-  } else {
-    newArticle = {
-      ...commonAttributes,
-      ...args,
-      GSI4PK: 'ARTICLE',
-      GSI4SK: `PATHNAME#${args.pathname}`,
-    } as PostArticle | ShortsArticle;
-  }
-
-  const params = {
-    tableName,
-    item: newArticle,
   };
 
   try {
-    await db.createItem(params);
+    await db.createItem({ tableName, item });
     return {
-      data: { success: true, item: newArticle },
+      data: { item, success: true },
       message: 'Article created successfully',
     };
   } catch (error) {
     console.error('Error creating article:', error);
     return {
-      message: 'Failed to create article',
       error: {
-        code: 'ARCHIVE>ARTICLE>UNKNOWN_ERROR',
-        message: error as string,
+        code: 'CREATE_FAILED',
+        message: (error as Error).message || 'Failed to create article',
       },
     };
   }
@@ -87,93 +50,76 @@ const updateArticle = async (args: UpdateArticleArgs): Promise<ActionResult> => 
   const { id, ...updateData } = args;
   const now = Date.now();
 
-  const queryParams = {
-    tableName,
-    keyConditionExpression: 'pk = :pkValue',
-    expressionAttributeValues: {
-      ':pkValue': `ARTICLE#${id}`,
-    },
-    limit: 1,
-  };
-
+  let existingItem;
   try {
-    const queryResult = await db.queryItems(queryParams);
+    const result = await db.queryItems({
+      tableName,
+      keyConditionExpression: 'pk = :pk',
+      expressionAttributeValues: { ':pk': `ARTICLE#${id}` },
+      limit: 1,
+    });
+    existingItem = result.items ? result.items[0] : null;
 
-    if (!queryResult.items || queryResult.items.length === 0) {
+    if (!existingItem) {
       return {
-        message: 'Article not found',
         error: {
-          code: 'ARCHIVE>ARTICLE>NOT_FOUND',
-          message: `Article with id ${id} not found`,
+          code: 'NOT_FOUND',
+          message: 'Article not found',
         },
       };
     }
-
-    const item = queryResult.items[0];
-    const sk = item.sk;
-
-    let updateExpression = 'set updated_at = :updated_at';
-    const expressionAttributeValues: Record<string, any> = {
-      ':updated_at': now,
+  } catch (error) {
+    console.error('Error fetching existing article:', error);
+    return {
+      error: {
+        code: 'FETCH_FAILED',
+        message: (error as Error).message || 'Failed to fetch existing article',
+      },
     };
-    const expressionAttributeNames: Record<string, string> = {};
+  }
 
-    Object.entries(updateData).forEach(([key, value]) => {
-      updateExpression += `, #${key} = :${key}`;
-      expressionAttributeValues[`:${key}`] = value;
-      expressionAttributeNames[`#${key}`] = key;
+  if (updateData.GSI1PK) delete updateData.GSI1PK;
+
+  let updateExpression =
+    'set ' +
+    Object.keys(updateData)
+      .map((key) => `#${key} = :${key}`)
+      .join(', ') +
+    ', updated_at = :updated_at';
+  const expressionAttributeNames = Object.keys(updateData).reduce((acc, key) => ({ ...acc, [`#${key}`]: key }), {});
+  const expressionAttributeValues: Record<string, any> = {
+    ...Object.keys(updateData).reduce((acc, key) => ({ ...acc, [`:${key}`]: (updateData as any)[key] }), {}),
+    ':updated_at': now,
+  };
+
+  if (
+    (updateData.status && updateData.status !== existingItem.status) ||
+    (updateData.type && updateData.type !== existingItem.type)
+  ) {
+    const newGsi1pk = `${updateData.type || existingItem.type}/${updateData.status || existingItem.status}`;
+    updateExpression += ', GSI1PK = :GSI1PK';
+    expressionAttributeValues[':GSI1PK'] = newGsi1pk;
+  }
+
+  try {
+    const updatedItem = await db.updateItem({
+      tableName,
+      key: { pk: `ARTICLE#${id}`, created_at: existingItem.created_at },
+      updateExpression,
+      expressionAttributeNames,
+      expressionAttributeValues,
     });
 
-    // GSI 업데이트 처리
-    if (updateData.type || updateData.status) {
-      const newType = updateData.type || item.type;
-      const newStatus = updateData.status || item.status;
-      updateExpression += `, GSI3PK = :GSI3PK`;
-      expressionAttributeValues[':GSI3PK'] = `TYPE#${newType}#STATUS#${newStatus}`;
-    }
-
-    if (updateData.updated_date) {
-      updateExpression += `, GSI3SK = :GSI3SK, GSI2SK = :GSI2SK`;
-      expressionAttributeValues[':GSI3SK'] = `UPDATED#${updateData.updated_date}#${id}`;
-      expressionAttributeValues[':GSI2SK'] = `UPDATED#${updateData.updated_date}#${id}`;
-    }
-
-    if (updateData.pathname) {
-      updateExpression += `, GSI4SK = :GSI4SK`;
-      expressionAttributeValues[':GSI4SK'] = `PATHNAME#${updateData.pathname}`;
-    } else if (updateData.url) {
-      updateExpression += `, GSI4SK = :GSI4SK`;
-      expressionAttributeValues[':GSI4SK'] = `URL#${updateData.url}`;
-    }
-
-    const params = {
-      tableName,
-      key: {
-        pk: `ARTICLE#${id}`,
-        sk: sk,
-      },
-      updateExpression,
-      expressionAttributeValues,
-      expressionAttributeNames,
-      returnValues: 'ALL_NEW',
-    };
-
-    const result = await db.updateItem(params);
-
-    if (!result) {
-      throw new Error('Failed to update article');
-    }
-
     return {
-      data: { item: result, success: true },
+      data: { item: updatedItem, success: true },
       message: 'Article updated successfully',
     };
   } catch (error) {
+    console.error('Error updating article:', error);
     return {
-      message: 'Failed to update article',
       error: {
-        code: 'ARCHIVE>ARTICLE>UPDATE_ERROR',
-        message: error instanceof Error ? error.message : String(error),
+        code: 'UPDATE_FAILED',
+        message: (error as Error).message || 'Failed to update article',
       },
     };
   }
@@ -182,65 +128,27 @@ const updateArticle = async (args: UpdateArticleArgs): Promise<ActionResult> => 
 const deleteArticle = async (args: { id: string }): Promise<ActionResult> => {
   const { id } = args;
 
-  const pkValue = `ARTICLE#${id}`;
-
   try {
-    const queryParams = {
-      tableName,
-      keyConditionExpression: 'pk = :pkValue',
-      expressionAttributeValues: {
-        ':pkValue': pkValue,
-      },
-      limit: 1,
-    };
-
-    const queryResult = await db.queryItems(queryParams);
-
-    if (!queryResult.items || queryResult.items.length === 0) {
+    const article = await db.getItem({ tableName, key: { pk: `ARTICLE#${id}` } });
+    if (!article) {
       return {
-        message: 'Article not found',
         error: {
-          code: 'ARCHIVE>ARTICLE>NOT_FOUND',
-          message: `Article with id ${id} not found`,
+          code: 'NOT_FOUND',
+          message: 'Article not found',
         },
       };
     }
-
-    const item = queryResult.items[0];
-
-    const deleteParams = {
-      tableName,
-      key: {
-        pk: pkValue,
-        sk: item.sk,
-      },
-      conditionExpression: 'attribute_exists(pk)',
-    };
-
-    await db.deleteItem(deleteParams);
-
+    await db.deleteItem({ tableName, key: { pk: `ARTICLE#${id}`, created_at: article.created_at } });
     return {
+      data: { success: true },
       message: 'Article deleted successfully',
-      data: { id: id, success: true },
     };
   } catch (error) {
     console.error('Error deleting article:', error);
-
-    if ((error as any).name === 'ConditionalCheckFailedException') {
-      return {
-        message: 'Article not found or already deleted',
-        error: {
-          code: 'ARCHIVE>ARTICLE>DELETE_FAILED',
-          message: `Article with id ${id} not found or already deleted`,
-        },
-      };
-    }
-
     return {
-      message: 'Failed to delete article',
       error: {
-        code: 'ARCHIVE>ARTICLE>DELETE_ERROR',
-        message: error instanceof Error ? error.message : String(error),
+        code: 'DELETE_FAILED',
+        message: (error as Error).message || 'Failed to delete article',
       },
     };
   }
@@ -249,39 +157,26 @@ const deleteArticle = async (args: { id: string }): Promise<ActionResult> => {
 const getArticle = async (args: { id: string }): Promise<ActionResult> => {
   const { id } = args;
 
-  const queryParams = {
-    tableName,
-    keyConditionExpression: 'pk = :pkValue',
-    expressionAttributeValues: {
-      ':pkValue': `ARTICLE#${id}`,
-    },
-    limit: 1,
-  };
-
   try {
-    const queryResult = await db.queryItems(queryParams);
-
-    if (!queryResult.items || queryResult.items.length === 0) {
+    const item = await db.getItem({ tableName, key: { pk: `ARTICLE#${id}` } });
+    if (!item) {
       return {
-        message: 'Article not found',
         error: {
-          code: 'ARCHIVE>ARTICLE>NOT_FOUND',
-          message: `Article with id ${id} not found`,
+          code: 'NOT_FOUND',
+          message: 'Article not found',
         },
       };
     }
-
     return {
-      data: { item: queryResult.items[0], success: true },
+      data: { item, success: true },
       message: 'Article retrieved successfully',
     };
   } catch (error) {
-    console.error('Error retrieving article:', error);
+    console.error('Error getting article:', error);
     return {
-      message: 'Failed to retrieve article',
       error: {
-        code: 'ARCHIVE>ARTICLE>RETRIEVE_ERROR',
-        message: error instanceof Error ? error.message : String(error),
+        code: 'GET_FAILED',
+        message: (error as Error).message || 'Failed to get article',
       },
     };
   }
@@ -291,38 +186,33 @@ const getAllArticles = async (args: {
   orderBy?: 'created_at' | 'updated_date';
   limit?: number;
   lastEvaluatedKey?: Record<string, any>;
+  sortOrder?: 'asc' | 'desc';
 }): Promise<ActionResult> => {
-  const { orderBy = 'created_at', limit = 50, lastEvaluatedKey } = args;
-
-  const params = {
-    tableName,
-    indexName: orderBy === 'created_at' ? 'AllArticlesIndex' : 'UpdatedDateIndex',
-    keyConditionExpression: orderBy === 'created_at' ? 'GSI1PK = :pk' : 'GSI2PK = :pk',
-    expressionAttributeValues: {
-      ':pk': 'ARTICLE',
-    },
-    scanIndexForward: false,
-    limit,
-    exclusiveStartKey: lastEvaluatedKey,
-  };
+  const { orderBy = 'created_at', limit, lastEvaluatedKey, sortOrder = 'desc' } = args;
+  const indexName = orderBy === 'updated_date' ? 'ArticleUpdateDateIndex' : undefined;
+  const scanIndexForward = sortOrder === 'asc';
 
   try {
-    const result = await db.queryItems(params);
+    const result = await db.queryItems({
+      tableName,
+      indexName,
+      keyConditionExpression: 'data_type = :dataType',
+      expressionAttributeValues: { ':dataType': 'article' },
+      limit,
+      scanIndexForward,
+      exclusiveStartKey: lastEvaluatedKey,
+    });
+
     return {
-      data: {
-        success: true,
-        items: result.items,
-        lastEvaluatedKey: result.lastEvaluatedKey,
-      },
+      data: { items: result.items || [], lastEvaluatedKey: result.lastEvaluatedKey, success: true },
       message: 'Articles retrieved successfully',
     };
   } catch (error) {
-    console.error('Error retrieving articles:', error);
+    console.error('Error getting all articles:', error);
     return {
-      message: 'Failed to retrieve articles',
       error: {
-        code: 'ARCHIVE>ARTICLE>RETRIEVE_ALL_ERROR',
-        message: error instanceof Error ? error.message : String(error),
+        code: 'GET_ALL_FAILED',
+        message: (error as Error).message || 'Failed to get all articles',
       },
     };
   }
@@ -333,78 +223,30 @@ const getArticlesByStatus = async (args: {
   limit?: number;
   lastEvaluatedKey?: Record<string, any>;
 }): Promise<ActionResult> => {
-  const { status, limit = 50, lastEvaluatedKey } = args;
-
-  const params = {
-    tableName,
-    indexName: 'TypeStatusIndex',
-    keyConditionExpression: 'GSI3PK = :gsi3pk',
-    expressionAttributeValues: {
-      ':gsi3pk': `TYPE#*#STATUS#${status}`,
-    },
-    scanIndexForward: false,
-    limit,
-    exclusiveStartKey: lastEvaluatedKey,
-  };
+  const { status, limit, lastEvaluatedKey } = args;
 
   try {
-    const result = await db.queryItems(params);
+    const result = await db.queryItems({
+      tableName,
+      indexName: 'StatusUpdateDateIndex',
+      keyConditionExpression: '#status = :status',
+      expressionAttributeValues: { ':status': status },
+      expressionAttributeNames: { '#status': 'status' },
+      limit,
+      scanIndexForward: false,
+      exclusiveStartKey: lastEvaluatedKey,
+    });
+
     return {
-      data: {
-        success: true,
-        items: result.items,
-        lastEvaluatedKey: result.lastEvaluatedKey,
-      },
+      data: { items: result.items || [], lastEvaluatedKey: result.lastEvaluatedKey, success: true },
       message: 'Articles retrieved successfully',
     };
   } catch (error) {
-    console.error('Error retrieving articles by status:', error);
+    console.error('Error getting articles by status:', error);
     return {
-      message: 'Failed to retrieve articles by status',
       error: {
-        code: 'ARCHIVE>ARTICLE>RETRIEVE_BY_STATUS_ERROR',
-        message: error instanceof Error ? error.message : String(error),
-      },
-    };
-  }
-};
-
-const getArticlesByType = async (args: {
-  type: string;
-  limit?: number;
-  lastEvaluatedKey?: Record<string, any>;
-}): Promise<ActionResult> => {
-  const { type, limit = 50, lastEvaluatedKey } = args;
-
-  const params = {
-    tableName,
-    indexName: 'TypeStatusIndex',
-    keyConditionExpression: 'GSI3PK = :gsi3pk',
-    expressionAttributeValues: {
-      ':gsi3pk': `TYPE#${type}#STATUS#*`,
-    },
-    scanIndexForward: false,
-    limit,
-    exclusiveStartKey: lastEvaluatedKey,
-  };
-
-  try {
-    const result = await db.queryItems(params);
-    return {
-      data: {
-        success: true,
-        items: result.items,
-        lastEvaluatedKey: result.lastEvaluatedKey,
-      },
-      message: 'Articles retrieved successfully',
-    };
-  } catch (error) {
-    console.error('Error retrieving articles by type:', error);
-    return {
-      message: 'Failed to retrieve articles by type',
-      error: {
-        code: 'ARCHIVE>ARTICLE>RETRIEVE_BY_TYPE_ERROR',
-        message: error instanceof Error ? error.message : String(error),
+        code: 'GET_BY_STATUS_FAILED',
+        message: (error as Error).message || 'Failed to get articles by status',
       },
     };
   }
@@ -416,37 +258,30 @@ const getArticlesByTypeStatus = async (args: {
   limit?: number;
   lastEvaluatedKey?: Record<string, any>;
 }): Promise<ActionResult> => {
-  const { type, status, limit = 50, lastEvaluatedKey } = args;
-
-  const params = {
-    tableName,
-    indexName: 'TypeStatusIndex',
-    keyConditionExpression: 'GSI3PK = :gsi3pk',
-    expressionAttributeValues: {
-      ':gsi3pk': `TYPE#${type}#STATUS#${status}`,
-    },
-    scanIndexForward: false,
-    limit,
-    exclusiveStartKey: lastEvaluatedKey,
-  };
+  const { type, status, limit, lastEvaluatedKey } = args;
+  const key = `${type}/${status}`;
 
   try {
-    const result = await db.queryItems(params);
+    const result = await db.queryItems({
+      tableName,
+      indexName: 'TypeStatusUpdatedDateIndex',
+      keyConditionExpression: 'GSI1PK = :key',
+      expressionAttributeValues: { ':key': key },
+      limit,
+      scanIndexForward: false,
+      exclusiveStartKey: lastEvaluatedKey,
+    });
+
     return {
-      data: {
-        success: true,
-        items: result.items,
-        lastEvaluatedKey: result.lastEvaluatedKey,
-      },
+      data: { items: result.items || [], lastEvaluatedKey: result.lastEvaluatedKey, success: true },
       message: 'Articles retrieved successfully',
     };
   } catch (error) {
-    console.error('Error retrieving articles by type and status:', error);
+    console.error('Error getting articles by type and status:', error);
     return {
-      message: 'Failed to retrieve articles by type and status',
       error: {
-        code: 'ARCHIVE>ARTICLE>RETRIEVE_BY_TYPE_STATUS_ERROR',
-        message: error instanceof Error ? error.message : String(error),
+        code: 'GET_BY_TYPE_STATUS_FAILED',
+        message: (error as Error).message || 'Failed to get articles by type and status',
       },
     };
   }
@@ -455,146 +290,114 @@ const getArticlesByTypeStatus = async (args: {
 const getArticleByPathname = async (args: { pathname: string }): Promise<ActionResult> => {
   const { pathname } = args;
 
-  const params = {
-    tableName,
-    indexName: 'PathnameIndex',
-    keyConditionExpression: 'GSI4PK = :gsi4pk and GSI4SK = :gsi4sk',
-    expressionAttributeValues: {
-      ':gsi4pk': 'ARTICLE',
-      ':gsi4sk': `PATHNAME#${pathname}`,
-    },
-    limit: 1,
-  };
-
   try {
-    const result = await db.queryItems(params);
-    const item = result.items ? result.items[0] : null;
-
-    return {
-      data: {
-        success: true,
-        item: item,
-      },
-      message: 'Article retrieved successfully',
-    };
-  } catch (error) {
-    console.error('Error retrieving article by pathname:', error);
-    return {
-      message: 'Failed to retrieve article by pathname',
-      error: {
-        code: 'ARCHIVE>ARTICLE>RETRIEVE_BY_PATHNAME_ERROR',
-        message: error instanceof Error ? error.message : String(error),
-      },
-    };
-  }
-};
-
-const getAllArticlesPublic = async (args?: {
-  orderBy?: 'created_at' | 'updated_date';
-  limit?: number;
-  lastEvaluatedKey?: Record<string, any>;
-}): Promise<ActionResult> => {
-  const { orderBy = 'updated_date', limit = 50, lastEvaluatedKey } = args || {};
-
-  const items: any[] = [];
-  let currentLastEvaluatedKey = lastEvaluatedKey;
-
-  while (true) {
-    const params = {
+    const result = await db.queryItems({
       tableName,
-      indexName: orderBy === 'created_at' ? 'AllArticlesIndex' : 'UpdatedDateIndex',
-      keyConditionExpression: orderBy === 'created_at' ? 'GSI1PK = :pk' : 'GSI2PK = :pk',
-      filterExpression: '#status = :status',
-      expressionAttributeNames: {
-        '#status': 'status',
-      },
-      expressionAttributeValues: {
-        ':pk': 'ARTICLE',
-        ':status': 'published',
-      },
-      scanIndexForward: false,
-      limit: 100,
-      exclusiveStartKey: currentLastEvaluatedKey,
-    };
+      indexName: 'PathnameIndex',
+      keyConditionExpression: 'pathname = :pathname',
+      expressionAttributeValues: { ':pathname': pathname },
+      limit: 1,
+    });
 
-    try {
-      const result = await db.queryItems(params);
-      items.push(...(result.items || []));
-      currentLastEvaluatedKey = result.lastEvaluatedKey;
-
-      if (items.length >= limit || !currentLastEvaluatedKey) break;
-    } catch (error) {
-      console.error('Error retrieving articles:', error);
+    const item = result.items ? result.items[0] : null;
+    if (!item) {
       return {
-        message: 'Failed to retrieve articles',
         error: {
-          code: 'ARCHIVE>ARTICLE>RETRIEVE_ALL_ERROR',
-          message: error instanceof Error ? error.message : String(error),
+          code: 'NOT_FOUND',
+          message: 'Article not found',
         },
       };
     }
-  }
-
-  // 최종적으로 정렬된 결과를 반환합니다.
-  const sortedItems = items.sort((a, b) => {
-    const dateA = new Date(a[orderBy]).getTime();
-    const dateB = new Date(b[orderBy]).getTime();
-    return dateB - dateA; // 내림차순 정렬
-  });
-
-  return {
-    data: {
-      success: true,
-      items: sortedItems.slice(0, limit),
-      lastEvaluatedKey: items.length > limit ? currentLastEvaluatedKey : undefined,
-    },
-    message: 'Articles retrieved successfully',
-  };
-};
-
-const getArticleByPathnamePublic = async (args: { pathname: string }): Promise<ActionResult> => {
-  const { pathname } = args;
-
-  const params = {
-    tableName,
-    indexName: 'PathnameIndex',
-    keyConditionExpression: 'GSI4PK = :gsi4pk and GSI4SK = :gsi4sk',
-    filterExpression: '#status = :status',
-    expressionAttributeNames: {
-      '#status': 'status',
-    },
-    expressionAttributeValues: {
-      ':gsi4pk': 'ARTICLE',
-      ':gsi4sk': `PATHNAME#${pathname}`,
-      ':status': 'published',
-    },
-    limit: 1,
-  };
-
-  try {
-    const result = await db.queryItems(params);
-    const item = result.items ? result.items[0] : null;
 
     return {
-      data: {
-        success: true,
-        item: item,
-      },
+      data: { item, success: true },
       message: 'Article retrieved successfully',
     };
   } catch (error) {
-    console.error('Error retrieving articles by pathname:', error);
+    console.error('Error getting article by pathname:', error);
     return {
-      message: 'Failed to retrieve article by pathname',
       error: {
-        code: 'ARCHIVE>ARTICLE>RETRIEVE_BY_PATHNAME_ERROR',
-        message: error instanceof Error ? error.message : String(error),
+        code: 'GET_BY_PATHNAME_FAILED',
+        message: (error as Error).message || 'Failed to get article by pathname',
       },
     };
   }
 };
 
-const deleteArticles = async ({ list }: { list: { pk: string; sk: string }[] }): Promise<ActionResult> => {
+const getAllPublishedArticles = async (args?: {
+  limit?: number;
+  lastEvaluatedKey?: Record<string, any>;
+  sortOrder?: 'asc' | 'desc';
+}): Promise<ActionResult> => {
+  const { limit, lastEvaluatedKey, sortOrder = 'desc' } = args || {};
+  const scanIndexForward = sortOrder === 'asc';
+
+  try {
+    const result = await db.queryItems({
+      tableName,
+      indexName: 'StatusUpdateDateIndex',
+      keyConditionExpression: '#status = :status',
+      expressionAttributeValues: { ':status': 'published' },
+      expressionAttributeNames: { '#status': 'status' },
+      limit,
+      scanIndexForward,
+      exclusiveStartKey: lastEvaluatedKey,
+    });
+
+    return {
+      data: { items: result.items || [], lastEvaluatedKey: result.lastEvaluatedKey, success: true },
+      message: 'Published articles retrieved successfully',
+    };
+  } catch (error) {
+    console.error('Error getting all published articles:', error);
+    return {
+      error: {
+        code: 'GET_ALL_PUBLISHED_FAILED',
+        message: (error as Error).message || 'Failed to get all published articles',
+      },
+    };
+  }
+};
+
+const getPublishedArticleByPathname = async (args: { pathname: string }): Promise<ActionResult> => {
+  const { pathname } = args;
+
+  try {
+    const result = await db.queryItems({
+      tableName,
+      indexName: 'PathnameIndex',
+      keyConditionExpression: 'pathname = :pathname and #status = :status',
+      expressionAttributeValues: { ':pathname': pathname, ':status': 'published' },
+      expressionAttributeNames: { '#status': 'status' },
+      limit: 1,
+    });
+
+    const item = result.items ? result.items[0] : null;
+    if (!item) {
+      return {
+        error: {
+          code: 'NOT_FOUND',
+          message: 'Published article not found',
+        },
+      };
+    }
+
+    return {
+      data: { item, success: true },
+      message: 'Published article retrieved successfully',
+    };
+  } catch (error) {
+    console.error('Error getting published article by pathname:', error);
+    return {
+      error: {
+        code: 'GET_PUBLISHED_BY_PATHNAME_FAILED',
+        message: (error as Error).message || 'Failed to get published article by pathname',
+      },
+    };
+  }
+};
+
+const deleteArticles = async ({ list }: { list: { pk: string; created_at: number }[] }): Promise<ActionResult> => {
   if (list.length === 0) {
     return {
       message: 'No articles to delete',
@@ -610,12 +413,12 @@ const deleteArticles = async ({ list }: { list: { pk: string; sk: string }[] }):
     }
 
     let deletedCount = 0;
-    let unprocessedItems: { pk: string; sk: string }[] = [];
+    let unprocessedItems: { pk: string; created_at: number }[] = [];
 
     for (const chunk of chunks) {
       const deleteParams = {
         tableName,
-        keys: chunk.map((item) => ({ pk: item.pk, sk: item.sk })),
+        keys: chunk.map((item) => ({ pk: item.pk, created_at: item.created_at })),
       };
 
       const result = await db.batchDeleteItems(deleteParams);
@@ -626,7 +429,7 @@ const deleteArticles = async ({ list }: { list: { pk: string; sk: string }[] }):
       unprocessedItems = unprocessedItems.concat(
         currentUnprocessedItems.map((item: any) => ({
           pk: item.DeleteRequest.Key.pk,
-          sk: item.DeleteRequest.Key.sk,
+          created_at: item.DeleteRequest.Key.created_at,
         })),
       );
     }
@@ -664,6 +467,10 @@ export default {
     run: deleteArticle,
     skip_auth: false,
   },
+  deleteArticles: {
+    run: deleteArticles,
+    skip_auth: false,
+  },
   getArticle: {
     run: getArticle,
     skip_auth: false,
@@ -676,10 +483,6 @@ export default {
     run: getArticlesByStatus,
     skip_auth: false,
   },
-  getArticlesByType: {
-    run: getArticlesByType,
-    skip_auth: false,
-  },
   getArticlesByTypeStatus: {
     run: getArticlesByTypeStatus,
     skip_auth: false,
@@ -688,17 +491,12 @@ export default {
     run: getArticleByPathname,
     skip_auth: false,
   },
-  deleteArticles: {
-    run: deleteArticles,
-    skip_auth: false,
-  },
-  // public
-  getArticleByPathnamePublic: {
-    run: getArticleByPathnamePublic,
+  getAllPublishedArticles: {
+    run: getAllPublishedArticles,
     skip_auth: true,
   },
-  getAllArticlesPublic: {
-    run: getAllArticlesPublic,
+  getPublishedArticleByPathname: {
+    run: getPublishedArticleByPathname,
     skip_auth: true,
   },
 };

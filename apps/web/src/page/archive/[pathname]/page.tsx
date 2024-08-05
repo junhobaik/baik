@@ -28,7 +28,7 @@ const ArchiveArticlePage = async ({ params }: { params: { pathname: string } }) 
       const res = await api.server.archive.getArticleByPathname({ pathname });
       item = res.data?.item;
     } else {
-      const res = await api.server.archive.getArticleByPathnamePublic({ pathname });
+      const res = await api.server.archive.getPublishedArticleByPathname({ pathname });
       item = res.data?.item;
     }
 

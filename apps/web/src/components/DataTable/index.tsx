@@ -33,7 +33,8 @@ export interface DataTableOptions<T> {
   keysToDisabled?: string[];
   updateItem?: (updatedItem: T) => Promise<void>;
   deleteItem?: (id: string) => Promise<void>;
-  deleteItems?: (list: { pk: string; sk: string }[]) => Promise<void>;
+  // TODO: remove any
+  deleteItems?: (list: any[]) => Promise<void>;
 }
 
 type DataTableProps<T> = {
@@ -57,7 +58,7 @@ const DataTable = <T extends DefaultDBAttributes>(props: DataTableProps<T>) => {
     const selectedIndexList = Object.keys(rowSelection);
     return selectedIndexList.map((index) => ({
       pk: items[Number(index)].pk,
-      sk: items[Number(index)].sk,
+      created_at: items[Number(index)].created_at,
     }));
   }, [rowSelection, items]);
 

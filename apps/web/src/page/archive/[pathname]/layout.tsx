@@ -27,7 +27,7 @@ export const generateMetadata = async ({ params }: Props): Promise<Metadata> => 
     res = await api.server.archive.getArticleByPathname({ pathname: params.pathname });
     item = res.data?.item;
   } else {
-    res = await api.server.archive.getArticleByPathnamePublic({ pathname: params.pathname });
+    res = await api.server.archive.getPublishedArticleByPathname({ pathname: params.pathname });
     item = res.data?.item;
   }
 

@@ -21,7 +21,7 @@ const fetchArticles = async (session: Session | null) => {
     const res = await api.server.archive.getAllArticles({ orderBy: 'updated_date' });
     articles = res.data?.items ?? [];
   } else {
-    const res = await api.server.archive.getAllArticlesPublic({ orderBy: 'updated_date' });
+    const res = await api.server.archive.getAllPublishedArticles();
     articles = res.data?.items ?? [];
   }
 

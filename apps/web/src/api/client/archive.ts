@@ -56,6 +56,7 @@ export const getAllArticles = async (args?: {
   orderBy?: 'created_at' | 'updated_date';
   limit?: number;
   lastEvaluatedKey?: Record<string, any>;
+  sortOrder?: 'asc' | 'desc';
 }): Promise<ActionResult> => {
   const param = {
     module: 'archive',
@@ -68,7 +69,6 @@ export const getAllArticles = async (args?: {
 
 export const getArticlesByStatus = async (args: {
   status: string;
-  orderBy?: 'created_at' | 'updated_date';
   limit?: number;
   lastEvaluatedKey?: Record<string, any>;
 }): Promise<ActionResult> => {
@@ -81,25 +81,9 @@ export const getArticlesByStatus = async (args: {
   return await request(param);
 };
 
-export const getArticlesByType = async (args: {
-  type: string;
-  orderBy?: 'created_at' | 'updated_date';
-  limit?: number;
-  lastEvaluatedKey?: Record<string, any>;
-}): Promise<ActionResult> => {
-  const param = {
-    module: 'archive',
-    action: 'getArticlesByType',
-    payload: args,
-  };
-
-  return await request(param);
-};
-
 export const getArticlesByTypeStatus = async (args: {
   type: string;
   status: string;
-  orderBy?: 'created_at' | 'updated_date';
   limit?: number;
   lastEvaluatedKey?: Record<string, any>;
 }): Promise<ActionResult> => {
@@ -126,35 +110,31 @@ export const getArticleByPathname = async (args: {
   return await request(param);
 };
 
-export const getArticleByPathnamePublic = async (args: {
-  pathname: string;
+export const getAllPublishedArticles = async (args?: {
   limit?: number;
   lastEvaluatedKey?: Record<string, any>;
+  sortOrder?: 'asc' | 'desc';
 }): Promise<ActionResult> => {
   const param = {
     module: 'archive',
-    action: 'getArticleByPathnamePublic',
-    payload: args,
-  };
-
-  return await request(param);
-};
-
-export const getAllArticlesPublic = async (args?: {
-  limit?: number;
-  orderBy?: 'created_at' | 'updated_date';
-  lastEvaluatedKey?: Record<string, any>;
-}): Promise<ActionResult> => {
-  const param = {
-    module: 'archive',
-    action: 'getAllArticlesPublic',
+    action: 'getAllPublishedArticles',
     payload: args || {},
   };
 
   return await request(param);
 };
 
-export const deleteArticles = async (list: { pk: string; sk: string }[]): Promise<ActionResult> => {
+export const getPublishedArticleByPathname = async (args: { pathname: string }): Promise<ActionResult> => {
+  const param = {
+    module: 'archive',
+    action: 'getPublishedArticleByPathname',
+    payload: args,
+  };
+
+  return await request(param);
+};
+
+export const deleteArticles = async (list: { pk: string; created_at: number }[]): Promise<ActionResult> => {
   const param = {
     module: 'archive',
     action: 'deleteArticles',

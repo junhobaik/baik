@@ -17,11 +17,7 @@ export const getAllArticles = async (args?: {
   return await request(param);
 };
 
-export const getArticleByPathname = async (args: {
-  pathname: string;
-  limit?: number;
-  lastEvaluatedKey?: Record<string, any>;
-}): Promise<ActionResult> => {
+export const getArticleByPathname = async (args: { pathname: string }): Promise<ActionResult> => {
   const param = {
     module: 'archive',
     action: 'getArticleByPathname',
@@ -31,28 +27,23 @@ export const getArticleByPathname = async (args: {
   return await request(param);
 };
 
-export const getArticleByPathnamePublic = async (args: {
-  pathname: string;
-  limit?: number;
-  lastEvaluatedKey?: Record<string, any>;
-}): Promise<ActionResult> => {
+export const getPublishedArticleByPathname = async (args: { pathname: string }): Promise<ActionResult> => {
   const param = {
     module: 'archive',
-    action: 'getArticleByPathnamePublic',
+    action: 'getPublishedArticleByPathname',
     payload: args,
   };
 
   return await request(param);
 };
 
-export const getAllArticlesPublic = async (args?: {
+export const getAllPublishedArticles = async (args?: {
   limit?: number;
-  orderBy?: 'created_at' | 'updated_date';
   lastEvaluatedKey?: Record<string, any>;
 }): Promise<ActionResult> => {
   const param = {
     module: 'archive',
-    action: 'getAllArticlesPublic',
+    action: 'getAllPublishedArticles',
     payload: args || {},
   };
 

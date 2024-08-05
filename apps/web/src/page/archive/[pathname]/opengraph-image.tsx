@@ -15,7 +15,7 @@ const size = {
 const contentType = 'image/png';
 
 export const ImageKo = async ({ params }: { params: { pathname: string } }) => {
-  const article = await api.server.archive.getArticleByPathnamePublic({ pathname: params.pathname });
+  const article = await api.server.archive.getPublishedArticleByPathname({ pathname: params.pathname });
   const title = article.data?.item?.title ?? '';
 
   return new ImageResponse(<OpenGraphImage title={title} thumbnail_img_url={article.data?.item.thumbnail_img_url} />, {
@@ -28,7 +28,7 @@ ImageKo.alt = alt;
 ImageKo.contentType = contentType;
 
 export const ImageEn = async ({ params }: { params: { pathname: string } }) => {
-  const article = await api.server.archive.getArticleByPathnamePublic({ pathname: params.pathname });
+  const article = await api.server.archive.getPublishedArticleByPathname({ pathname: params.pathname });
   const title = article.data?.item?.intl?.en?.title ?? '';
 
   return new ImageResponse(<OpenGraphImage title={title} thumbnail_img_url={article.data?.item.thumbnail_img_url} />, {
