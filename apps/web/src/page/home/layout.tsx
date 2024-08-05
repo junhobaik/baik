@@ -40,6 +40,7 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 
   return {
+    metadataBase: new URL(variables.SITE_URL),
     title: title[lang],
     description: description[lang],
     alternates: {
