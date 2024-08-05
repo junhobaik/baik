@@ -51,11 +51,10 @@ const ArticlesDataTable = (props: ArticlesDataTableProps) => {
         title: 'Status',
         render: ({ value, item }) => {
           const updateStatus = async (e: React.ChangeEvent<HTMLSelectElement>) => {
-            const res = await api.client.archive.updateArticle({
+            await api.client.archive.updateArticle({
               id: item.id,
               status: e.target.value as Article['status'],
             });
-            console.log(res);
           };
 
           return (

@@ -299,8 +299,6 @@ const getArticleByPathname = async (args: { pathname: string }): Promise<ActionR
       limit: 1,
     });
 
-    console.log(result);
-
     const item = result.items ? result.items[0] : null;
     if (!item) {
       return {

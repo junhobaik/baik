@@ -27,10 +27,6 @@ export interface FilterType {
 const ArchiveScreen = (props: ArchiveScreenProps) => {
   const { session, articles, lang = 'ko' } = props;
 
-  useEffect(() => {
-    console.log(articles);
-  }, [articles]);
-
   const setEnEnabled = useSetAtom(enEnabled);
 
   const [filter, setFilter] = useState<FilterType>({
