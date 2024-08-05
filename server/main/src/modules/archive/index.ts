@@ -299,6 +299,8 @@ const getArticleByPathname = async (args: { pathname: string }): Promise<ActionR
       limit: 1,
     });
 
+    console.log(result);
+
     const item = result.items ? result.items[0] : null;
     if (!item) {
       return {
@@ -366,8 +368,9 @@ const getPublishedArticleByPathname = async (args: { pathname: string }): Promis
     const result = await db.queryItems({
       tableName,
       indexName: 'PathnameIndex',
-      keyConditionExpression: 'pathname = :pathname and #status = :status',
+      keyConditionExpression: 'pathname = :pathname',
       expressionAttributeValues: { ':pathname': pathname, ':status': 'published' },
+      filterExpression: '#status = :status',
       expressionAttributeNames: { '#status': 'status' },
       limit: 1,
     });
