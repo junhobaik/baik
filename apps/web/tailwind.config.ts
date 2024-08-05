@@ -14,6 +14,11 @@ const config: Config = {
       typography: {
         DEFAULT: {
           css: {
+            pre: {
+              backgroundColor: 'transparent',
+              color: 'inherit',
+              padding: 0,
+            },
             code: {
               backgroundColor: '#eaeaea',
               padding: '2px 4px',
