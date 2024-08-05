@@ -2,6 +2,8 @@
 
 import React, { useEffect } from 'react';
 
+import dynamic from 'next/dynamic';
+
 import { Article } from '@baik/types';
 import dayjs from 'dayjs';
 import { useAtom } from 'jotai';
@@ -9,6 +11,8 @@ import { useAtom } from 'jotai';
 import MDContent from '@/components/MDContent';
 import TypeChip from '@/components/TypeChip';
 import { enEnabled } from '@/store';
+
+const DynamicComments = dynamic(() => import('./components/Comments'), { ssr: false });
 
 interface ArticleScreenProps {
   article: Article;
@@ -54,6 +58,10 @@ const ArticleScreen = (props: ArticleScreenProps) => {
         </div>
 
         <MDContent content={article.content} codeBlockType="sandpack" />
+
+        <div className="comments-container mt-24 min-h-[296px]">
+          <DynamicComments />
+        </div>
       </div>
     </div>
   );
