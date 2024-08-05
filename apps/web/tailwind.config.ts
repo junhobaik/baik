@@ -9,7 +9,28 @@ const config: Config = {
     '../../node_modules/@nextui-org/theme/dist/**/*.{js,ts,jsx,tsx}',
   ],
   darkMode: 'class',
-  theme: {},
+  theme: {
+    extend: {
+      typography: {
+        DEFAULT: {
+          css: {
+            code: {
+              backgroundColor: '#eaeaea',
+              padding: '2px 4px',
+              borderRadius: '4px',
+              margin: '0 2px',
+            },
+            'code::before': {
+              content: '""',
+            },
+            'code::after': {
+              content: '""',
+            },
+          },
+        },
+      },
+    },
+  },
   plugins: [nextui(), require('@tailwindcss/typography')],
 };
 export default config;

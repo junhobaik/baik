@@ -35,7 +35,7 @@ const MDContent = (props: MDContentProps) => {
 
   return (
     <Markdown
-      className="markdown-body"
+      className="prose"
       remarkPlugins={[remarkGfm, remarkMath]}
       rehypePlugins={[rehypeRaw, rehypeKatex, rehypeSlug]}
       components={{
