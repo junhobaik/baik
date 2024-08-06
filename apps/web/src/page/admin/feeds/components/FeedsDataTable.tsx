@@ -1,10 +1,12 @@
 import React from 'react';
 
+import dynamic from 'next/dynamic';
+
 import type { FeedItem } from '@baik/types';
 import { IconCopy } from '@tabler/icons-react';
 import dayjs from 'dayjs';
 
-import DataTable, { DataTableOptions } from '@/components/DataTable';
+import { DataTableOptions, DataTableProps } from '@/components/DataTable';
 import { copyClipboard } from '@/utils';
 
 interface FeedsDataTableProps {
@@ -13,6 +15,10 @@ interface FeedsDataTableProps {
   fetchMoreItems: () => Promise<unknown>;
   isLoading: boolean;
 }
+
+const DataTable = dynamic<DataTableProps<FeedItem>>(() => import('@/components/DataTable').then((mod) => mod.default), {
+  ssr: false,
+});
 
 const tableOptions: DataTableOptions<FeedItem> = {
   headers: [

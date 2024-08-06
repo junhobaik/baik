@@ -3,6 +3,7 @@
 // apps/web/src/page/admin/Articles/ArticlesDataTable.tsx
 import React from 'react';
 
+import dynamic from 'next/dynamic';
 import { useRouter } from 'next/navigation';
 
 import type { Article } from '@baik/types';
@@ -11,7 +12,7 @@ import { IconCopy, IconLink } from '@tabler/icons-react';
 import dayjs from 'dayjs';
 
 import api from '@/api';
-import DataTable, { DataTableOptions } from '@/components/DataTable';
+import { DataTableOptions, DataTableProps } from '@/components/DataTable';
 import useArticles from '@/hooks/useArticles';
 import { copyClipboard, removeDefaultKey } from '@/utils';
 
@@ -21,6 +22,10 @@ interface ArticlesDataTableProps {
   fetchMoreItems: () => Promise<unknown>;
   isLoading: boolean;
 }
+
+const DataTable = dynamic<DataTableProps<Article>>(() => import('@/components/DataTable').then((mod) => mod.default), {
+  ssr: false,
+});
 
 const ArticlesDataTable = (props: ArticlesDataTableProps) => {
   const { items, hasNextItems, fetchMoreItems, isLoading } = props;

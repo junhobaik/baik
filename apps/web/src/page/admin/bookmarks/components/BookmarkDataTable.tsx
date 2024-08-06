@@ -1,11 +1,13 @@
 import React from 'react';
 
+import dynamic from 'next/dynamic';
+
 import type { BookmarkGroup, BookmarkItem } from '@baik/types';
 import { IconCopy } from '@tabler/icons-react';
 import dayjs from 'dayjs';
 
 import api from '@/api';
-import DataTable, { DataTableOptions } from '@/components/DataTable';
+import { DataTableOptions, DataTableProps } from '@/components/DataTable';
 import useBookmarkGroups from '@/hooks/useBookmarkGroups';
 import { copyClipboard, removeDefaultKey } from '@/utils';
 
@@ -15,6 +17,13 @@ interface BookmarkDataTableProps {
   fetchMoreItems: () => Promise<unknown>;
   isLoading: boolean;
 }
+
+const DataTable = dynamic<DataTableProps<BookmarkGroup>>(
+  () => import('@/components/DataTable').then((mod) => mod.default),
+  {
+    ssr: false,
+  },
+);
 
 const BookmarkDataTable = (props: BookmarkDataTableProps) => {
   const { items, hasNextItems, fetchMoreItems, isLoading } = props;
