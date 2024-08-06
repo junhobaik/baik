@@ -4,7 +4,7 @@
 import React, { useCallback, useMemo, useState } from 'react';
 
 import { DefaultDBAttributes } from '@baik/types';
-import { Button, ButtonProps, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger, Spinner } from '@nextui-org/react';
+import { Button, ButtonProps, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger } from '@nextui-org/react';
 import { IconCaretDownFilled, IconEdit, IconFileCode2, IconTrash } from '@tabler/icons-react';
 import { ColumnDef, flexRender, getCoreRowModel, useReactTable } from '@tanstack/react-table';
 import styled from 'styled-components';
@@ -37,7 +37,7 @@ export interface DataTableOptions<T> {
   deleteItems?: (list: any[]) => Promise<void>;
 }
 
-type DataTableProps<T> = {
+export type DataTableProps<T> = {
   items: T[];
   options: DataTableOptions<T>;
 } & (
@@ -45,7 +45,7 @@ type DataTableProps<T> = {
   | { hasNextItems: boolean; fetchMoreItems: () => Promise<unknown>; isLoading: boolean }
 );
 
-const DataTable = <T extends DefaultDBAttributes>(props: DataTableProps<T>) => {
+const DataTable = <T extends Partial<DefaultDBAttributes>>(props: DataTableProps<T>) => {
   useRenderTracker({ name: 'DataTable' });
 
   const { items, options, hasNextItems = false, fetchMoreItems, isLoading = false } = props;
@@ -194,7 +194,7 @@ const DataTable = <T extends DefaultDBAttributes>(props: DataTableProps<T>) => {
                   variant="light"
                   color="danger"
                   isLoading={deleteLoading}
-                  onClick={() => handleDeleteItem(row.original.id)}
+                  onClick={() => handleDeleteItem(row.original.id as string)}
                 >
                   <IconTrash size={18} />
                 </Button>
