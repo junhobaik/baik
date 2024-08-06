@@ -1,19 +1,21 @@
 # baik 🚧
 
-
-[🔗 임시 도메인(https://baik-web.vercel.app)](https://baik-web.vercel.app)
+[🔗 Home (Onboarding Page)](https://baik.dev)  
+[🔗 Archive (Blog Page)](https://baik.dev/archive)
 
 ---
 
 **개인 웹 페이지**
 
 - Archive
-  - Blog
-  - Archive (Save Webclip)
+  - Posts
+  - Webclip
 - Dashboard
-  - Bookmark Management
+  - Bookmark management
   - RSS Feed Subscription & Reader
-- ...Others
+- Admin
+  - Data management
+- ...Others Personal webs
 
 ## Tech Stacks
 
@@ -24,6 +26,8 @@
 - `jotai`
 - `tailwind`
 - `styled-components`
+- `NextUI`
+- `@junhobaik/ui`
 - `tsup`
 - `pnpm`
 - `turbo (turborepo)`
@@ -33,11 +37,12 @@
   - `API Gateway`
   - `DynamoDB`
   - `S3`
-  - `Route 53`
+  - `CloudFront`
   - `Event Bridge`
 - Google Tag Manager
 - Google Analytics
 - Google Search Console
 - Sentry
+- DataDog
 
 ![](/assets/baik-stack.png)
