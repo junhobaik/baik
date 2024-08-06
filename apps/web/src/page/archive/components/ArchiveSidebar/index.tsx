@@ -22,7 +22,7 @@ const ArchiveSidebar = (props: ArchiveSidebarProps) => {
   }, [articles]);
 
   return (
-    <div className="hidden lg:!flex min-w-80 ml-8 pl-4 mt-8 border-l">
+    <div className="hidden lg:!flex min-w-80 max-w-80 ml-8 pl-4 mt-8 border-l">
       <div className="flex-grow">
         <p className="text-sm text-gray-500 mb-2">Recent Posts</p>
         {filteredPosts.recent.map((article) => {
