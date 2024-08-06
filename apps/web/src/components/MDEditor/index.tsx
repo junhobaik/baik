@@ -45,6 +45,7 @@ import {
 import styled from 'styled-components';
 
 import api from '@/api';
+import { blobToBase64, compressImage } from '@/utils/image';
 
 import '@mdxeditor/editor/style.css';
 
@@ -84,22 +85,46 @@ const MDEditor = forwardRef<MDXEditorMethods | null, MDEditorProps>((props, ref)
     );
   };
 
+  interface ImageProcessOptions {
+    quality?: number;
+    maxWidth?: number;
+    maxHeight?: number;
+  }
+
   const imageUploadHandler = async (file: File) => {
     try {
-      const reader = new FileReader();
-      const filePromise = new Promise<string>((resolve, reject) => {
-        reader.onload = (e) => resolve(e.target?.result as string);
-        reader.onerror = (e) => reject(e);
+      const processOptions: ImageProcessOptions = {
+        quality: 0.8,
+        maxWidth: 1920,
+      };
+
+      let processedFile: File | Blob = file;
+      let fileName = file.name;
+
+      if (file.size / 1024 / 1024 > 0.3) {
+        processedFile = await compressImage(file, processOptions);
+        fileName = file.name.replace(/\.[^/.]+$/, '') + '.webp';
+
+        console.debug(
+          '[Image Compression]',
+          ` ${fileName}: `,
+          `${(file.size / 1024 / 1024).toFixed(4)}MB`,
+          '->',
+          `${(processedFile.size / 1024 / 1024).toFixed(4)}MB`,
+        );
+      }
+
+      const base64File = await blobToBase64(processedFile);
+
+      const res = await api.client.storage.uploadImage({
+        file: base64File,
+        filename: fileName,
       });
-      reader.readAsDataURL(file);
 
-      const base64File = await filePromise;
-
-      const res = await api.client.storage.uploadImage({ file: base64File, filename: file.name });
-
-      return Promise.resolve(res.data?.item);
+      return res.data?.item;
     } catch (error) {
-      return Promise.reject(error);
+      console.error('Error in image upload:', error);
+      throw error;
     }
   };
 
