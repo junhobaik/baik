@@ -129,7 +129,15 @@ const deleteArticle = async (args: { id: string }): Promise<ActionResult> => {
   const { id } = args;
 
   try {
-    const article = await db.getItem({ tableName, key: { pk: `ARTICLE#${id}` } });
+    const queryResult = await db.queryItems({
+      tableName,
+      keyConditionExpression: 'pk = :pk',
+      expressionAttributeValues: { ':pk': `ARTICLE#${id}` },
+      limit: 1,
+    });
+
+    const article = queryResult.items ? queryResult.items[0] : null;
+
     if (!article) {
       return {
         error: {
@@ -138,7 +146,12 @@ const deleteArticle = async (args: { id: string }): Promise<ActionResult> => {
         },
       };
     }
-    await db.deleteItem({ tableName, key: { pk: `ARTICLE#${id}`, created_at: article.created_at } });
+
+    await db.deleteItem({
+      tableName,
+      key: { pk: `ARTICLE#${id}`, created_at: article.created_at },
+    });
+
     return {
       data: { success: true },
       message: 'Article deleted successfully',
@@ -158,7 +171,15 @@ const getArticle = async (args: { id: string }): Promise<ActionResult> => {
   const { id } = args;
 
   try {
-    const item = await db.getItem({ tableName, key: { pk: `ARTICLE#${id}` } });
+    const queryResult = await db.queryItems({
+      tableName,
+      keyConditionExpression: 'pk = :pk',
+      expressionAttributeValues: { ':pk': `ARTICLE#${id}` },
+      limit: 1,
+    });
+
+    const item = queryResult.items ? queryResult.items[0] : null;
+
     if (!item) {
       return {
         error: {
@@ -167,6 +188,7 @@ const getArticle = async (args: { id: string }): Promise<ActionResult> => {
         },
       };
     }
+
     return {
       data: { item, success: true },
       message: 'Article retrieved successfully',
