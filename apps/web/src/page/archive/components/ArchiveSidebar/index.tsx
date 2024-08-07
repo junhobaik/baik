@@ -28,7 +28,7 @@ const ArchiveSidebar = (props: ArchiveSidebarProps) => {
         {filteredPosts.recent.map((article) => {
           return (
             <Link href={`${pathname}/${article.pathname}`} key={`sidebar-recent-${article.id}`}>
-              <p key={`recent-article-item-${article.id}`} className="py-1 text-gray-800 hover:text-blue-500">
+              <p key={`recent-article-item-${article.id}`} className="py-1 text-gray-800 hover:text-blue-500 leading-5">
                 {article.title}
               </p>
             </Link>
@@ -39,7 +39,7 @@ const ArchiveSidebar = (props: ArchiveSidebarProps) => {
         {filteredPosts.recommended.map((article) => {
           return (
             <Link href={`${pathname}/${article.pathname}`} key={`sidebar-recommended-${article.id}`}>
-              <p key={`recent-article-item-${article.id}`} className="py-1 text-gray-800 hover:text-blue-500">
+              <p key={`recent-article-item-${article.id}`} className="py-1 text-gray-800 hover:text-blue-500 leading-5">
                 {article.title}
               </p>
             </Link>
