@@ -12,6 +12,7 @@ import MDContent from '@/components/MDContent';
 import TypeChip from '@/components/TypeChip';
 import { enEnabled } from '@/store';
 
+const DynamicMDContentToc = dynamic(() => import('@/components/MDContentToc'), { ssr: false });
 const DynamicComments = dynamic(() => import('./Comments'), { ssr: false });
 
 interface ArticleScreenProps {
@@ -27,8 +28,8 @@ const ArticleScreen = (props: ArticleScreenProps) => {
   }, [article]);
 
   return (
-    <div>
-      <div className="flex flex-col max-w-[720px] mx-auto pt-4 pb-24">
+    <div className="flex mx-auto justify-center items-start">
+      <div className="flex flex-col max-w-[720px] pt-4 pb-24">
         {article.type === 'shorts' ? (
           <div className={'bg-purple-50 flex items-center px-2 rounded-lg mb-4 h-8'}>
             <TypeChip type="shorts" className="m-0" />
@@ -49,7 +50,9 @@ const ArticleScreen = (props: ArticleScreenProps) => {
           />
         ) : null}
 
-        <h1 className="text-3xl font-semibold text-gray-800 mb-8">{article.title}</h1>
+        <h1 id={article.title} className="text-3xl font-semibold text-gray-800 mb-8">
+          {article.title}
+        </h1>
 
         <div className="flex items-center justify-between mb-20">
           <p className="text-gray-600 py-1 px-2 bg-gray-100 rounded-lg">
@@ -63,6 +66,12 @@ const ArticleScreen = (props: ArticleScreenProps) => {
           <DynamicComments />
         </div>
       </div>
+
+      {article.type === 'post' && (
+        <div className="hidden lg:flex min-w-60 max-w-60 ml-8 sticky mt-[72px] top-24 h-full">
+          <DynamicMDContentToc title={article.title} />
+        </div>
+      )}
     </div>
   );
 };
