@@ -17,8 +17,6 @@ import CodeBlock from './CodeBlock';
 import ImageBlock from './ImageBlock';
 import MermaidBlock from './MermaidBlock';
 
-import 'katex/dist/katex.min.css';
-
 interface MDContentProps {
   content: string;
   frontmatter?: boolean;

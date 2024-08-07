@@ -2,6 +2,10 @@
 
 import type { Metadata } from 'next';
 
+import 'react-medium-image-zoom/dist/styles.css';
+import 'katex/dist/katex.min.css';
+import '@mdxeditor/editor/style.css';
+
 import '@junhobaik/ui/css';
 import '@/styles/globals.css';
 

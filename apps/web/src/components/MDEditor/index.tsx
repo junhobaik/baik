@@ -49,9 +49,6 @@ import styled from 'styled-components';
 import api from '@/api';
 import { blobToBase64, compressImage } from '@/utils/image';
 
-// import '@mdxeditor/editor/style.css';
-const FixStyleLoad = dynamic(() => import('./FixStyleLoad'), { ssr: false });
-
 interface MDEditorProps extends MDXEditorProps {
   markdown: string;
   contentMaxWidth?: string;
@@ -132,132 +129,129 @@ const MDEditor = forwardRef<MDXEditorMethods | null, MDEditorProps>((props, ref)
   };
 
   return (
-    <>
-      <FixStyleLoad />
-      <MDXEditorStyled className={props.className ?? ''} $contentMaxWidth={contentMaxWidth}>
-        <MDXEditor
-          className="mdxeditor prose"
-          ref={ref}
-          markdown={markdown}
-          contentEditableClassName="content-editor prose"
-          plugins={[
-            listsPlugin(),
-            quotePlugin(),
-            headingsPlugin({ allowedHeadingLevels: [1, 2, 3] }),
-            linkPlugin(),
-            linkDialogPlugin(),
-            frontmatterPlugin(),
-            thematicBreakPlugin(),
-            markdownShortcutPlugin(),
-            tablePlugin(),
+    <MDXEditorStyled className={props.className ?? ''} $contentMaxWidth={contentMaxWidth}>
+      <MDXEditor
+        className="mdxeditor prose"
+        ref={ref}
+        markdown={markdown}
+        contentEditableClassName="content-editor prose"
+        plugins={[
+          listsPlugin(),
+          quotePlugin(),
+          headingsPlugin({ allowedHeadingLevels: [1, 2, 3] }),
+          linkPlugin(),
+          linkDialogPlugin(),
+          frontmatterPlugin(),
+          thematicBreakPlugin(),
+          markdownShortcutPlugin(),
+          tablePlugin(),
 
-            diffSourcePlugin({
-              diffMarkdown: markdown,
-              viewMode: 'rich-text',
-              readOnlyDiff: true,
-            }),
+          diffSourcePlugin({
+            diffMarkdown: markdown,
+            viewMode: 'rich-text',
+            readOnlyDiff: true,
+          }),
 
-            codeBlockPlugin({ defaultCodeBlockLanguage: '', codeBlockEditorDescriptors: [] }),
-            codeMirrorPlugin({
-              autoLoadLanguageSupport: true,
-              codeBlockLanguages: {
-                html: 'html',
-                js: 'js',
-                javascript: 'javascript',
-                ts: 'ts',
-                typescript: 'typescript',
-                css: 'css',
-                txt: 'txt',
-                text: 'text',
-                jsx: 'jsx',
-                tsx: 'tsx',
-                shell: 'shell',
-                bash: 'bash',
-                '': 'Unspecified',
-                python: 'python',
-                sql: 'sql',
-              },
-            }),
-            sandpackPlugin({ sandpackConfig: simpleSandpackConfig }),
+          codeBlockPlugin({ defaultCodeBlockLanguage: '', codeBlockEditorDescriptors: [] }),
+          codeMirrorPlugin({
+            autoLoadLanguageSupport: true,
+            codeBlockLanguages: {
+              html: 'html',
+              js: 'js',
+              javascript: 'javascript',
+              ts: 'ts',
+              typescript: 'typescript',
+              css: 'css',
+              txt: 'txt',
+              text: 'text',
+              jsx: 'jsx',
+              tsx: 'tsx',
+              shell: 'shell',
+              bash: 'bash',
+              '': 'Unspecified',
+              python: 'python',
+              sql: 'sql',
+            },
+          }),
+          sandpackPlugin({ sandpackConfig: simpleSandpackConfig }),
 
-            imagePlugin({
-              imageUploadHandler,
-              imageAutocompleteSuggestions: [],
-            }),
+          imagePlugin({
+            imageUploadHandler,
+            imageAutocompleteSuggestions: [],
+          }),
 
-            directivesPlugin({ directiveDescriptors: [AdmonitionDirectiveDescriptor] }),
+          directivesPlugin({ directiveDescriptors: [AdmonitionDirectiveDescriptor] }),
 
-            toolbarPlugin({
-              toolbarContents: () => {
-                return (
-                  <DiffSourceToggleWrapper>
-                    <ConditionalContents
-                      options={[
-                        {
-                          when: (editor) => editor?.editorType === 'codeblock',
-                          contents: () => <ChangeCodeMirrorLanguage />,
-                        },
-                        { when: (editor) => editor?.editorType === 'sandpack', contents: () => <ShowSandpackInfo /> },
-                        {
-                          fallback: () => (
-                            <>
-                              <UndoRedo />
-                              <Separator />
-                              <BoldItalicUnderlineToggles />
-                              <CodeToggle />
-                              {/* <Separator /> */}
-                              {/* <ListsToggle /> */}
-                              {/* <Separator /> */}
+          toolbarPlugin({
+            toolbarContents: () => {
+              return (
+                <DiffSourceToggleWrapper>
+                  <ConditionalContents
+                    options={[
+                      {
+                        when: (editor) => editor?.editorType === 'codeblock',
+                        contents: () => <ChangeCodeMirrorLanguage />,
+                      },
+                      { when: (editor) => editor?.editorType === 'sandpack', contents: () => <ShowSandpackInfo /> },
+                      {
+                        fallback: () => (
+                          <>
+                            <UndoRedo />
+                            <Separator />
+                            <BoldItalicUnderlineToggles />
+                            <CodeToggle />
+                            {/* <Separator /> */}
+                            {/* <ListsToggle /> */}
+                            {/* <Separator /> */}
 
-                              {/* <BlockTypeSelect /> */}
-                              {/* <ConditionalContents
+                            {/* <BlockTypeSelect /> */}
+                            {/* <ConditionalContents
                               options={[
                                 { when: whenInAdmonition, contents: () => <ChangeAdmonitionType /> },
                                 { fallback: () => <BlockTypeSelect /> },
                               ]}
                             /> */}
 
-                              <Separator />
+                            <Separator />
 
-                              <CreateLink />
-                              <InsertImage />
+                            <CreateLink />
+                            <InsertImage />
 
-                              <Separator />
+                            <Separator />
 
-                              <InsertTable />
-                              {/* <InsertThematicBreak /> */}
+                            <InsertTable />
+                            {/* <InsertThematicBreak /> */}
 
-                              <Separator />
-                              <InsertCodeBlock />
-                              <InsertSandpack />
+                            <Separator />
+                            <InsertCodeBlock />
+                            <InsertSandpack />
 
-                              <ConditionalContents
-                                options={[
-                                  {
-                                    when: (editorInFocus) => !whenInAdmonition(editorInFocus),
-                                    contents: () => (
-                                      <>
-                                        <Separator />
-                                        <InsertAdmonition />
-                                      </>
-                                    ),
-                                  },
-                                ]}
-                              />
-                            </>
-                          ),
-                        },
-                      ]}
-                    />
-                  </DiffSourceToggleWrapper>
-                );
-              },
-            }),
-          ]}
-          {...restProps}
-        />
-      </MDXEditorStyled>
-    </>
+                            <ConditionalContents
+                              options={[
+                                {
+                                  when: (editorInFocus) => !whenInAdmonition(editorInFocus),
+                                  contents: () => (
+                                    <>
+                                      <Separator />
+                                      <InsertAdmonition />
+                                    </>
+                                  ),
+                                },
+                              ]}
+                            />
+                          </>
+                        ),
+                      },
+                    ]}
+                  />
+                </DiffSourceToggleWrapper>
+              );
+            },
+          }),
+        ]}
+        {...restProps}
+      />
+    </MDXEditorStyled>
   );
 });
 

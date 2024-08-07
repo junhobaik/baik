@@ -21,6 +21,7 @@ const client = DynamoDBDocument.from(new DynamoDB(config), {
 });
 
 export const authConfig: NextAuthConfig = {
+  trustHost: true,
   providers: [Google],
   adapter: DynamoDBAdapter(client, { tableName: 'baik-auth' }),
   callbacks: {
