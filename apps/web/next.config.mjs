@@ -3,6 +3,9 @@ import { withSentryConfig } from '@sentry/nextjs';
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: false,
+  compiler: {
+    styledComponents: true,
+  },
   experimental: {
     swcPlugins: [['@swc-jotai/react-refresh', {}]],
   },
@@ -15,6 +18,7 @@ const nextConfig = {
     ],
   },
 };
+
 export default withSentryConfig(nextConfig, {
   // For all available options, see:
   // https://github.com/getsentry/sentry-webpack-plugin#options
