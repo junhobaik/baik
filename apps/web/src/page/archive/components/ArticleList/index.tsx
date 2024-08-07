@@ -13,7 +13,7 @@ import styled from 'styled-components';
 
 import TypeChip from '@/components/TypeChip';
 import { variables } from '@/configs';
-import { markdownToPlainText } from '@/utils';
+import { formatTimestamp, markdownToPlainText } from '@/utils';
 
 import { FilterType } from '../ArchiveScreen';
 
@@ -21,10 +21,11 @@ interface ArticleListProps {
   session: Session | null;
   articles: Article[];
   filter: { value: FilterType; set: Dispatch<SetStateAction<FilterType>> };
+  lang?: 'en' | 'ko';
 }
 
 const ArticleList = (props: ArticleListProps) => {
-  const { session, articles, filter } = props;
+  const { session, articles, filter, lang = 'ko' } = props;
   const pathname = usePathname();
 
   const parsedArticles = useMemo(() => {
@@ -66,6 +67,7 @@ const ArticleList = (props: ArticleListProps) => {
     (article: Article) => {
       const plainContent = markdownToPlainText(article.content);
       const date = dayjs(article.updated_date).format('YYYY.MM.DD');
+      formatTimestamp(article.updated_date, 'YYYY.MM.DD', lang);
       const path =
         article.type === 'clip' ? article.url : `${pathname}${pathname.endsWith('/') ? '' : '/'}${article.pathname}`;
 
