@@ -2,20 +2,28 @@
 import type { Metadata, Viewport } from 'next';
 
 import { auth } from '@/auth';
+
+import { headers } from 'next/headers';
 import localFont from 'next/font/local';
 
 import Sidebar from '../../components/Sidebar';
-
 import { Providers } from './components/providers';
 import { Registries } from './components/registries';
+
+import { variables } from '@/configs';
+
 import { Toaster } from 'react-hot-toast';
 import { GoogleTagManager } from '@next/third-parties/google';
+import dayjs from 'dayjs';
+import utc from 'dayjs/plugin/utc';
+import timezone from 'dayjs/plugin/timezone';
 
 import '@junhobaik/ui/css';
 import '@/styles/globals.css';
 
-import { variables } from '@/configs';
-import { headers } from 'next/headers';
+dayjs.extend(utc);
+dayjs.extend(timezone);
+dayjs.tz.setDefault('Asia/Seoul');
 
 export const viewport: Viewport = {
   width: 'device-width',
