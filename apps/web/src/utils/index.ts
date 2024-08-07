@@ -1,5 +1,8 @@
 import { marked } from 'marked';
 
+export * from './image';
+export * from './date';
+
 export const delay = (ms: number) => {
   return new Promise((resolve) => setTimeout(resolve, ms));
 };
