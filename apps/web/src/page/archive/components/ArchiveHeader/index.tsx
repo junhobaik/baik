@@ -22,6 +22,8 @@ const ArchiveHeader = ({ lang = 'ko' }: { lang?: 'ko' | 'en' }) => {
 
   const enAvailable = useAtomValue(enEnabled);
 
+  const isEnPath = useMemo(() => pathname.startsWith('/archive/en'), [pathname]);
+
   const disabledIntlKeys = useMemo(() => {
     const keys = new Set<'ko' | 'en'>();
 
@@ -34,13 +36,13 @@ const ArchiveHeader = ({ lang = 'ko' }: { lang?: 'ko' | 'en' }) => {
   return (
     <header className="sticky top-0 flex justify-center h-16 z-50 bg-white border-b">
       <div className="flex items-center justify-between w-[92%]">
-        <Link className="flex items-center" href={pathname.startsWith('/archive/en') ? '/archive/en' : '/archive'}>
+        <Link className="flex items-center" href={isEnPath ? '/archive/en' : '/archive'}>
           <Image width={20} height={20} src="/icon.png" alt="" />
           <p className="ml-1 text-md font-semibold">Baik</p>
         </Link>
 
         <div className="flex items-center">
-          <SearchDialog />
+          {!isEnPath && <SearchDialog />}
 
           <Spacer x={1} />
 
