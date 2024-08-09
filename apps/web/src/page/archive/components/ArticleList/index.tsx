@@ -66,8 +66,9 @@ const ArticleList = (props: ArticleListProps) => {
   const renderArticleContent = useCallback(
     (article: Article) => {
       const plainContent = markdownToPlainText(article.content);
-      const date = dayjs(article.updated_date).format('YYYY.MM.DD');
-      formatTimestamp(article.updated_date, 'YYYY.MM.DD', lang);
+
+      const date = formatTimestamp(article.updated_date, 'YYYY.MM.DD', lang);
+
       const path =
         article.type === 'clip' ? article.url : `${pathname}${pathname.endsWith('/') ? '' : '/'}${article.pathname}`;
 
