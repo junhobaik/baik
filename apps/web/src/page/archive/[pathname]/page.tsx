@@ -10,6 +10,7 @@ import { type Session } from 'next-auth';
 
 import api from '@/api';
 import { auth } from '@/auth';
+import { variables } from '@/configs';
 import { markdownToPlainText } from '@/utils';
 
 import ArticleScreen from './components/Screen';
@@ -52,7 +53,15 @@ const ArchiveArticlePage = async ({ params }: { params: { pathname: string } }) 
     dateModified: new Date(article.updated_date).toISOString(),
     author: {
       '@type': 'Person',
-      name: 'Junho Baik',
+      name: variables.MY_NAME,
+      url: variables.SITE_URL,
+      image: variables.MY_PROFILE_IMG_URL,
+    },
+    publisher: {
+      '@type': 'Person',
+      name: variables.MY_NAME,
+      url: variables.SITE_URL,
+      image: variables.MY_PROFILE_IMG_URL,
     },
     keywords: article.keywords || [],
     image: article.thumbnail_img_url || '',

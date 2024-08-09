@@ -60,15 +60,14 @@ const ArchivePage = async () => {
     author: {
       '@type': 'Person',
       name: variables.MY_NAME,
+      url: variables.SITE_URL,
+      image: variables.MY_PROFILE_IMG_URL,
     },
     publisher: {
       '@type': 'Person',
       name: variables.MY_NAME,
       url: variables.SITE_URL,
-      image: {
-        '@type': 'ImageObject',
-        url: variables.MY_PROFILE_IMG_URL,
-      },
+      image: variables.MY_PROFILE_IMG_URL,
     },
     blogPost: articles
       .map((article) => {
