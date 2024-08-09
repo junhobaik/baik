@@ -53,10 +53,11 @@ export const generateMetadata = async ({ params }: Props): Promise<Metadata> => 
   };
 
   return {
+    metadataBase: new URL(alternateUrls[lang]),
     title: title.default ? `${title.default}${variables.SITE_TITLE_SUFFIX}` : variables.SITE_TITLE,
     description: description.default || content.default.slice(0, 140) || '',
     alternates: {
-      canonical: alternateUrls[lang as 'en' | 'ko'],
+      canonical: alternateUrls[lang],
       languages: {
         'en-US': alternateUrls.en,
         'ko-KR': alternateUrls.ko,
@@ -69,7 +70,7 @@ export const generateMetadata = async ({ params }: Props): Promise<Metadata> => 
         absolute: title.default ? `${title.default}${variables.SITE_TITLE_SUFFIX}` : variables.SITE_TITLE,
       },
       description: description.default || content.default.slice(0, 140) || '',
-      url: alternateUrls[lang as 'en' | 'ko'],
+      url: alternateUrls[lang],
       siteName: variables.SITE_TITLE,
       images: item?.thumbnail_img_url ? [{ url: item.thumbnail_img_url }] : [],
       locale: lang === 'en' ? 'en_US' : 'ko_KR',
