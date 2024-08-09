@@ -5,7 +5,7 @@ export const SITE_URL = process.env.NODE_ENV === 'production' ? SITE_URL_PRD : S
 
 export const ARCHIVE_URL_PRD = 'https://baik.dev/archive';
 export const ARCHIVE_URL_DEV = 'http://localhost:3000/archive';
-export const ARCHIVE_URL = process.env.NODE_ENV === 'production' ? SITE_URL_PRD : SITE_URL_DEV;
+export const ARCHIVE_URL = process.env.NODE_ENV === 'production' ? ARCHIVE_URL_PRD : ARCHIVE_URL_DEV;
 export const ARCHIVE_URL_EN = ARCHIVE_URL + '/en';
 
 export const BASE_URL_PRD = 'https://bx7cbjmv1k.execute-api.ap-northeast-2.amazonaws.com/dev';
